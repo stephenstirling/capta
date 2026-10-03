@@ -21,6 +21,8 @@ public partial class App : Application
     private ToolbarWindow? _toolbar;
     private CaptureCoordinator? _capture;
     private readonly GraphicsCaptureSource _screenSource = new();
+    private CaptureCardWindow? _card;
+    private readonly List<PinWindow> _pins = [];
 
     public static new App? Current => (App?)Application.Current;
 
@@ -87,6 +89,7 @@ public partial class App : Application
     public async void StartCapture(CaptureMode mode)
     {
         _toolbar?.Hide();
+        _card?.Hide();
         try
         {
             await _capture!.RunAsync(mode);
@@ -98,17 +101,32 @@ public partial class App : Application
         }
     }
 
-    private async void OnCaptured(CapturedImage image)
+    private async void OnCaptured(CaptureResult result)
     {
         try
         {
-            await ImageExport.CopyToClipboardAsync(image);
+            await ImageExport.CopyToClipboardAsync(result.Image);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Clipboard failed: {ex}");
             _tray?.ShowError("Couldn't copy to the clipboard", ex.Message);
         }
+
+        if (_card is null)
+        {
+            _card = new CaptureCardWindow();
+            _card.PinRequested += Pin;
+        }
+        _card.Show(result);
+    }
+
+    private async void Pin(CaptureResult result)
+    {
+        var pin = new PinWindow(result);
+        _pins.Add(pin);
+        pin.Closed += (_, _) => _pins.Remove(pin);
+        await pin.ShowAsync();
     }
 
     private void OnPrintScreenOwnershipChanged(bool windowsOwnsKey)
@@ -140,6 +158,8 @@ public partial class App : Application
         _ownership?.Dispose();
         _notice?.Close();
         _toolbar?.Close();
+        _card?.Close();
+        foreach (var pin in _pins.ToArray()) pin.Close();
         _tray?.Dispose();
         _tray = null;
         _screenSource.Dispose();

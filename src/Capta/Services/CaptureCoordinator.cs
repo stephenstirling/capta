@@ -1,6 +1,7 @@
 using Capta.Capture;
 using Capta.Interop;
 using Capta.Overlay;
+using Windows.Graphics;
 
 namespace Capta.Services;
 
@@ -13,7 +14,7 @@ public sealed class CaptureCoordinator
     public CaptureCoordinator(IScreenSource source) => _source = source;
 
     /// <summary>Raised on the UI thread with each finished capture.</summary>
-    public event Action<CapturedImage>? Captured;
+    public event Action<CaptureResult>? Captured;
 
     public async Task RunAsync(CaptureMode mode)
     {
@@ -21,11 +22,11 @@ public sealed class CaptureCoordinator
         _busy = true;
         try
         {
-            var image = mode == CaptureMode.FullScreen
-                ? await _source.CaptureMonitorAsync(Monitors.AtPoint(WindowHelper.CursorPosition()))
+            var result = mode == CaptureMode.FullScreen
+                ? await CaptureFullScreenAsync()
                 : await SelectAsync(mode);
-            if (image is not null)
-                Captured?.Invoke(image);
+            if (result is not null)
+                Captured?.Invoke(result);
         }
         finally
         {
@@ -33,18 +34,36 @@ public sealed class CaptureCoordinator
         }
     }
 
-    private async Task<CapturedImage?> SelectAsync(CaptureMode mode)
+    private async Task<CaptureResult> CaptureFullScreenAsync()
+    {
+        var monitor = Monitors.AtPoint(WindowHelper.CursorPosition());
+        return new CaptureResult(await _source.CaptureMonitorAsync(monitor), monitor, monitor.Bounds);
+    }
+
+    private async Task<CaptureResult?> SelectAsync(CaptureMode mode)
     {
         var monitors = Monitors.All();
         // Freeze every monitor first; the overlay draws on top of these frames.
         var frames = await Task.WhenAll(monitors.Select(_source.CaptureMonitorAsync));
 
-        return await OverlaySession.RunAsync(mode, monitors, frames) switch
+        switch (await OverlaySession.RunAsync(mode, monitors, frames))
         {
-            OverlayResult.RegionSelected r => r.Frame.Crop(r.Rect),
-            // Live capture: gets the whole window even where it was occluded or off-monitor.
-            OverlayResult.WindowSelected w => await _source.CaptureWindowAsync(w.Target.Handle),
-            _ => null,
-        };
+            case OverlayResult.RegionSelected r:
+            {
+                var b = r.Monitor.Bounds;
+                var screen = new RectInt32(b.X + r.Rect.X, b.Y + r.Rect.Y, r.Rect.Width, r.Rect.Height);
+                return new CaptureResult(r.Frame.Crop(r.Rect), r.Monitor, screen);
+            }
+            case OverlayResult.WindowSelected w:
+            {
+                // Live capture: gets the whole window even where it was occluded or off-monitor.
+                var image = await _source.CaptureWindowAsync(w.Target.Handle);
+                var b = w.Target.Bounds;
+                var monitor = Monitors.AtPoint(new PointInt32(b.X + b.Width / 2, b.Y + b.Height / 2));
+                return new CaptureResult(image, monitor, new RectInt32(b.X, b.Y, image.Width, image.Height));
+            }
+            default:
+                return null;
+        }
     }
 }
