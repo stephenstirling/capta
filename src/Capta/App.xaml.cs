@@ -20,6 +20,7 @@ public partial class App : Application
     private PrintScreenNoticeWindow? _notice;
     private ToolbarWindow? _toolbar;
     private CaptureCoordinator? _capture;
+    private readonly GraphicsCaptureSource _screenSource = new();
 
     public static new App? Current => (App?)Application.Current;
 
@@ -35,7 +36,7 @@ public partial class App : Application
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         // Start hidden, whether launched by the startup task or from Start.
-        _capture = new CaptureCoordinator(new GdiScreenSource());
+        _capture = new CaptureCoordinator(_screenSource);
         _capture.Captured += OnCaptured;
 
         _tray = new TrayIconService(this);
@@ -97,9 +98,17 @@ public partial class App : Application
         }
     }
 
-    private void OnCaptured(CapturedImage image)
+    private async void OnCaptured(CapturedImage image)
     {
-        Debug.WriteLine($"Captured {image.Width}x{image.Height}");
+        try
+        {
+            await ImageExport.CopyToClipboardAsync(image);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Clipboard failed: {ex}");
+            _tray?.ShowError("Couldn't copy to the clipboard", ex.Message);
+        }
     }
 
     private void OnPrintScreenOwnershipChanged(bool windowsOwnsKey)
@@ -133,6 +142,7 @@ public partial class App : Application
         _toolbar?.Close();
         _tray?.Dispose();
         _tray = null;
+        _screenSource.Dispose();
         Exit();
     }
 }

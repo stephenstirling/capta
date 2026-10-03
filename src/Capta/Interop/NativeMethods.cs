@@ -56,6 +56,11 @@ internal static partial class NativeMethods
         nint hEvent,
         [MarshalAs(UnmanagedType.Bool)] bool fAsynchronous);
 
+    public const uint MONITOR_DEFAULTTONEAREST = 2;
+
+    [LibraryImport("user32.dll")]
+    public static partial nint MonitorFromWindow(nint hwnd, uint dwFlags);
+
     public static bool IsKeyDown(int vk) => (GetAsyncKeyState(vk) & 0x8000) != 0;
 
     // ---- Windows / DWM ----

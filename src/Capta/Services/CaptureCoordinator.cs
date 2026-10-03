@@ -36,23 +36,15 @@ public sealed class CaptureCoordinator
     private async Task<CapturedImage?> SelectAsync(CaptureMode mode)
     {
         var monitors = Monitors.All();
+        // Freeze every monitor first; the overlay draws on top of these frames.
         var frames = await Task.WhenAll(monitors.Select(_source.CaptureMonitorAsync));
 
         return await OverlaySession.RunAsync(mode, monitors, frames) switch
         {
             OverlayResult.RegionSelected r => r.Frame.Crop(r.Rect),
-            OverlayResult.WindowSelected w => await CaptureWindowAsync(w.Target, monitors, frames),
+            // Live capture: gets the whole window even where it was occluded or off-monitor.
+            OverlayResult.WindowSelected w => await _source.CaptureWindowAsync(w.Target.Handle),
             _ => null,
         };
-    }
-
-    private Task<CapturedImage> CaptureWindowAsync(WindowTarget target, IReadOnlyList<MonitorInfo> monitors, CapturedImage[] frames)
-    {
-        // Interim: crop the window's frame out of the frozen monitor image.
-        var cx = target.Bounds.X + target.Bounds.Width / 2;
-        var cy = target.Bounds.Y + target.Bounds.Height / 2;
-        var i = Math.Max(0, monitors.ToList().FindIndex(m => m.Contains(new(cx, cy))));
-        var b = monitors[i].Bounds;
-        return Task.FromResult(frames[i].Crop(new(target.Bounds.X - b.X, target.Bounds.Y - b.Y, target.Bounds.Width, target.Bounds.Height)));
     }
 }
