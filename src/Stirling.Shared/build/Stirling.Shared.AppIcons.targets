@@ -1,0 +1,18 @@
+<Project>
+  <!--
+    Import from an app project after setting StirlingIconSet, e.g.
+
+      <PropertyGroup><StirlingIconSet>Capta</StirlingIconSet></PropertyGroup>
+      <Import Project="..\Stirling.Shared\build\Stirling.Shared.AppIcons.targets" />
+
+    Links Assets/<IconSet>/* into the app's Assets folder so Package.appxmanifest
+    can reference Assets\Square44x44Logo.png etc., and sets ApplicationIcon.
+  -->
+  <PropertyGroup>
+    <StirlingIconDir>$(MSBuildThisFileDirectory)..\Assets\$(StirlingIconSet)\</StirlingIconDir>
+    <ApplicationIcon Condition="'$(ApplicationIcon)' == ''">$(StirlingIconDir)$(StirlingIconSet).ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(StirlingIconDir)*.png;$(StirlingIconDir)*.ico" Link="Assets\%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

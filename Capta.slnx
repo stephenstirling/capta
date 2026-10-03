@@ -1,0 +1,28 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+    <Platform Name="ARM64" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/Capta/Capta.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Deploy />
+    </Project>
+    <Project Path="src/Stirling.Shared/Stirling.Shared.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+      <Platform Solution="*|ARM64" Project="ARM64" />
+    </Project>
+  </Folder>
+  <Folder Name="/tools/">
+    <File Path="tools/generate_icons.py" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+</Solution>
