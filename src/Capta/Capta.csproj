@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Capta</RootNamespace>
+    <AssemblyName>Capta</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Program.cs owns Main so we can enforce a single instance before XAML starts. -->
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+    <StirlingIconSet>Capta</StirlingIconSet>
+    <ApplicationIcon>..\Stirling.Shared\Assets\Capta\Capta.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <Import Project="..\Stirling.Shared\build\Stirling.Shared.AppIcons.targets" />
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+    <ProjectCapability Include="Msix" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+    <PackageReference Include="H.NotifyIcon.WinUI" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Stirling.Shared\Stirling.Shared.csproj" />
+  </ItemGroup>
+
+  <!-- Enables the Package and Publish context menu in Visual Studio Solution Explorer. -->
+  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishReadyToRun>true</PublishReadyToRun>
+  </PropertyGroup>
+</Project>

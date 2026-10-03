@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Capta (Package)": {
+      "commandName": "MsixPackage"
+    }
+  }
+}
