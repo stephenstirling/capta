@@ -1,5 +1,6 @@
 using H.NotifyIcon;
 using H.NotifyIcon.Core;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -14,6 +15,8 @@ public sealed class TrayIconService : IDisposable
     private readonly App _app;
     private TaskbarIcon? _icon;
     private ToggleMenuFlyoutItem? _startupItem;
+    private MenuFlyoutItem? _printScreenWarning;
+    private MenuFlyoutSeparator? _printScreenWarningSeparator;
 
     public TrayIconService(App app) => _app = app;
 
@@ -25,7 +28,19 @@ public sealed class TrayIconService : IDisposable
         var exit = new MenuFlyoutItem { Text = "Exit", Icon = new SymbolIcon(Symbol.Cancel) };
         exit.Click += (_, _) => _app.Quit();
 
-        var menu = new MenuFlyout { Items = { _startupItem, new MenuFlyoutSeparator(), exit } };
+        _printScreenWarning = new MenuFlyoutItem
+        {
+            Text = "Print Screen opens Snipping Tool: fix…",
+            Icon = new FontIcon { Glyph = "" },
+            Visibility = Visibility.Collapsed,
+        };
+        _printScreenWarning.Click += (_, _) => _app.ShowPrintScreenNotice();
+        _printScreenWarningSeparator = new MenuFlyoutSeparator { Visibility = Visibility.Collapsed };
+
+        var menu = new MenuFlyout
+        {
+            Items = { _printScreenWarning, _printScreenWarningSeparator, _startupItem, new MenuFlyoutSeparator(), exit },
+        };
         menu.Opening += async (_, _) => await RefreshStartupStateAsync();
 
         _icon = new TaskbarIcon
@@ -62,6 +77,15 @@ public sealed class TrayIconService : IDisposable
             await StartupTaskService.SetEnabledAsync(!StartupTaskService.IsEnabled(current));
         }
         await RefreshStartupStateAsync();
+    }
+
+    public void SetPrintScreenWarning(bool windowsOwnsKey)
+    {
+        var v = windowsOwnsKey ? Visibility.Visible : Visibility.Collapsed;
+        if (_printScreenWarning is not null) _printScreenWarning.Visibility = v;
+        if (_printScreenWarningSeparator is not null) _printScreenWarningSeparator.Visibility = v;
+        if (_icon is not null)
+            _icon.ToolTipText = windowsOwnsKey ? "Capta: Print Screen is still used by Windows" : "Capta";
     }
 
     public void ShowWelcomeNotification() =>
