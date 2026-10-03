@@ -1,11 +1,11 @@
 using H.NotifyIcon;
 using H.NotifyIcon.Core;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.ApplicationModel;
 using Windows.System;
+using DispatcherQueuePriority = Microsoft.UI.Dispatching.DispatcherQueuePriority;
 
 namespace Capta.Services;
 
@@ -39,7 +39,15 @@ public sealed class TrayIconService : IDisposable
 
         var menu = new MenuFlyout
         {
-            Items = { _printScreenWarning, _printScreenWarningSeparator, _startupItem, new MenuFlyoutSeparator(), exit },
+            Items =
+            {
+                _printScreenWarning, _printScreenWarningSeparator,
+                CaptureItem("Region", "", "PrtSc", CaptureMode.Region),
+                CaptureItem("Window", "", "Shift+PrtSc", CaptureMode.Window),
+                CaptureItem("Full screen", "", "Ctrl+PrtSc", CaptureMode.FullScreen),
+                new MenuFlyoutSeparator(),
+                _startupItem, new MenuFlyoutSeparator(), exit,
+            },
         };
         menu.Opening += async (_, _) => await RefreshStartupStateAsync();
 
@@ -50,8 +58,22 @@ public sealed class TrayIconService : IDisposable
             ContextMenuMode = ContextMenuMode.SecondWindow,
             NoLeftClickDelay = true,
             ContextFlyout = menu,
+            LeftClickCommand = new RelayCommand(_app.ShowToolbar),
         };
         _icon.ForceCreate(enablesEfficiencyMode: false);
+    }
+
+    private MenuFlyoutItem CaptureItem(string text, string glyph, string shortcut, CaptureMode mode)
+    {
+        var item = new MenuFlyoutItem
+        {
+            Text = text,
+            Icon = new FontIcon { Glyph = glyph },
+            KeyboardAcceleratorTextOverride = shortcut,
+        };
+        // Let the menu window close before the overlay freezes the screen.
+        item.Click += (_, _) => _app.Dispatcher.TryEnqueue(DispatcherQueuePriority.Low, () => _app.StartCapture(mode));
+        return item;
     }
 
     public async Task RefreshStartupStateAsync()
@@ -88,8 +110,15 @@ public sealed class TrayIconService : IDisposable
             _icon.ToolTipText = windowsOwnsKey ? "Capta: Print Screen is still used by Windows" : "Capta";
     }
 
-    public void ShowWelcomeNotification() =>
-        _icon?.ShowNotification("Capta is running", "Find Capta in the notification area.", NotificationIcon.None);
+    public void ShowError(string title, string message) =>
+        _icon?.ShowNotification(title, message, NotificationIcon.Error);
+
+    private sealed class RelayCommand(Action action) : System.Windows.Input.ICommand
+    {
+        public event EventHandler? CanExecuteChanged { add { } remove { } }
+        public bool CanExecute(object? parameter) => true;
+        public void Execute(object? parameter) => action();
+    }
 
     public void Dispose()
     {

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Capta.Capture;
 using Capta.Interop;
 using Capta.Services;
 using Capta.Views;
@@ -17,6 +18,8 @@ public partial class App : Application
     private PrintScreenHook? _hook;
     private PrintScreenOwnership? _ownership;
     private PrintScreenNoticeWindow? _notice;
+    private ToolbarWindow? _toolbar;
+    private CaptureCoordinator? _capture;
 
     public static new App? Current => (App?)Application.Current;
 
@@ -32,6 +35,9 @@ public partial class App : Application
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         // Start hidden, whether launched by the startup task or from Start.
+        _capture = new CaptureCoordinator(new GdiScreenSource());
+        _capture.Captured += OnCaptured;
+
         _tray = new TrayIconService(this);
         _tray.Create();
 
@@ -58,7 +64,42 @@ public partial class App : Application
 
     private void OnHotkey(HotkeyAction action)
     {
-        Debug.WriteLine($"Capta hotkey: {action}");
+        switch (action)
+        {
+            case HotkeyAction.ShowToolbar: ShowToolbar(); break;
+            case HotkeyAction.Region: StartCapture(CaptureMode.Region); break;
+            case HotkeyAction.Window: StartCapture(CaptureMode.Window); break;
+            case HotkeyAction.FullScreen: StartCapture(CaptureMode.FullScreen); break;
+        }
+    }
+
+    public void ShowToolbar()
+    {
+        if (_toolbar is null)
+        {
+            _toolbar = new ToolbarWindow();
+            _toolbar.ModeChosen += StartCapture;
+        }
+        _toolbar.ShowOnCursorMonitor();
+    }
+
+    public async void StartCapture(CaptureMode mode)
+    {
+        _toolbar?.Hide();
+        try
+        {
+            await _capture!.RunAsync(mode);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Capture failed: {ex}");
+            _tray?.ShowError("Capture failed", ex.Message);
+        }
+    }
+
+    private void OnCaptured(CapturedImage image)
+    {
+        Debug.WriteLine($"Captured {image.Width}x{image.Height}");
     }
 
     private void OnPrintScreenOwnershipChanged(bool windowsOwnsKey)
@@ -81,7 +122,7 @@ public partial class App : Application
     /// <summary>Called on a background thread when a second instance redirects to us.</summary>
     internal void OnRedirectedActivation(AppActivationArguments args)
     {
-        Dispatcher.TryEnqueue(() => _tray?.ShowWelcomeNotification());
+        Dispatcher.TryEnqueue(ShowToolbar);
     }
 
     public void Quit()
@@ -89,6 +130,7 @@ public partial class App : Application
         _hook?.Dispose();
         _ownership?.Dispose();
         _notice?.Close();
+        _toolbar?.Close();
         _tray?.Dispose();
         _tray = null;
         Exit();
