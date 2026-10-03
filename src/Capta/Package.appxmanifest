@@ -43,7 +43,7 @@
       <Extensions>
         <uap5:Extension
           Category="windows.startupTask"
-          Executable="$targetnametoken$.exe"
+          Executable="Capta.exe"
           EntryPoint="Windows.FullTrustApplication">
           <uap5:StartupTask TaskId="CaptaStartup" Enabled="true" DisplayName="Capta" />
         </uap5:Extension>
