@@ -29,6 +29,20 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
         return ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)));
     }
 
+    /// <summary>Whether the monitor is currently showing HDR (captures will be tone-mapped).</summary>
+    public static bool IsHdr(nint hmonitor)
+    {
+        try
+        {
+            return WinRTInterop.GetDisplayInformation(hmonitor).GetAdvancedColorInfo().CurrentAdvancedColorKind
+                == Windows.Graphics.Display.AdvancedColorKind.HighDynamicRange;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     /// <summary>SDR white in nits for the monitor; 80 (scRGB reference) when unknown or SDR.</summary>
     private static float SdrWhiteLevel(nint hmonitor)
     {

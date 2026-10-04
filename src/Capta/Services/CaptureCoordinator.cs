@@ -18,7 +18,11 @@ public sealed class CaptureCoordinator
 
     public async Task RunAsync(CaptureMode mode)
     {
-        if (_busy) return;
+        if (_busy)
+        {
+            Log.Info("Capture ignored: one is already running");
+            return;
+        }
         _busy = true;
         try
         {
@@ -62,7 +66,10 @@ public sealed class CaptureCoordinator
         // Freeze every monitor first; the overlay draws on top of these frames.
         var frames = await Task.WhenAll(monitors.Select(_source.CaptureMonitorAsync));
 
-        switch (await OverlaySession.RunAsync(mode, monitors, frames))
+        Log.Info($"Froze {frames.Length} monitor(s); showing overlay");
+        var selection = await OverlaySession.RunAsync(mode, monitors, frames);
+        Log.Info($"Overlay result: {selection.GetType().Name}");
+        switch (selection)
         {
             case OverlayResult.RegionSelected r:
             {

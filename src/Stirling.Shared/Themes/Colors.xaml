@@ -62,6 +62,22 @@
             <SolidColorBrush x:Key="CaptaLensBrush" Color="{StaticResource CaptaLensColor}" />
             <SolidColorBrush x:Key="CaptaScrimBrush" Color="{StaticResource CaptaScrimColor}" />
 
+            <!-- Floating toolbar and card: rgba(24,27,32,0.96), from mockups/Toolbar.html -->
+            <Color x:Key="CaptaFloatingSurfaceColor">#F5181B20</Color>
+            <SolidColorBrush x:Key="CaptaFloatingSurfaceBrush" Color="{StaticResource CaptaFloatingSurfaceColor}" />
+            <Color x:Key="CaptaFloatingBorderColor">#343A44</Color>
+            <SolidColorBrush x:Key="CaptaFloatingBorderBrush" Color="{StaticResource CaptaFloatingBorderColor}" />
+            <Color x:Key="CaptaFloatingTextColor">#D7DBE0</Color>
+            <SolidColorBrush x:Key="CaptaFloatingTextBrush" Color="{StaticResource CaptaFloatingTextColor}" />
+            <Color x:Key="CaptaDividerColor">#3A404A</Color>
+            <SolidColorBrush x:Key="CaptaDividerBrush" Color="{StaticResource CaptaDividerColor}" />
+            <Color x:Key="CaptaTextFaintColor">#6B7380</Color>
+            <SolidColorBrush x:Key="CaptaTextFaintBrush" Color="{StaticResource CaptaTextFaintColor}" />
+            <!-- Icon-button hover: rgba(255,255,255,0.08) -->
+            <Color x:Key="CaptaHoverOverlayColor">#14FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaHoverOverlayBrush" Color="{StaticResource CaptaHoverOverlayColor}" />
+            <Color x:Key="CaptaPressedOverlayColor">#0AFFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaPressedOverlayBrush" Color="{StaticResource CaptaPressedOverlayColor}" />
             <!-- Fluent control overrides, mapped onto the tokens above. -->
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
@@ -71,6 +87,9 @@
             <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="{StaticResource CaptaAccentTextColor}" Opacity="0.8" />
             <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="{StaticResource CaptaOnAccentColor}" />
             <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="{StaticResource CaptaOnAccentColor}" Opacity="0.7" />
+            <StaticResource x:Key="AccentButtonForeground" ResourceKey="CaptaOnAccentBrush" />
+            <StaticResource x:Key="AccentButtonForegroundPointerOver" ResourceKey="CaptaOnAccentBrush" />
+            <StaticResource x:Key="AccentButtonForegroundPressed" ResourceKey="CaptaOnAccentBrush" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -119,6 +138,20 @@
             <SolidColorBrush x:Key="CaptaLensBrush" Color="{StaticResource CaptaLensColor}" />
             <SolidColorBrush x:Key="CaptaScrimBrush" Color="{StaticResource CaptaScrimColor}" />
 
+            <Color x:Key="CaptaFloatingSurfaceColor">#F5FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaFloatingSurfaceBrush" Color="{StaticResource CaptaFloatingSurfaceColor}" />
+            <Color x:Key="CaptaFloatingBorderColor">#D9DCE1</Color>
+            <SolidColorBrush x:Key="CaptaFloatingBorderBrush" Color="{StaticResource CaptaFloatingBorderColor}" />
+            <Color x:Key="CaptaFloatingTextColor">#3F4650</Color>
+            <SolidColorBrush x:Key="CaptaFloatingTextBrush" Color="{StaticResource CaptaFloatingTextColor}" />
+            <Color x:Key="CaptaDividerColor">#D9DCE1</Color>
+            <SolidColorBrush x:Key="CaptaDividerBrush" Color="{StaticResource CaptaDividerColor}" />
+            <Color x:Key="CaptaTextFaintColor">#9AA1AC</Color>
+            <SolidColorBrush x:Key="CaptaTextFaintBrush" Color="{StaticResource CaptaTextFaintColor}" />
+            <Color x:Key="CaptaHoverOverlayColor">#0F000000</Color>
+            <SolidColorBrush x:Key="CaptaHoverOverlayBrush" Color="{StaticResource CaptaHoverOverlayColor}" />
+            <Color x:Key="CaptaPressedOverlayColor">#08000000</Color>
+            <SolidColorBrush x:Key="CaptaPressedOverlayBrush" Color="{StaticResource CaptaPressedOverlayColor}" />
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
             <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
@@ -127,6 +160,9 @@
             <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="{StaticResource CaptaAccentTextColor}" Opacity="0.8" />
             <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="{StaticResource CaptaOnAccentColor}" />
             <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="{StaticResource CaptaOnAccentColor}" Opacity="0.7" />
+            <StaticResource x:Key="AccentButtonForeground" ResourceKey="CaptaOnAccentBrush" />
+            <StaticResource x:Key="AccentButtonForegroundPointerOver" ResourceKey="CaptaOnAccentBrush" />
+            <StaticResource x:Key="AccentButtonForegroundPressed" ResourceKey="CaptaOnAccentBrush" />
         </ResourceDictionary>
 
         <!-- Not in the design: High Contrast maps the tokens to system colours. -->
@@ -152,18 +188,30 @@
             <SolidColorBrush x:Key="CaptaWarningSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="CaptaLensBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="CaptaScrimBrush" Color="#99000000" />
-        </ResourceDictionary>
+                    <SolidColorBrush x:Key="CaptaFloatingSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaFloatingBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaFloatingTextBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaDividerBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaTextFaintBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
+            <SolidColorBrush x:Key="CaptaHoverOverlayBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaPressedOverlayBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+</ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>
 
-    <!-- WinUI accent ramp. Only SystemAccentColor is from the design; the steps are derived. -->
+    <!--
+        WinUI accent ramp. Fluent's own styles resolve the accent through these keys, so they
+        are what makes stock controls follow the design. Dark theme uses the Light steps and
+        light theme uses the Dark steps: fills are amber in both (DESIGN.md), and accent text
+        in light theme uses CaptaAccentTextColor (#8C6427).
+    -->
     <Color x:Key="SystemAccentColor">#FFB547</Color>
-    <Color x:Key="SystemAccentColorLight1">#FFC46D</Color>
-    <Color x:Key="SystemAccentColorLight2">#FFD393</Color>
-    <Color x:Key="SystemAccentColorLight3">#FFE3BC</Color>
-    <Color x:Key="SystemAccentColorDark1">#E09A2E</Color>
-    <Color x:Key="SystemAccentColorDark2">#B0741A</Color>
-    <Color x:Key="SystemAccentColorDark3">#7F520C</Color>
+    <Color x:Key="SystemAccentColorLight1">#FFB547</Color>
+    <Color x:Key="SystemAccentColorLight2">#FFB547</Color>
+    <Color x:Key="SystemAccentColorLight3">#FFB547</Color>
+    <Color x:Key="SystemAccentColorDark1">#FFB547</Color>
+    <Color x:Key="SystemAccentColorDark2">#8C6427</Color>
+    <Color x:Key="SystemAccentColorDark3">#8C6427</Color>
 
     <!-- Shape and size tokens -->
     <CornerRadius x:Key="CaptaRadiusWindow">14</CornerRadius>

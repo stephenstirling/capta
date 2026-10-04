@@ -54,12 +54,12 @@ public sealed partial class CaptureCardWindow : Window
         _timer.Tick += (_, _) => Hide();
     }
 
-    public async void Show(CaptureResult result)
+    public async void Show(CaptureResult result, bool copied)
     {
         _current = result;
         var image = result.Image;
         SizeText.Text = $"{image.Width} × {image.Height}";
-        SetStatus("", "Copied to clipboard");
+        SetStatus("", copied ? "Copied to clipboard" : "Capture ready");
 
         var source = new SoftwareBitmapSource();
         await source.SetBitmapAsync(image.ToSoftwareBitmap());

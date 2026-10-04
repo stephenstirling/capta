@@ -89,6 +89,8 @@ internal static partial class NativeMethods
     public const int DWMWA_CLOAKED = 14;
     public const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
     public const int DWMWCP_DONOTROUND = 1;
+    public const int DWMWA_BORDER_COLOR = 34;
+    public const uint DWMWA_COLOR_NONE = 0xFFFFFFFE;
 
     public const uint WDA_EXCLUDEFROMCAPTURE = 0x11;
 

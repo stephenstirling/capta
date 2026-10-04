@@ -84,17 +84,22 @@ public partial class App : Application
         if (_toolbar is null)
         {
             _toolbar = new ToolbarWindow();
-            _toolbar.ModeChosen += StartCapture;
+            _toolbar.CaptureRequested += StartCapture;
         }
         _toolbar.ShowOnCursorMonitor();
     }
 
-    public async void StartCapture(CaptureMode mode)
+    public void StartCapture(CaptureMode mode) => StartCapture(mode, 0);
+
+    public async void StartCapture(CaptureMode mode, int delaySeconds)
     {
+        Log.Info($"Capture requested: {mode}, delay {delaySeconds}s");
         _toolbar?.Hide();
         _card?.Hide();
         try
         {
+            if (delaySeconds > 0)
+                await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
             await _capture!.RunAsync(mode);
         }
         catch (Exception ex)
@@ -106,10 +111,15 @@ public partial class App : Application
 
     private async void OnCaptured(CaptureResult result)
     {
+        var copied = false;
         try
         {
-            await ImageExport.CopyToClipboardAsync(result.Image);
-            Log.Info($"Captured {result.Image.Width}x{result.Image.Height}, copied to clipboard");
+            if (Settings.AutoCopy)
+            {
+                await ImageExport.CopyToClipboardAsync(result.Image);
+                copied = true;
+            }
+            Log.Info($"Captured {result.Image.Width}x{result.Image.Height}, copied: {copied}");
         }
         catch (Exception ex)
         {
@@ -122,7 +132,7 @@ public partial class App : Application
             _card = new CaptureCardWindow();
             _card.PinRequested += Pin;
         }
-        _card.Show(result);
+        _card.Show(result, copied);
     }
 
     private async void Pin(CaptureResult result)

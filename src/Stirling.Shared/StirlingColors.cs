@@ -17,6 +17,12 @@ public static class StirlingColors
     /// <summary>CaptaOnAccentColor: text and icons drawn on the accent.</summary>
     public static readonly Color OnAccent = Color.FromArgb(0xFF, 0x1A, 0x12, 0x06);
 
+    /// <summary>
+    /// Drop-shadow colour. The mockups use black, but pure black is see-through in the
+    /// "sheet of glass" transparent windows, so this is a near-black that survives.
+    /// </summary>
+    public static readonly Color Shadow = Color.FromArgb(0xFF, 0x1A, 0x1B, 0x1F);
+
     /// <summary>Pack URI for merging the theme into an app's resources.</summary>
     public const string ThemeUri = "ms-appx:///Stirling.Shared/Themes/Colors.xaml";
 }
