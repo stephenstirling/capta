@@ -83,7 +83,7 @@
                     <TextBlock Text="Copy" FontSize="12" HorizontalAlignment="Center" />
                 </StackPanel>
             </Button>
-            <Button Grid.Column="1" Style="{StaticResource CardButton}" Click="OnEdit" ToolTipService.ToolTip="Edit in Ocula">
+            <Button Grid.Column="1" Style="{StaticResource CardButton}" Click="OnEdit" ToolTipService.ToolTip="Edit">
                 <StackPanel Spacing="2">
                     <FontIcon Glyph="&#xE70F;" FontSize="16" />
                     <TextBlock Text="Edit" FontSize="12" HorizontalAlignment="Center" />
