@@ -22,9 +22,12 @@ public sealed class CaptureCoordinator
         _busy = true;
         try
         {
-            var result = mode == CaptureMode.FullScreen
-                ? await CaptureFullScreenAsync()
-                : await SelectAsync(mode);
+            var result = mode switch
+            {
+                CaptureMode.FullScreen => await CaptureFullScreenAsync(),
+                CaptureMode.ActiveWindow => await CaptureActiveWindowAsync(),
+                _ => await SelectAsync(mode),
+            };
             if (result is not null)
                 Captured?.Invoke(result);
         }
@@ -38,6 +41,19 @@ public sealed class CaptureCoordinator
     {
         var monitor = Monitors.AtPoint(WindowHelper.CursorPosition());
         return new CaptureResult(await _source.CaptureMonitorAsync(monitor), monitor, monitor.Bounds);
+    }
+
+    /// <summary>The foreground window, captured live; falls back to full screen over the desktop or shell.</summary>
+    private async Task<CaptureResult> CaptureActiveWindowAsync()
+    {
+        var target = WindowFinder.Foreground();
+        if (target is null)
+            return await CaptureFullScreenAsync();
+
+        var image = await _source.CaptureWindowAsync(target.Handle);
+        var b = target.Bounds;
+        var monitor = Monitors.AtPoint(new PointInt32(b.X + b.Width / 2, b.Y + b.Height / 2));
+        return new CaptureResult(image, monitor, new RectInt32(b.X, b.Y, image.Width, image.Height));
     }
 
     private async Task<CaptureResult?> SelectAsync(CaptureMode mode)

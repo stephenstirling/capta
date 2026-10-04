@@ -3,6 +3,18 @@
 Fast, HDR-correct screen capture for Windows 11. Capta lives in the notification area,
 takes over the Print Screen key and copies captures to the clipboard as PNG.
 
+## Shortcuts
+
+| Keys | Action |
+| --- | --- |
+| PrtSc | Region capture |
+| Shift+PrtSc | Full screen, straight to the clipboard |
+| Alt+PrtSc | Active window |
+| Ctrl+PrtSc | Show the floating toolbar (will become Record video) |
+
+Win+PrtSc and Win+Shift+S stay with Windows. If Windows is set to open Snipping Tool on Print Screen,
+Capta shows how to turn that off in Settings.
+
 ## Requirements
 
 - Windows 11 22H2 (10.0.22621) or later

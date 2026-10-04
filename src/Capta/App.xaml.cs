@@ -72,10 +72,10 @@ public partial class App : Application
         Log.Info($"Hotkey: {action}");
         switch (action)
         {
-            case HotkeyAction.ShowToolbar: ShowToolbar(); break;
             case HotkeyAction.Region: StartCapture(CaptureMode.Region); break;
-            case HotkeyAction.Window: StartCapture(CaptureMode.Window); break;
             case HotkeyAction.FullScreen: StartCapture(CaptureMode.FullScreen); break;
+            case HotkeyAction.ActiveWindow: StartCapture(CaptureMode.ActiveWindow); break;
+            case HotkeyAction.ShowToolbar: ShowToolbar(); break;
         }
     }
 

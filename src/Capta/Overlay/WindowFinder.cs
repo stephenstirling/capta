@@ -48,6 +48,19 @@ public static class WindowFinder
         return result;
     }
 
+    /// <summary>The foreground top-level window, unless it's Capta's own, the desktop or the taskbar.</summary>
+    public static unsafe WindowTarget? Foreground()
+    {
+        var hwnd = GetAncestor(GetForegroundWindow(), GA_ROOT);
+        if (hwnd == 0 || !IsWindowVisible(hwnd) || IsIconic(hwnd)) return null;
+        GetWindowThreadProcessId(hwnd, out var pid);
+        if (pid == (uint)Environment.ProcessId || s_ignoredClasses.Contains(GetClassName(hwnd))) return null;
+
+        RECT r;
+        if (DwmGetWindowAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &r, sizeof(RECT)) != 0) return null;
+        return new WindowTarget(hwnd, new RectInt32(r.Left, r.Top, r.Width, r.Height));
+    }
+
     /// <summary>Topmost window whose frame contains <paramref name="p"/>.</summary>
     public static WindowTarget? HitTest(IReadOnlyList<WindowTarget> windows, PointInt32 p)
     {

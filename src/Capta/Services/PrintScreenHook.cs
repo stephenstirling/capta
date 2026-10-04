@@ -5,7 +5,7 @@ using static Capta.Interop.NativeMethods;
 namespace Capta.Services;
 
 /// <summary>
-/// Low-level keyboard hook that claims Print Screen and its Shift/Ctrl/Alt chords.
+/// Low-level keyboard hook that claims Print Screen and its Shift/Alt/Ctrl chords (see <see cref="HotkeyAction"/>).
 /// Win+PrtSc is left alone so the Windows "save screenshot" shortcut keeps working.
 /// </summary>
 /// <remarks>
@@ -65,9 +65,9 @@ public sealed class PrintScreenHook : IDisposable
         if (_swallowingKeyUp)
             return true;
 
-        var action = IsKeyDown(VK_MENU) ? HotkeyAction.ShowToolbar
-            : IsKeyDown(VK_CONTROL) ? HotkeyAction.FullScreen
-            : IsKeyDown(VK_SHIFT) ? HotkeyAction.Window
+        var action = IsKeyDown(VK_CONTROL) ? HotkeyAction.ShowToolbar
+            : IsKeyDown(VK_MENU) ? HotkeyAction.ActiveWindow
+            : IsKeyDown(VK_SHIFT) ? HotkeyAction.FullScreen
             : HotkeyAction.Region;
 
         _swallowingKeyUp = true;

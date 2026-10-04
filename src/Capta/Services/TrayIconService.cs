@@ -28,6 +28,14 @@ public sealed class TrayIconService : IDisposable
         var exit = new MenuFlyoutItem { Text = "Exit", Icon = new SymbolIcon(Symbol.Cancel) };
         exit.Click += (_, _) => _app.Quit();
 
+        var toolbar = new MenuFlyoutItem
+        {
+            Text = "Show toolbar",
+            Icon = new FontIcon { Glyph = "" },
+            KeyboardAcceleratorTextOverride = "Ctrl+PrtSc",
+        };
+        toolbar.Click += (_, _) => _app.ShowToolbar();
+
         _printScreenWarning = new MenuFlyoutItem
         {
             Text = "Print Screen opens Snipping Tool: fix…",
@@ -43,8 +51,9 @@ public sealed class TrayIconService : IDisposable
             {
                 _printScreenWarning, _printScreenWarningSeparator,
                 CaptureItem("Region", "", "PrtSc", CaptureMode.Region),
-                CaptureItem("Window", "", "Shift+PrtSc", CaptureMode.Window),
-                CaptureItem("Full screen", "", "Ctrl+PrtSc", CaptureMode.FullScreen),
+                CaptureItem("Window", "", "", CaptureMode.Window),
+                CaptureItem("Full screen", "", "Shift+PrtSc", CaptureMode.FullScreen),
+                toolbar,
                 new MenuFlyoutSeparator(),
                 _startupItem, new MenuFlyoutSeparator(), exit,
             },
@@ -69,7 +78,7 @@ public sealed class TrayIconService : IDisposable
         {
             Text = text,
             Icon = new FontIcon { Glyph = glyph },
-            KeyboardAcceleratorTextOverride = shortcut,
+            KeyboardAcceleratorTextOverride = shortcut, // display only; the hook owns the keys
         };
         // Let the menu window close before the overlay freezes the screen.
         item.Click += (_, _) => _app.Dispatcher.TryEnqueue(DispatcherQueuePriority.Low, () => _app.StartCapture(mode));

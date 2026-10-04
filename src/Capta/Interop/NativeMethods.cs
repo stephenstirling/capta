@@ -62,6 +62,9 @@ internal static partial class NativeMethods
     public static partial nint GetForegroundWindow();
 
     [LibraryImport("user32.dll")]
+    public static partial nint GetAncestor(nint hwnd, uint gaFlags);
+
+    [LibraryImport("user32.dll")]
     public static partial nint MonitorFromWindow(nint hwnd, uint dwFlags);
 
     public static bool IsKeyDown(int vk) => (GetAsyncKeyState(vk) & 0x8000) != 0;
