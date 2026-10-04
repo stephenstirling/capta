@@ -15,10 +15,16 @@ public static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            Capta.Services.Log.Error("Unhandled exception", e.ExceptionObject as Exception);
+        Capta.Services.Log.Info($"Starting (pid {Environment.ProcessId})");
         WinRT.ComWrappersSupport.InitializeComWrappers();
 
         if (RedirectToExistingInstance())
+        {
+            Capta.Services.Log.Info("Redirected activation to the running instance");
             return 0;
+        }
 
         Application.Start(p =>
         {

@@ -7,6 +7,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Foundation;
 using Windows.Graphics;
@@ -78,13 +79,14 @@ public sealed partial class OverlayWindow : Window
 
     public void Show(bool focus)
     {
-        Activate();
+        this.ShowRestored();
         // Moving onto a monitor with a different DPI can rescale the window; pin it again.
         AppWindow.MoveAndResize(_monitor.Bounds);
         if (focus)
         {
             this.BringToFront();
             FocusHost.Focus(FocusState.Programmatic);
+            Capta.Services.Log.Info($"Overlay shown; foreground is ours: {GetForegroundWindow() == this.GetHwnd()}");
         }
         UpdateShade();
     }
@@ -218,8 +220,11 @@ public sealed partial class OverlayWindow : Window
 
     private void UpdateShade()
     {
-        ShadeOuter.Rect = new Rect(0, 0, Root.ActualWidth, Root.ActualHeight);
-        ShadeHole.Rect = _selection.Width > 0 ? ToDip(_selection) : Rect.Empty;
+        var group = new GeometryGroup { FillRule = FillRule.EvenOdd };
+        group.Children.Add(new RectangleGeometry { Rect = new Rect(0, 0, Root.ActualWidth, Root.ActualHeight) });
+        if (_selection.Width > 0 && _selection.Height > 0)
+            group.Children.Add(new RectangleGeometry { Rect = ToDip(_selection) });
+        Shade.Data = group;
     }
 
     private void UpdateSelectionVisuals()

@@ -13,6 +13,10 @@
     <ApplicationIcon Condition="'$(ApplicationIcon)' == ''">$(StirlingIconDir)$(StirlingIconSet).ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="$(StirlingIconDir)*.png;$(StirlingIconDir)*.ico" Link="Assets\%(Filename)%(Extension)" />
+    <!-- MSIX payload placement follows TargetPath, not Link, for files outside the project. -->
+    <Content Include="$(StirlingIconDir)*.png;$(StirlingIconDir)*.ico"
+             Link="Assets\%(Filename)%(Extension)"
+             TargetPath="Assets\%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

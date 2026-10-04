@@ -49,8 +49,19 @@ internal static partial class WindowHelper
 
     public static void BringToFront(this Window window)
     {
-        window.Activate();
+        window.ShowRestored();
         SetForegroundWindow(window.GetHwnd());
+    }
+
+    /// <summary>
+    /// Activate, then undo any minimized state. A windowless tray process can inherit a
+    /// minimized show command from its launch, which the first Activate() would apply.
+    /// </summary>
+    public static void ShowRestored(this Window window)
+    {
+        window.Activate();
+        if (window.AppWindow.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Minimized } presenter)
+            presenter.Restore(activateWindow: true);
     }
 
     /// <summary>Configures a compact, non-resizable dialog-style window.</summary>

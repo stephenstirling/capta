@@ -1,4 +1,15 @@
 <Project>
+  <!--
+    Optional, git-ignored machine overrides. MSIX packages can't be registered from a
+    network share, so a checkout on a mapped drive can redirect bin/obj to local disk:
+
+      <Project><PropertyGroup><StirlingLocalBuildRoot>$(LOCALAPPDATA)\StirlingBuild\</StirlingLocalBuildRoot></PropertyGroup></Project>
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)Directory.Build.user.props" Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.user.props')" />
+  <PropertyGroup Condition="'$(StirlingLocalBuildRoot)' != ''">
+    <BaseOutputPath>$(StirlingLocalBuildRoot)$(MSBuildProjectName)\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(StirlingLocalBuildRoot)$(MSBuildProjectName)\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
   <!-- Shared by every Stirling project in this repo. -->
   <PropertyGroup>
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>

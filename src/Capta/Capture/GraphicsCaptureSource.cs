@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Windows.Graphics.Capture;
 using Windows.Graphics.DirectX;
 using static Capta.Interop.NativeMethods;
@@ -42,7 +41,7 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"AdvancedColorInfo unavailable: {ex.Message}");
+            Capta.Services.Log.Info($"AdvancedColorInfo unavailable: {ex.Message}");
             return 80f;
         }
     }
@@ -58,7 +57,7 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
             using var session = pool.CreateCaptureSession(item);
             session.IsCursorCaptureEnabled = false;
             try { session.IsBorderRequired = false; }
-            catch (Exception ex) { Debug.WriteLine($"Borderless capture unavailable: {ex.Message}"); }
+            catch (Exception ex) { Capta.Services.Log.Info($"Borderless capture unavailable: {ex.Message}"); }
 
             var arrived = new TaskCompletionSource<(ushort[], int, int)>(TaskCreationOptions.RunContinuationsAsynchronously);
             pool.FrameArrived += (p, _) =>
@@ -98,7 +97,7 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Borderless access request failed: {ex.Message}");
+            Capta.Services.Log.Info($"Borderless access request failed: {ex.Message}");
         }
     }
 

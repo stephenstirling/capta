@@ -59,6 +59,9 @@ internal static partial class NativeMethods
     public const uint MONITOR_DEFAULTTONEAREST = 2;
 
     [LibraryImport("user32.dll")]
+    public static partial nint GetForegroundWindow();
+
+    [LibraryImport("user32.dll")]
     public static partial nint MonitorFromWindow(nint hwnd, uint dwFlags);
 
     public static bool IsKeyDown(int vk) => (GetAsyncKeyState(vk) & 0x8000) != 0;

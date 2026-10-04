@@ -30,14 +30,8 @@
             <Image x:Name="Backdrop" Stretch="Fill" />
 
             <!-- Even-odd fill: the outer rect dims everything, the hole un-dims the selection. -->
-            <Path x:Name="Shade" Fill="{ThemeResource StirlingScrimBrush}" IsHitTestVisible="False">
-                <Path.Data>
-                    <GeometryGroup FillRule="EvenOdd">
-                        <RectangleGeometry x:Name="ShadeOuter" />
-                        <RectangleGeometry x:Name="ShadeHole" />
-                    </GeometryGroup>
-                </Path.Data>
-            </Path>
+            <!-- Even-odd scrim, rebuilt in code: WinUI doesn't re-render a Path when child geometries change. -->
+            <Path x:Name="Shade" Fill="{ThemeResource StirlingScrimBrush}" IsHitTestVisible="False" />
 
             <Canvas IsHitTestVisible="False">
                 <Rectangle

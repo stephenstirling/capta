@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Capta.Capture;
 using Capta.Interop;
 using Capta.Services;
@@ -33,6 +32,7 @@ public partial class App : Application
         InitializeComponent();
         // No main window: the process lives in the tray until the user chooses Exit.
         DispatcherShutdownMode = DispatcherShutdownMode.OnExplicitShutdown;
+        UnhandledException += (_, e) => Log.Error("Unhandled UI exception", e.Exception);
     }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
@@ -47,10 +47,12 @@ public partial class App : Application
         _hook = new PrintScreenHook(Dispatcher);
         _hook.Pressed += OnHotkey;
         _hook.Install();
+        Log.Info("Tray icon and Print Screen hook installed");
 
         _ownership = new PrintScreenOwnership();
         _ownership.Changed += owned => Dispatcher.TryEnqueue(() => OnPrintScreenOwnershipChanged(owned));
         _ownership.StartWatching();
+        Log.Info($"Windows owns Print Screen: {_ownership.WindowsOwnsKey}");
         OnPrintScreenOwnershipChanged(_ownership.WindowsOwnsKey);
 
         // Pop the explanation once; afterwards the tray menu carries the warning.
@@ -67,6 +69,7 @@ public partial class App : Application
 
     private void OnHotkey(HotkeyAction action)
     {
+        Log.Info($"Hotkey: {action}");
         switch (action)
         {
             case HotkeyAction.ShowToolbar: ShowToolbar(); break;
@@ -96,7 +99,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Capture failed: {ex}");
+            Log.Error("Capture failed", ex);
             _tray?.ShowError("Capture failed", ex.Message);
         }
     }
@@ -106,10 +109,11 @@ public partial class App : Application
         try
         {
             await ImageExport.CopyToClipboardAsync(result.Image);
+            Log.Info($"Captured {result.Image.Width}x{result.Image.Height}, copied to clipboard");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Clipboard failed: {ex}");
+            Log.Error("Clipboard failed", ex);
             _tray?.ShowError("Couldn't copy to the clipboard", ex.Message);
         }
 
