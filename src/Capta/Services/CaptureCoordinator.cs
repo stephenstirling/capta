@@ -78,7 +78,7 @@ public sealed class CaptureCoordinator
                 var b = r.Monitor.Bounds;
                 var screen = new RectInt32(b.X + r.Rect.X, b.Y + r.Rect.Y, r.Rect.Width, r.Rect.Height);
                 return new CaptureResult(r.Frame.Crop(r.Rect), r.Monitor, screen,
-                    mode, GraphicsCaptureSource.IsHdr(r.Monitor.Handle));
+                    r.Mode, GraphicsCaptureSource.IsHdr(r.Monitor.Handle));
             }
             case OverlayResult.WindowSelected w:
             {

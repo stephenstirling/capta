@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Capture overlay: design/mockups/Main.html. One per monitor, over a frozen frame. -->
 <Window
     x:Class="Capta.Overlay.OverlayWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Capta.Overlay"
+    xmlns:c="using:Capta.Controls"
     Title="Capta overlay">
 
-    <!-- One overlay per monitor. The backdrop is a frozen capture, so the window is fully opaque. -->
     <ContentControl
         x:Name="FocusHost"
         IsTabStop="True"
         UseSystemFocusVisuals="False"
         HorizontalContentAlignment="Stretch"
         VerticalContentAlignment="Stretch"
-        KeyDown="OnKeyDown">
+        KeyDown="OnKeyDown"
+        KeyUp="OnKeyUp">
         <local:CursorGrid
             x:Name="Root"
             Background="{ThemeResource CaptaOverlayBackgroundBrush}"
@@ -21,77 +23,230 @@
             PointerPressed="OnPointerPressed"
             PointerMoved="OnPointerMoved"
             PointerReleased="OnPointerReleased"
-            PointerExited="OnPointerExited">
-            <Grid.Resources>
-            </Grid.Resources>
+            PointerExited="OnPointerExited"
+            DoubleTapped="OnDoubleTapped">
+            <local:CursorGrid.Resources>
+                <ResourceDictionary>
+                    <ResourceDictionary.MergedDictionaries>
+                        <ResourceDictionary Source="ms-appx:///Styles/Floating.xaml" />
+                    </ResourceDictionary.MergedDictionaries>
+                    <!-- Selected capture mode: amber fill with dark text (.tb in the mockup). -->
+                    <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="CaptaAccentBrush" />
+                    <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="CaptaAccentBrush" />
+                    <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="CaptaAccentBrush" />
+                    <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="CaptaOnAccentBrush" />
+                    <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="CaptaOnAccentBrush" />
+                    <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="CaptaOnAccentBrush" />
+                    <Style x:Key="ModeBarToggle" TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
+                        <Setter Property="Height" Value="44" />
+                        <Setter Property="Padding" Value="14,0" />
+                        <Setter Property="CornerRadius" Value="11" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="IsTabStop" Value="False" />
+                        <Setter Property="AllowFocusOnInteraction" Value="False" />
+                    </Style>
+                    <Style x:Key="ModeBarButton" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                        <Setter Property="Height" Value="44" />
+                        <Setter Property="MinWidth" Value="44" />
+                        <Setter Property="Padding" Value="14,0" />
+                        <Setter Property="CornerRadius" Value="11" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="IsTabStop" Value="False" />
+                        <Setter Property="AllowFocusOnInteraction" Value="False" />
+                    </Style>
+                    <Style x:Key="Handle" TargetType="Border">
+                        <Setter Property="Width" Value="16" />
+                        <Setter Property="Height" Value="16" />
+                        <Setter Property="Background" Value="{ThemeResource CaptaOverlayHandleBrush}" />
+                        <Setter Property="BorderBrush" Value="{ThemeResource CaptaAccentBrush}" />
+                        <Setter Property="BorderThickness" Value="2" />
+                        <Setter Property="CornerRadius" Value="3" />
+                    </Style>
+                    <Style x:Key="KeyCap" TargetType="Border">
+                        <Setter Property="Padding" Value="6,2" />
+                        <Setter Property="Background" Value="{ThemeResource CaptaKeyCapSurfaceBrush}" />
+                        <Setter Property="BorderBrush" Value="{ThemeResource CaptaKeyCapBorderBrush}" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="CornerRadius" Value="5" />
+                    </Style>
+                </ResourceDictionary>
+            </local:CursorGrid.Resources>
 
             <Image x:Name="Backdrop" Stretch="Fill" />
 
-            <!-- Even-odd fill: the outer rect dims everything, the hole un-dims the selection. -->
             <!-- Even-odd scrim, rebuilt in code: WinUI doesn't re-render a Path when child geometries change. -->
             <Path x:Name="Shade" Fill="{ThemeResource CaptaScrimBrush}" IsHitTestVisible="False" />
 
-            <Canvas IsHitTestVisible="False">
-                <Rectangle
-                    x:Name="SelectionFrame"
-                    Stroke="{ThemeResource CaptaAccentBrush}"
-                    StrokeThickness="2"
-                    Visibility="Collapsed" />
-
-                <Border
-                    x:Name="SizeBadge"
-                    Background="{ThemeResource CaptaReadoutSurfaceBrush}"
-                    CornerRadius="4"
-                    Padding="8,3"
-                    Visibility="Collapsed">
+            <Canvas x:Name="SelectionLayer" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="SelectionFrame" BorderBrush="{ThemeResource CaptaAccentBrush}" BorderThickness="2" />
+                <Rectangle x:Name="GuideV1" Width="1" Fill="{ThemeResource CaptaOverlayGuideBrush}" />
+                <Rectangle x:Name="GuideV2" Width="1" Fill="{ThemeResource CaptaOverlayGuideBrush}" />
+                <Rectangle x:Name="GuideH1" Height="1" Fill="{ThemeResource CaptaOverlayGuideBrush}" />
+                <Rectangle x:Name="GuideH2" Height="1" Fill="{ThemeResource CaptaOverlayGuideBrush}" />
+                <Border x:Name="HandleNW" Style="{StaticResource Handle}" />
+                <Border x:Name="HandleN" Style="{StaticResource Handle}" />
+                <Border x:Name="HandleNE" Style="{StaticResource Handle}" />
+                <Border x:Name="HandleE" Style="{StaticResource Handle}" />
+                <Border x:Name="HandleSE" Style="{StaticResource Handle}" />
+                <Border x:Name="HandleS" Style="{StaticResource Handle}" />
+                <Border x:Name="HandleSW" Style="{StaticResource Handle}" />
+                <Border x:Name="HandleW" Style="{StaticResource Handle}" />
+                <Border x:Name="SizeBadge" Padding="10,6" Background="{ThemeResource CaptaAccentBrush}" CornerRadius="8">
                     <TextBlock
                         x:Name="SizeText"
                         FontFamily="{StaticResource CaptaMonoFont}"
                         FontSize="12"
-                        Foreground="{ThemeResource CaptaFloatingTextBrush}" />
-                </Border>
-
-                <Border
-                    x:Name="Loupe"
-                    Background="{ThemeResource CaptaReadoutSurfaceBrush}"
-                    BorderBrush="{ThemeResource CaptaAccentBrush}"
-                    BorderThickness="1.5"
-                    CornerRadius="8"
-                    Padding="4"
-                    Visibility="Collapsed">
-                    <StackPanel Spacing="4">
-                        <Grid Width="120" Height="120">
-                            <Image x:Name="LoupeImage" Width="120" Height="120" Stretch="Fill" />
-                            <Rectangle
-                                Width="10"
-                                Height="10"
-                                Margin="55,55,0,0"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Top"
-                                Stroke="{ThemeResource CaptaAccentBrush}"
-                                StrokeThickness="1.5" />
-                        </Grid>
-                        <TextBlock
-                            x:Name="LoupeText"
-                            HorizontalAlignment="Center"
-                            FontFamily="{StaticResource CaptaMonoFont}"
-                            FontSize="11"
-                            Foreground="{ThemeResource CaptaFloatingTextBrush}" />
-                    </StackPanel>
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource CaptaOnAccentBrush}" />
                 </Border>
             </Canvas>
 
-            <Border
-                x:Name="Hint"
-                Margin="0,24,0,0"
-                Padding="14,8"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Top"
-                Background="{ThemeResource CaptaReadoutSurfaceBrush}"
-                CornerRadius="8"
-                IsHitTestVisible="False">
-                <TextBlock x:Name="HintText" FontSize="13" Foreground="{ThemeResource CaptaFloatingTextBrush}" />
-            </Border>
+            <!-- Magnifier: 11×11 pixels at 12× in a 132px circle, with a readout pill below. -->
+            <Canvas IsHitTestVisible="False">
+                <StackPanel x:Name="Loupe" Spacing="8" Visibility="Collapsed">
+                    <Grid Width="132" Height="132">
+                        <Grid x:Name="LoupeShadow" Width="132" Height="132" />
+                        <Ellipse x:Name="LoupeImage" />
+                        <Rectangle
+                            Width="16"
+                            Height="16"
+                            Margin="58,58,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Stroke="{ThemeResource CaptaOverlayHandleBrush}"
+                            StrokeThickness="2" />
+                        <Ellipse Stroke="{ThemeResource CaptaOverlayHandleBrush}" StrokeThickness="3" />
+                    </Grid>
+                    <Border
+                        HorizontalAlignment="Center"
+                        Padding="10,6"
+                        Background="{ThemeResource CaptaReadoutSurfaceBrush}"
+                        BorderBrush="{ThemeResource CaptaFloatingBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock x:Name="CoordText" FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Foreground="{ThemeResource CaptaFloatingTextBrush}" />
+                            <Border
+                                x:Name="Swatch"
+                                Width="10"
+                                Height="10"
+                                VerticalAlignment="Center"
+                                BorderBrush="{ThemeResource CaptaSwatchBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="2" />
+                            <TextBlock x:Name="HexText" FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Foreground="{ThemeResource CaptaFloatingTextBrush}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Canvas>
+
+            <!-- Mode bar and key hints, centred at the top. -->
+            <StackPanel x:Name="TopBar" Margin="0,24,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Spacing="20">
+                <Grid>
+                    <Grid x:Name="ModeBarShadow" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <Border
+                        x:Name="ModeBar"
+                        Padding="6"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="{ThemeResource CaptaFloatingSurfaceBrush}"
+                        BorderBrush="{ThemeResource CaptaFloatingBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CaptaRadiusToolbar}">
+                        <ContentPresenter FontFamily="{StaticResource CaptaFont}" FontSize="13" FontWeight="SemiBold">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <ToggleButton x:Name="RegionMode" Style="{StaticResource ModeBarToggle}" Click="OnModeClick" Tag="Region">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <c:LineIcon Data="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" Dashed="True" />
+                                        <TextBlock Text="Region" />
+                                    </StackPanel>
+                                </ToggleButton>
+                                <ToggleButton x:Name="WindowMode" Style="{StaticResource ModeBarToggle}" Click="OnModeClick" Tag="Window">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <c:LineIcon Data="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM3 9h18" />
+                                        <TextBlock Text="Window" />
+                                    </StackPanel>
+                                </ToggleButton>
+                                <ToggleButton Style="{StaticResource ModeBarToggle}" Click="OnFullScreenClick" ToolTipService.ToolTip="Capture this screen">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <c:LineIcon Data="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+                                        <TextBlock Text="Full screen" />
+                                    </StackPanel>
+                                </ToggleButton>
+                                <ToggleButton Style="{StaticResource ModeBarToggle}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <c:LineIcon Data="M6 16c-2-3 0-9 5-10s9 2 8 6-6 3-7 6 2 4 4 3" />
+                                        <TextBlock Text="Freeform" />
+                                    </StackPanel>
+                                </ToggleButton>
+                                <ToggleButton Style="{StaticResource ModeBarToggle}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <c:LineIcon Data="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM12 8v8M9 13l3 3 3-3" />
+                                        <TextBlock Text="Scrolling" />
+                                    </StackPanel>
+                                </ToggleButton>
+                                <Rectangle Width="1" Height="26" Margin="4,0" Fill="{ThemeResource CaptaDividerBrush}" />
+                                <ToggleButton Style="{StaticResource ModeBarToggle}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <c:LineIcon Data="M5 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM16 10l5-3v10l-5-3" />
+                                        <TextBlock Text="Record" />
+                                    </StackPanel>
+                                </ToggleButton>
+                                <Rectangle Width="1" Height="26" Margin="4,0" Fill="{ThemeResource CaptaDividerBrush}" />
+                                <Button Style="{StaticResource ModeBarButton}" Padding="12,0" IsEnabled="False" ToolTipService.ToolTip="Set a delay from the toolbar">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <c:LineIcon Data="M20 13a8 8 0 1 1-16 0a8 8 0 1 1 16 0zM12 9v4l2 2M9 2h6" />
+                                        <TextBlock Text="No delay" />
+                                        <c:LineIcon Size="13" StrokeWidth="2" Data="M6 9l6 6 6-6" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource ModeBarButton}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <c:LineIcon Data="M4 7V4h3M20 7V4h-3M4 17v3h3M20 17v3h-3M8 9h8M12 9v7" />
+                                        <TextBlock Text="Grab text" />
+                                    </StackPanel>
+                                </Button>
+                                <Rectangle Width="1" Height="26" Margin="4,0" Fill="{ThemeResource CaptaDividerBrush}" />
+                                <Button Style="{StaticResource ModeBarButton}" Padding="0" IsEnabled="False" ToolTipService.ToolTip="Capture settings (coming soon)">
+                                    <c:LineIcon Data="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M18 6a2 2 0 1 1-4 0a2 2 0 1 1 4 0zM12 12a2 2 0 1 1-4 0a2 2 0 1 1 4 0zM20 18a2 2 0 1 1-4 0a2 2 0 1 1 4 0z" />
+                                </Button>
+                                <Button Style="{StaticResource ModeBarButton}" Padding="0" Click="OnCancelClick" ToolTipService.ToolTip="Cancel capture (Esc)">
+                                    <c:LineIcon Data="M6 6l12 12M18 6L6 18" />
+                                </Button>
+                            </StackPanel>
+                        </ContentPresenter>
+                    </Border>
+                </Grid>
+
+                <StackPanel x:Name="Hints" HorizontalAlignment="Center" Orientation="Horizontal" Spacing="18" IsHitTestVisible="False">
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="FontSize" Value="12" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="Foreground" Value="{ThemeResource CaptaTextSecondaryBrush}" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock x:Name="HintLead" Text="Drag to select" />
+                    <StackPanel x:Name="RegionHints" Orientation="Horizontal" Spacing="18">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="Space" /></Border>
+                            <TextBlock Text="move" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="Shift" /></Border>
+                            <TextBlock Text="square" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="Enter" /></Border>
+                            <TextBlock Text="capture" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="Esc" /></Border>
+                        <TextBlock Text="cancel" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
         </local:CursorGrid>
     </ContentControl>
 </Window>

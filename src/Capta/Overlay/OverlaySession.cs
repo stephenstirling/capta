@@ -10,7 +10,8 @@ public abstract record OverlayResult
     public sealed record Cancelled : OverlayResult;
 
     /// <param name="Rect">Selection in physical pixels, relative to <paramref name="Monitor"/>.</param>
-    public sealed record RegionSelected(MonitorInfo Monitor, CapturedImage Frame, RectInt32 Rect) : OverlayResult;
+    /// <param name="Mode">Region, or FullScreen when the mode bar's Full screen was used.</param>
+    public sealed record RegionSelected(MonitorInfo Monitor, CapturedImage Frame, RectInt32 Rect, CaptureMode Mode) : OverlayResult;
 
     public sealed record WindowSelected(WindowTarget Target) : OverlayResult;
 }
@@ -25,7 +26,8 @@ public sealed class OverlaySession
     public static async Task<OverlayResult> RunAsync(CaptureMode mode, IReadOnlyList<MonitorInfo> monitors, IReadOnlyList<CapturedImage> frames)
     {
         var session = new OverlaySession();
-        var targets = mode == CaptureMode.Window ? WindowFinder.Snapshot() : [];
+        // Snapshot windows up front (before our overlays exist) so Window mode can be chosen later.
+        var targets = WindowFinder.Snapshot();
         var cursor = WindowHelper.CursorPosition();
 
         for (var i = 0; i < monitors.Count; i++)
@@ -53,6 +55,12 @@ public sealed class OverlaySession
     }
 
     internal void Complete(OverlayResult result) => _result.TrySetResult(result);
+
+    /// <summary>Switches every monitor's overlay between Region and Window.</summary>
+    internal void SetMode(CaptureMode mode)
+    {
+        foreach (var w in _windows) w.ApplyMode(mode);
+    }
 
     internal void Cancel() => _result.TrySetResult(new OverlayResult.Cancelled());
 
