@@ -14,8 +14,8 @@ See README.md for layout and build commands.
 
 - All colour, shape and font tokens live in `src/Stirling.Shared/Themes/Colors.xaml`, merged once in `App.xaml`.
   Add or change tokens there; don't add a second resource dictionary.
-- `design/xaml/CaptaTheme.xaml` is the design hand-off the tokens were imported from. Keep it for reference only;
-  it isn't compiled. If the design changes, update `Colors.xaml` to match.
+- If a mockup uses a colour that has no token yet, add a token to `Colors.xaml` (both themes) rather than
+  hard-coding it.
 - Reference brushes with `{ThemeResource …}` so Light, Dark and High Contrast all switch correctly.
 - For code that draws pixels outside XAML, use `Stirling.Shared.StirlingColors`, which mirrors the tokens.
 

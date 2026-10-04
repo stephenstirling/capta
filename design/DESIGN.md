@@ -5,7 +5,7 @@ This folder is the source of truth for how Capta should look and behave. When bu
 ## What's here
 
 - `mockups/*.html` are the approved screens. Every size, colour, radius and gap is written as an inline `style=""` on the element, so read the HTML to get exact values. They need the canvas runtime to render, so don't expect them to open in a browser; read them as specs. The `{{accent}}` placeholders mean the accent colour `#FFB547`.
-- `xaml/CaptaTheme.xaml` holds the same tokens as a WinUI resource dictionary, with Light and Dark versions. Use these brushes instead of hard-coded colours.
+- The theme tokens live in `src/Stirling.Shared/Themes/Colors.xaml`, the app's only theme dictionary, with Light, Dark and High Contrast versions. Use its brushes instead of hard-coded colours, and add any new token there.
 - `icons/` holds the chosen "Aperture" app icon as SVGs, PNGs at every size, `Capta.ico`, and single-colour tray icons (white for dark taskbars, black for light).
 
 ## Screens and their mockup files
