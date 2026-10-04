@@ -23,7 +23,6 @@
             PointerReleased="OnPointerReleased"
             PointerExited="OnPointerExited">
             <Grid.Resources>
-                <SolidColorBrush x:Key="AmberBrush" Color="{StaticResource StirlingAmber}" />
                 <SolidColorBrush x:Key="BadgeBrush" Color="#E61E1A14" />
             </Grid.Resources>
 
@@ -31,12 +30,12 @@
 
             <!-- Even-odd fill: the outer rect dims everything, the hole un-dims the selection. -->
             <!-- Even-odd scrim, rebuilt in code: WinUI doesn't re-render a Path when child geometries change. -->
-            <Path x:Name="Shade" Fill="{ThemeResource StirlingScrimBrush}" IsHitTestVisible="False" />
+            <Path x:Name="Shade" Fill="{ThemeResource CaptaScrimBrush}" IsHitTestVisible="False" />
 
             <Canvas IsHitTestVisible="False">
                 <Rectangle
                     x:Name="SelectionFrame"
-                    Stroke="{StaticResource AmberBrush}"
+                    Stroke="{ThemeResource CaptaAccentBrush}"
                     StrokeThickness="2"
                     Visibility="Collapsed" />
 
@@ -56,7 +55,7 @@
                 <Border
                     x:Name="Loupe"
                     Background="{StaticResource BadgeBrush}"
-                    BorderBrush="{StaticResource AmberBrush}"
+                    BorderBrush="{ThemeResource CaptaAccentBrush}"
                     BorderThickness="1.5"
                     CornerRadius="8"
                     Padding="4"
@@ -70,7 +69,7 @@
                                 Margin="55,55,0,0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Stroke="{StaticResource AmberBrush}"
+                                Stroke="{ThemeResource CaptaAccentBrush}"
                                 StrokeThickness="1.5" />
                         </Grid>
                         <TextBlock

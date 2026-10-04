@@ -35,7 +35,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <FontIcon x:Name="StatusIcon" Glyph="&#xE73E;" FontSize="14" Foreground="{ThemeResource StirlingAccentStrongBrush}" />
+                <FontIcon x:Name="StatusIcon" Glyph="&#xE73E;" FontSize="14" Foreground="{ThemeResource CaptaAccentTextBrush}" />
                 <TextBlock x:Name="StatusText" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Copied to clipboard" />
             </StackPanel>
             <Button
@@ -53,7 +53,7 @@
             Grid.Row="1"
             MaxHeight="190"
             HorizontalAlignment="Center"
-            BorderBrush="{ThemeResource StirlingStrokeBrush}"
+            BorderBrush="{ThemeResource CaptaBorderBrush}"
             BorderThickness="1"
             CornerRadius="6">
             <Grid>

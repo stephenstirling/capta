@@ -1,18 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Stirling brand palette. Merge into App.xaml *after* XamlControlsResources:
+    Stirling brand palette: the single theme dictionary for Capta (and later Ocula).
+    Token values come from design/xaml/CaptaTheme.xaml and design/mockups/*.html;
+    update them here, not in a second dictionary.
+
+    Merge into App.xaml *after* XamlControlsResources:
 
         <ResourceDictionary Source="ms-appx:///Stirling.Shared/Themes/Colors.xaml" />
 
-    Overrides the WinUI accent ramp with amber (#FFB547) so every Fluent control
-    picks it up, and adds Stirling* brushes for app-specific surfaces.
+    Besides the Capta* tokens, this overrides the WinUI accent ramp and accent brushes
+    with amber (#FFB547) so stock Fluent controls match the design.
 -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Color x:Key="StirlingAmber">#FFB547</Color>
+    <ResourceDictionary.ThemeDictionaries>
 
+        <ResourceDictionary x:Key="Dark">
+            <Color x:Key="CaptaBackgroundColor">#0F1114</Color>
+            <Color x:Key="CaptaSurfaceColor">#15171B</Color>
+            <Color x:Key="CaptaSurfaceRaisedColor">#1A1D21</Color>
+            <Color x:Key="CaptaControlColor">#23272C</Color>
+            <Color x:Key="CaptaControlHoverColor">#2A2F37</Color>
+            <Color x:Key="CaptaInsetColor">#111317</Color>
+            <Color x:Key="CaptaBorderColor">#262A30</Color>
+            <Color x:Key="CaptaBorderStrongColor">#2E333A</Color>
+            <Color x:Key="CaptaTextColor">#ECEEF1</Color>
+            <Color x:Key="CaptaTextSecondaryColor">#C9CED6</Color>
+            <Color x:Key="CaptaTextMutedColor">#8B93A0</Color>
+            <Color x:Key="CaptaAccentColor">#FFB547</Color>
+            <Color x:Key="CaptaAccentTextColor">#FFB547</Color>
+            <Color x:Key="CaptaOnAccentColor">#1A1206</Color>
+            <Color x:Key="CaptaAccentSoftColor">#2BFFB547</Color>
+            <Color x:Key="CaptaSuccessColor">#5FD3A5</Color>
+            <Color x:Key="CaptaInfoColor">#9CD4FF</Color>
+            <Color x:Key="CaptaInfoSurfaceColor">#18202B</Color>
+            <Color x:Key="CaptaWarningSurfaceColor">#2A2418</Color>
+            <Color x:Key="CaptaLensColor">#3A4D70</Color>
+            <!-- Capture-overlay dim, from mockups/Main.html: rgba(5,6,8,0.62). -->
+            <Color x:Key="CaptaScrimColor">#9E050608</Color>
+            <SolidColorBrush x:Key="CaptaBackgroundBrush" Color="{StaticResource CaptaBackgroundColor}" />
+            <SolidColorBrush x:Key="CaptaSurfaceBrush" Color="{StaticResource CaptaSurfaceColor}" />
+            <SolidColorBrush x:Key="CaptaSurfaceRaisedBrush" Color="{StaticResource CaptaSurfaceRaisedColor}" />
+            <SolidColorBrush x:Key="CaptaControlBrush" Color="{StaticResource CaptaControlColor}" />
+            <SolidColorBrush x:Key="CaptaControlHoverBrush" Color="{StaticResource CaptaControlHoverColor}" />
+            <SolidColorBrush x:Key="CaptaInsetBrush" Color="{StaticResource CaptaInsetColor}" />
+            <SolidColorBrush x:Key="CaptaBorderBrush" Color="{StaticResource CaptaBorderColor}" />
+            <SolidColorBrush x:Key="CaptaBorderStrongBrush" Color="{StaticResource CaptaBorderStrongColor}" />
+            <SolidColorBrush x:Key="CaptaTextBrush" Color="{StaticResource CaptaTextColor}" />
+            <SolidColorBrush x:Key="CaptaTextSecondaryBrush" Color="{StaticResource CaptaTextSecondaryColor}" />
+            <SolidColorBrush x:Key="CaptaTextMutedBrush" Color="{StaticResource CaptaTextMutedColor}" />
+            <SolidColorBrush x:Key="CaptaAccentBrush" Color="{StaticResource CaptaAccentColor}" />
+            <SolidColorBrush x:Key="CaptaAccentTextBrush" Color="{StaticResource CaptaAccentTextColor}" />
+            <SolidColorBrush x:Key="CaptaOnAccentBrush" Color="{StaticResource CaptaOnAccentColor}" />
+            <SolidColorBrush x:Key="CaptaAccentSoftBrush" Color="{StaticResource CaptaAccentSoftColor}" />
+            <SolidColorBrush x:Key="CaptaSuccessBrush" Color="{StaticResource CaptaSuccessColor}" />
+            <SolidColorBrush x:Key="CaptaInfoBrush" Color="{StaticResource CaptaInfoColor}" />
+            <SolidColorBrush x:Key="CaptaInfoSurfaceBrush" Color="{StaticResource CaptaInfoSurfaceColor}" />
+            <SolidColorBrush x:Key="CaptaWarningSurfaceBrush" Color="{StaticResource CaptaWarningSurfaceColor}" />
+            <SolidColorBrush x:Key="CaptaLensBrush" Color="{StaticResource CaptaLensColor}" />
+            <SolidColorBrush x:Key="CaptaScrimBrush" Color="{StaticResource CaptaScrimColor}" />
+
+            <!-- Fluent control overrides, mapped onto the tokens above. -->
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="{StaticResource CaptaAccentTextColor}" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="{StaticResource CaptaAccentTextColor}" />
+            <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="{StaticResource CaptaAccentTextColor}" Opacity="0.8" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="{StaticResource CaptaOnAccentColor}" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="{StaticResource CaptaOnAccentColor}" Opacity="0.7" />
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <Color x:Key="CaptaBackgroundColor">#F3F4F6</Color>
+            <Color x:Key="CaptaSurfaceColor">#FFFFFF</Color>
+            <Color x:Key="CaptaSurfaceRaisedColor">#F7F8FA</Color>
+            <Color x:Key="CaptaControlColor">#ECEEF1</Color>
+            <Color x:Key="CaptaControlHoverColor">#E3E5E9</Color>
+            <Color x:Key="CaptaInsetColor">#EEF0F3</Color>
+            <Color x:Key="CaptaBorderColor">#E3E5E9</Color>
+            <Color x:Key="CaptaBorderStrongColor">#D9DCE1</Color>
+            <Color x:Key="CaptaTextColor">#1B1E23</Color>
+            <Color x:Key="CaptaTextSecondaryColor">#3F4650</Color>
+            <Color x:Key="CaptaTextMutedColor">#5B6370</Color>
+            <Color x:Key="CaptaAccentColor">#FFB547</Color>
+            <!-- Amber is too light for text on white; use this for accent-coloured text and icons. -->
+            <Color x:Key="CaptaAccentTextColor">#8C6427</Color>
+            <Color x:Key="CaptaOnAccentColor">#1A1206</Color>
+            <Color x:Key="CaptaAccentSoftColor">#33FFB547</Color>
+            <Color x:Key="CaptaSuccessColor">#1F8A62</Color>
+            <Color x:Key="CaptaInfoColor">#1F5FA8</Color>
+            <Color x:Key="CaptaInfoSurfaceColor">#EAF3FF</Color>
+            <Color x:Key="CaptaWarningSurfaceColor">#FFF4E0</Color>
+            <Color x:Key="CaptaLensColor">#22304A</Color>
+            <!-- The overlay is always dark, so the scrim doesn't change with theme. -->
+            <Color x:Key="CaptaScrimColor">#9E050608</Color>
+            <SolidColorBrush x:Key="CaptaBackgroundBrush" Color="{StaticResource CaptaBackgroundColor}" />
+            <SolidColorBrush x:Key="CaptaSurfaceBrush" Color="{StaticResource CaptaSurfaceColor}" />
+            <SolidColorBrush x:Key="CaptaSurfaceRaisedBrush" Color="{StaticResource CaptaSurfaceRaisedColor}" />
+            <SolidColorBrush x:Key="CaptaControlBrush" Color="{StaticResource CaptaControlColor}" />
+            <SolidColorBrush x:Key="CaptaControlHoverBrush" Color="{StaticResource CaptaControlHoverColor}" />
+            <SolidColorBrush x:Key="CaptaInsetBrush" Color="{StaticResource CaptaInsetColor}" />
+            <SolidColorBrush x:Key="CaptaBorderBrush" Color="{StaticResource CaptaBorderColor}" />
+            <SolidColorBrush x:Key="CaptaBorderStrongBrush" Color="{StaticResource CaptaBorderStrongColor}" />
+            <SolidColorBrush x:Key="CaptaTextBrush" Color="{StaticResource CaptaTextColor}" />
+            <SolidColorBrush x:Key="CaptaTextSecondaryBrush" Color="{StaticResource CaptaTextSecondaryColor}" />
+            <SolidColorBrush x:Key="CaptaTextMutedBrush" Color="{StaticResource CaptaTextMutedColor}" />
+            <SolidColorBrush x:Key="CaptaAccentBrush" Color="{StaticResource CaptaAccentColor}" />
+            <SolidColorBrush x:Key="CaptaAccentTextBrush" Color="{StaticResource CaptaAccentTextColor}" />
+            <SolidColorBrush x:Key="CaptaOnAccentBrush" Color="{StaticResource CaptaOnAccentColor}" />
+            <SolidColorBrush x:Key="CaptaAccentSoftBrush" Color="{StaticResource CaptaAccentSoftColor}" />
+            <SolidColorBrush x:Key="CaptaSuccessBrush" Color="{StaticResource CaptaSuccessColor}" />
+            <SolidColorBrush x:Key="CaptaInfoBrush" Color="{StaticResource CaptaInfoColor}" />
+            <SolidColorBrush x:Key="CaptaInfoSurfaceBrush" Color="{StaticResource CaptaInfoSurfaceColor}" />
+            <SolidColorBrush x:Key="CaptaWarningSurfaceBrush" Color="{StaticResource CaptaWarningSurfaceColor}" />
+            <SolidColorBrush x:Key="CaptaLensBrush" Color="{StaticResource CaptaLensColor}" />
+            <SolidColorBrush x:Key="CaptaScrimBrush" Color="{StaticResource CaptaScrimColor}" />
+
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="{StaticResource CaptaAccentTextColor}" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="{StaticResource CaptaAccentTextColor}" />
+            <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="{StaticResource CaptaAccentTextColor}" Opacity="0.8" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="{StaticResource CaptaOnAccentColor}" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="{StaticResource CaptaOnAccentColor}" Opacity="0.7" />
+        </ResourceDictionary>
+
+        <!-- Not in the design: High Contrast maps the tokens to system colours. -->
+        <ResourceDictionary x:Key="HighContrast">
+            <SolidColorBrush x:Key="CaptaBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaSurfaceRaisedBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaControlBrush" Color="{ThemeResource SystemColorButtonFaceColor}" />
+            <SolidColorBrush x:Key="CaptaControlHoverBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaInsetBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaBorderStrongBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaTextBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaTextSecondaryBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaTextMutedBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
+            <SolidColorBrush x:Key="CaptaAccentBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaAccentTextBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaOnAccentBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+            <SolidColorBrush x:Key="CaptaAccentSoftBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaSuccessBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaInfoBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaInfoSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaWarningSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaLensBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaScrimBrush" Color="#99000000" />
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+
+    <!-- WinUI accent ramp. Only SystemAccentColor is from the design; the steps are derived. -->
     <Color x:Key="SystemAccentColor">#FFB547</Color>
     <Color x:Key="SystemAccentColorLight1">#FFC46D</Color>
     <Color x:Key="SystemAccentColorLight2">#FFD393</Color>
@@ -21,57 +165,22 @@
     <Color x:Key="SystemAccentColorDark2">#B0741A</Color>
     <Color x:Key="SystemAccentColorDark3">#7F520C</Color>
 
-    <ResourceDictionary.ThemeDictionaries>
-        <ResourceDictionary x:Key="Light">
-            <!-- Amber is a light hue: fills use the darker steps and text on accent is dark. -->
-            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#E09A2E" />
-            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#E09A2E" Opacity="0.9" />
-            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#E09A2E" Opacity="0.8" />
-            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#7F520C" />
-            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#7F520C" />
-            <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#B0741A" />
-            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#1E1A14" />
-            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#1E1A14" Opacity="0.7" />
+    <!-- Shape and size tokens -->
+    <CornerRadius x:Key="CaptaRadiusWindow">14</CornerRadius>
+    <CornerRadius x:Key="CaptaRadiusCard">12</CornerRadius>
+    <CornerRadius x:Key="CaptaRadiusButton">10</CornerRadius>
+    <CornerRadius x:Key="CaptaRadiusToolbar">16</CornerRadius>
+    <CornerRadius x:Key="CaptaRadiusPill">17</CornerRadius>
+    <x:Double x:Key="CaptaIconButtonSize">44</x:Double>
+    <x:Double x:Key="CaptaButtonHeight">40</x:Double>
+    <x:Double x:Key="CaptaTitleBarHeight">40</x:Double>
+    <x:Double x:Key="CaptaCommandBarHeight">64</x:Double>
+    <x:Double x:Key="CaptaSidePanelWidth">340</x:Double>
 
-            <SolidColorBrush x:Key="StirlingAccentBrush" Color="#FFB547" />
-            <SolidColorBrush x:Key="StirlingAccentStrongBrush" Color="#B0741A" />
-            <SolidColorBrush x:Key="StirlingSurfaceBrush" Color="#FBF8F3" />
-            <SolidColorBrush x:Key="StirlingSurfaceRaisedBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="StirlingInkBrush" Color="#1E1A14" />
-            <SolidColorBrush x:Key="StirlingInkMutedBrush" Color="#6B6257" />
-            <SolidColorBrush x:Key="StirlingStrokeBrush" Color="#1E1A14" Opacity="0.12" />
-            <SolidColorBrush x:Key="StirlingScrimBrush" Color="#000000" Opacity="0.45" />
-        </ResourceDictionary>
+    <FontFamily x:Key="CaptaFont">Segoe UI Variable Text</FontFamily>
+    <FontFamily x:Key="CaptaMonoFont">Cascadia Mono</FontFamily>
 
-        <ResourceDictionary x:Key="Dark">
-            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#FFB547" />
-            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#FFB547" Opacity="0.9" />
-            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#FFB547" Opacity="0.8" />
-            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FFD393" />
-            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FFD393" />
-            <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#FFC46D" />
-            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#1E1A14" />
-            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#1E1A14" Opacity="0.7" />
-
-            <SolidColorBrush x:Key="StirlingAccentBrush" Color="#FFB547" />
-            <SolidColorBrush x:Key="StirlingAccentStrongBrush" Color="#FFC46D" />
-            <SolidColorBrush x:Key="StirlingSurfaceBrush" Color="#1C1A17" />
-            <SolidColorBrush x:Key="StirlingSurfaceRaisedBrush" Color="#26231F" />
-            <SolidColorBrush x:Key="StirlingInkBrush" Color="#F5F1EA" />
-            <SolidColorBrush x:Key="StirlingInkMutedBrush" Color="#B3AA9E" />
-            <SolidColorBrush x:Key="StirlingStrokeBrush" Color="#FFFFFF" Opacity="0.10" />
-            <SolidColorBrush x:Key="StirlingScrimBrush" Color="#000000" Opacity="0.55" />
-        </ResourceDictionary>
-
-        <ResourceDictionary x:Key="HighContrast">
-            <SolidColorBrush x:Key="StirlingAccentBrush" Color="{ThemeResource SystemColorHighlightColor}" />
-            <SolidColorBrush x:Key="StirlingAccentStrongBrush" Color="{ThemeResource SystemColorHighlightColor}" />
-            <SolidColorBrush x:Key="StirlingSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
-            <SolidColorBrush x:Key="StirlingSurfaceRaisedBrush" Color="{ThemeResource SystemColorWindowColor}" />
-            <SolidColorBrush x:Key="StirlingInkBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
-            <SolidColorBrush x:Key="StirlingInkMutedBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
-            <SolidColorBrush x:Key="StirlingStrokeBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
-            <SolidColorBrush x:Key="StirlingScrimBrush" Color="#000000" Opacity="0.6" />
-        </ResourceDictionary>
-    </ResourceDictionary.ThemeDictionaries>
+    <!-- Aperture glyph, 24x24 grid, for use in Path elements -->
+    <x:String x:Key="CaptaApertureTopPath">M3 9V5.5A2.5 2.5 0 0 1 5.5 3H9M15 3h3.5A2.5 2.5 0 0 1 21 5.5V9</x:String>
+    <x:String x:Key="CaptaApertureBottomPath">M3 15v3.5A2.5 2.5 0 0 0 5.5 21H9M21 15v3.5a2.5 2.5 0 0 1-2.5 2.5H15</x:String>
 </ResourceDictionary>

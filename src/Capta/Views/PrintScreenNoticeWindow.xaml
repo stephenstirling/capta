@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Spacing="12">
-            <FontIcon Glyph="&#xE7BA;" FontSize="20" Foreground="{ThemeResource StirlingAccentStrongBrush}" />
+            <FontIcon Glyph="&#xE7BA;" FontSize="20" Foreground="{ThemeResource CaptaAccentTextBrush}" />
             <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Print Screen opens Snipping Tool" />
         </StackPanel>
 
