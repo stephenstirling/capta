@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Capta — colour and HDR settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#FFB547}a:hover{color:#FFD08A}
+.ib{background:transparent;border:0;cursor:pointer;color:#C9CED6}
+.ib:hover{background:rgba(255,255,255,0.06)}
+</style>
+</helmet>
+<div style="width: 680px; height: 900px; box-sizing: border-box; background: #15171B; border: 1px solid #2E333A; border-radius: 14px; font-family: 'Segoe UI Variable Text','Segoe UI',Manrope,system-ui,sans-serif; color: #ECEEF1; display: flex; flex-direction: column; overflow: hidden">
+
+<div style="padding: 22px 24px 14px; display: flex; align-items: center; gap: 12px">
+<span style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; padding: 3px 6px; border-radius: 5px; border: 1.5px solid {{accent}}; color: {{accent}}">HDR</span>
+<span style="font-size: 20px; font-weight: 700; flex-grow: 1">Colour &amp; HDR</span>
+<button class="ib" aria-label="Close" style="width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+
+<div style="flex-grow: 1; padding: 0 24px 20px; display: flex; flex-direction: column; gap: 22px">
+
+<div style="display: flex; gap: 10px">
+<div style="flex: 1; padding: 12px 14px; background: #1D2025; border: 1px solid {{accent}}; border-radius: 12px">
+<div style="font-size: 13px; font-weight: 700">Display 1</div>
+<div style="font-size: 12px; color: #A7AEB8; margin-top: 3px">HDR on · SDR white 240 nits</div>
+</div>
+<div style="flex: 1; padding: 12px 14px; background: #1D2025; border: 1px solid #2A2E35; border-radius: 12px">
+<div style="font-size: 13px; font-weight: 700">Display 2</div>
+<div style="font-size: 12px; color: #A7AEB8; margin-top: 3px">SDR · sRGB profile</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8B93A0">When capturing an HDR screen</div>
+<button style="display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 12px; border: 1.5px solid {{accent}}; background: {{accentSoft}}; cursor: pointer; font: inherit; color: inherit; text-align: left" aria-pressed="true">
+<span style="width: 18px; height: 18px; border-radius: 9px; border: 2px solid {{accent}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px"><span style="width: 9px; height: 9px; border-radius: 5px; background: {{accent}}"></span></span>
+<span><span style="display: block; font-size: 14px; font-weight: 700">Tone-map to SDR <span style="font-weight: 500; color: #A7AEB8">· recommended</span></span><span style="display: block; font-size: 12.5px; color: #C9CED6; margin-top: 3px">Looks the way it does on screen, and stays correct when pasted or shared anywhere.</span></span>
+</button>
+<button style="display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 12px; border: 1px solid #2A2E35; background: #1A1D21; cursor: pointer; font: inherit; color: inherit; text-align: left">
+<span style="width: 18px; height: 18px; border-radius: 9px; border: 2px solid #5A616C; flex-shrink: 0; margin-top: 1px"></span>
+<span><span style="display: block; font-size: 14px; font-weight: 700">Keep HDR</span><span style="display: block; font-size: 12.5px; color: #C9CED6; margin-top: 3px">Saves full brightness range as JPEG XR or AVIF. An SDR copy still goes to the clipboard.</span></span>
+</button>
+<button style="display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 12px; border: 1px solid #2A2E35; background: #1A1D21; cursor: pointer; font: inherit; color: inherit; text-align: left">
+<span style="width: 18px; height: 18px; border-radius: 9px; border: 2px solid #5A616C; flex-shrink: 0; margin-top: 1px"></span>
+<span><span style="display: block; font-size: 14px; font-weight: 700">Save both</span><span style="display: block; font-size: 12.5px; color: #C9CED6; margin-top: 3px">SDR PNG plus an HDR original alongside it in Ocula.</span></span>
+</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8B93A0">Tone mapping</div>
+<div style="display: flex; border-radius: 12px; overflow: hidden; height: 120px; position: relative">
+<div style="flex: 1; background: #3B3F46; position: relative; overflow: hidden">
+<div style="position: absolute; left: 24px; top: 22px; width: 70px; height: 70px; border-radius: 35px; background: #F4F4F2"></div>
+<div style="position: absolute; left: 0; bottom: 0; width: 100%; height: 40px; background: #8A8F98"></div>
+<span style="position: absolute; left: 10px; bottom: 8px; font-size: 11px; font-weight: 700; color: #1A1C20; background: rgba(255,255,255,0.75); padding: 2px 6px; border-radius: 4px">Naive · washed out</span>
+</div>
+<div style="width: 2px; background: #ECEEF1"></div>
+<div style="flex: 1; background: #1E2A3A; position: relative; overflow: hidden">
+<div style="position: absolute; left: 24px; top: 22px; width: 70px; height: 70px; border-radius: 35px; background: #FFD27A"></div>
+<div style="position: absolute; left: 0; bottom: 0; width: 100%; height: 40px; background: #2F5D50"></div>
+<span style="position: absolute; left: 10px; bottom: 8px; font-size: 11px; font-weight: 700; color: #1A1206; background: {{accent}}; padding: 2px 6px; border-radius: 4px">Capta · tone-mapped</span>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px">
+<label for="sdrw">SDR white level</label>
+<span style="font-family: 'JetBrains Mono',Consolas,monospace; font-size: 12px; color: #D7DBE0">240 nits</span>
+</div>
+<input id="sdrw" type="range" min="80" max="480" value="240" style="width: 100%; accent-color: {{accent}}">
+<button style="display: flex; align-items: center; gap: 10px; background: transparent; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 13px; color: #D7DBE0; text-align: left; min-height: 32px" aria-pressed="true">
+<span style="width: 18px; height: 18px; border-radius: 5px; background: {{accent}}; display: flex; align-items: center; justify-content: center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1A1206" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span>
+Match the Windows HDR brightness slider automatically</button>
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px">
+<span>Highlight roll-off</span>
+<div style="display: flex; padding: 3px; background: #111317; border-radius: 10px; gap: 2px">
+<button class="ib" style="height: 32px; padding: 0 12px; border-radius: 8px; font: inherit; font-size: 12px">Soft</button>
+<button style="height: 32px; padding: 0 12px; border: 0; border-radius: 8px; cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; background: #33383F; color: #ECEEF1">Balanced</button>
+<button class="ib" style="height: 32px; padding: 0 12px; border-radius: 8px; font: inherit; font-size: 12px">Clip</button>
+</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8B93A0; margin-bottom: 6px">Colour output</div>
+<div style="display: flex; align-items: center; justify-content: space-between; min-height: 44px; font-size: 13px">
+<span>Colour space</span>
+<button class="ib" style="height: 36px; padding: 0 12px; border-radius: 8px; background: #23272C; font: inherit; font-size: 13px; color: #ECEEF1; display: flex; align-items: center; gap: 8px">sRGB<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></button>
+</div>
+<button style="display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; background: transparent; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 13px; color: #ECEEF1; text-align: left" aria-pressed="true">
+<span>Embed colour profile in saved files</span>
+<span style="width: 40px; height: 22px; border-radius: 11px; background: {{accent}}; position: relative; display: inline-block; flex-shrink: 0"><span style="position: absolute; top: 3px; left: 21px; width: 16px; height: 16px; border-radius: 8px; background: #1A1206"></span></span>
+</button>
+<button style="display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; background: transparent; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 13px; color: #ECEEF1; text-align: left" aria-pressed="true">
+<span>Correct for each monitor's colour profile</span>
+<span style="width: 40px; height: 22px; border-radius: 11px; background: {{accent}}; position: relative; display: inline-block; flex-shrink: 0"><span style="position: absolute; top: 3px; left: 21px; width: 16px; height: 16px; border-radius: 8px; background: #1A1206"></span></span>
+</button>
+</div>
+
+</div>
+
+<div style="padding: 14px 24px; border-top: 1px solid #262A30; display: flex; justify-content: space-between; align-items: center">
+<button class="ib" style="height: 40px; padding: 0 12px; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 600">Reset to defaults</button>
+<button style="height: 40px; padding: 0 22px; border: 0; border-radius: 10px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; background: {{accent}}; color: #1A1206">Done</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#FFB547","options":["#FFB547","#5EC8FF","#A795FF","#5FD3A5"]},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+const accent = this.props.accent ?? '#FFB547';
+return { accent: accent, accentSoft: accent + '1F' };
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Capta — startup and shortcuts</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#FFB547}a:hover{color:#FFD08A}
+.ib{background:transparent;border:0;cursor:pointer;color:#C9CED6}
+.ib:hover{background:rgba(255,255,255,0.06)}
+</style>
+</helmet>
+<div style="width: 680px; height: 900px; box-sizing: border-box; background: #15171B; border: 1px solid #2E333A; border-radius: 14px; font-family: 'Segoe UI Variable Text','Segoe UI',Manrope,system-ui,sans-serif; color: #ECEEF1; display: flex; flex-direction: column; overflow: hidden">
+
+<div style="padding: 22px 24px 10px; display: flex; align-items: center; gap: 12px">
+<span style="font-size: 20px; font-weight: 700; flex-grow: 1">Startup &amp; shortcuts</span>
+<button class="ib" aria-label="Close" style="width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+
+<div style="flex-grow: 1; padding: 0 24px 16px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column">
+<div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8B93A0; margin-bottom: 4px">Startup</div>
+<button style="display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; background: transparent; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 14px; color: #ECEEF1; text-align: left" aria-pressed="true">
+<span>Start Capta when Windows starts</span>
+<span style="width: 40px; height: 22px; border-radius: 11px; background: {{accent}}; position: relative; display: inline-block; flex-shrink: 0"><span style="position: absolute; top: 3px; left: 21px; width: 16px; height: 16px; border-radius: 8px; background: #1A1206"></span></span>
+</button>
+<button style="display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; background: transparent; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 14px; color: #ECEEF1; text-align: left" aria-pressed="true">
+<span><span style="display: block">Start quietly in the system tray</span><span style="display: block; font-size: 12px; color: #A7AEB8">Ready on Print Screen without opening a window</span></span>
+<span style="width: 40px; height: 22px; border-radius: 11px; background: {{accent}}; position: relative; display: inline-block; flex-shrink: 0"><span style="position: absolute; top: 3px; left: 21px; width: 16px; height: 16px; border-radius: 8px; background: #1A1206"></span></span>
+</button>
+<button style="display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; background: transparent; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 14px; color: #ECEEF1; text-align: left" aria-pressed="false">
+<span>Show the floating toolbar at startup</span>
+<span style="width: 40px; height: 22px; border-radius: 11px; background: #3A404A; position: relative; display: inline-block; flex-shrink: 0"><span style="position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 8px; background: #C9CED6"></span></span>
+</button>
+<button style="display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; background: transparent; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 14px; color: #ECEEF1; text-align: left" aria-pressed="true">
+<span>Keep running in the tray when the toolbar is closed</span>
+<span style="width: 40px; height: 22px; border-radius: 11px; background: {{accent}}; position: relative; display: inline-block; flex-shrink: 0"><span style="position: absolute; top: 3px; left: 21px; width: 16px; height: 16px; border-radius: 8px; background: #1A1206"></span></span>
+</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8B93A0">Print Screen key</div>
+
+<sc-if value="{{conflict}}" hint-placeholder-val="{{ true }}">
+<div style="padding: 14px 16px; border-radius: 12px; background: #2A2418; border: 1px solid #5C4A25; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; gap: 12px">
+<svg style="flex-shrink: 0; margin-top: 1px" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFB547" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg>
+<div>
+<div style="font-size: 14px; font-weight: 700">Windows is using Print Screen for the Snipping Tool</div>
+<div style="font-size: 12.5px; color: #D7CDBA; margin-top: 3px; line-height: 1.5">Turn off "Use the Print screen key to open screen capture" in Windows settings. Capta notices the change automatically.</div>
+</div>
+</div>
+<div style="display: flex; gap: 8px; padding-left: 32px">
+<button onClick="{{takeOver}}" style="height: 40px; padding: 0 16px; border: 0; border-radius: 10px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; background: {{accent}}; color: #1A1206">Open keyboard settings</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{owned}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 14px 16px; border-radius: 12px; background: #172420; border: 1px solid #2C5245; display: flex; align-items: center; gap: 12px">
+<svg style="flex-shrink: 0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5FD3A5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg>
+<div style="flex-grow: 1">
+<div style="font-size: 14px; font-weight: 700">Print Screen opens Capta</div>
+<div style="font-size: 12.5px; color: #B9CFC6; margin-top: 2px">Works even when the toolbar is hidden.</div>
+</div>
+<button onClick="{{giveBack}}" class="ib" style="height: 40px; padding: 0 12px; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 600; color: #ECEEF1">Give back to Windows…</button>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-direction: column; background: #1A1D21; border: 1px solid #2A2E35; border-radius: 12px; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border-bottom: 1px solid #262A30; font-size: 13.5px">
+<span style="flex-grow: 1">Open capture (last used mode)</span>
+<span style="font-family: 'JetBrains Mono',Consolas,monospace; font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #2A2F37; border: 1px solid #3D434D">PrtSc</span>
+<button class="ib" aria-label="Change shortcut for open capture" style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path></svg></button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border-bottom: 1px solid #262A30; font-size: 13.5px">
+<span style="flex-grow: 1">Full screen, straight to clipboard</span>
+<span style="font-family: 'JetBrains Mono',Consolas,monospace; font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #2A2F37; border: 1px solid #3D434D">Shift + PrtSc</span>
+<button class="ib" aria-label="Change shortcut for full screen" style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path></svg></button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border-bottom: 1px solid #262A30; font-size: 13.5px">
+<span style="flex-grow: 1">Active window</span>
+<span style="font-family: 'JetBrains Mono',Consolas,monospace; font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #2A2F37; border: 1px solid #3D434D">Alt + PrtSc</span>
+<button class="ib" aria-label="Change shortcut for active window" style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path></svg></button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border-bottom: 1px solid #262A30; font-size: 13.5px">
+<span style="flex-grow: 1">Record video</span>
+<span style="font-family: 'JetBrains Mono',Consolas,monospace; font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #2A2F37; border: 1px solid #3D434D">Ctrl + PrtSc</span>
+<button class="ib" aria-label="Change shortcut for record video" style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path></svg></button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; font-size: 13.5px">
+<span style="flex-grow: 1">Grab text from screen</span>
+<span style="font-family: 'JetBrains Mono',Consolas,monospace; font-size: 12px; padding: 4px 8px; border-radius: 6px; background: #2A2F37; border: 1px solid #3D434D">Ctrl + Shift + PrtSc</span>
+<button class="ib" aria-label="Change shortcut for grab text" style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path></svg></button>
+</div>
+</div>
+<div style="font-size: 12px; color: #8B93A0; line-height: 1.5">Win + Shift + S is reserved by Windows and will still open the Snipping Tool.</div>
+</div>
+
+</div>
+
+<div style="padding: 14px 24px; border-top: 1px solid #262A30; display: flex; justify-content: flex-end">
+<button style="height: 40px; padding: 0 22px; border: 0; border-radius: 10px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; background: {{accent}}; color: #1A1206">Done</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#FFB547","options":["#FFB547","#5EC8FF","#A795FF","#5FD3A5"]},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { owned: false };
+}
+renderVals() {
+const owned = this.state.owned;
+return {
+accent: this.props.accent ?? '#FFB547',
+owned: owned,
+conflict: !owned,
+takeOver: () => this.setState({ owned: true }),
+giveBack: () => this.setState({ owned: false })
+};
+}
+}
+</script>
+</body>
+</html>

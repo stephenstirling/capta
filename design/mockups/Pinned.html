@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Capta — pinned capture</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#FFB547}a:hover{color:#FFD08A}
+.ib{background:transparent;border:0;cursor:pointer;color:#D7DBE0}
+.ib:hover{background:rgba(255,255,255,0.1)}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; overflow: hidden; background: #1A1F27; font-family: 'Segoe UI Variable Text','Segoe UI',Manrope,system-ui,sans-serif; color: #ECEEF1">
+
+<div style="position: absolute; left: 60px; top: 50px; width: 1040px; height: 760px; background: #1E232B; border: 1px solid #323843; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column">
+<div style="height: 36px; background: #181C22; border-bottom: 1px solid #2C323C"></div>
+<div style="flex-grow: 1; display: flex">
+<div style="width: 220px; background: #1A1E25; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+<div style="width: 70%; height: 8px; border-radius: 4px; background: #3A414D"></div>
+<div style="width: 85%; height: 8px; border-radius: 4px; background: #48505E"></div>
+<div style="width: 60%; height: 8px; border-radius: 4px; background: #3A414D"></div>
+<div style="width: 75%; height: 8px; border-radius: 4px; background: #3A414D"></div>
+</div>
+<div style="flex-grow: 1; padding: 28px 32px; display: flex; flex-direction: column; gap: 12px">
+<div style="width: 40%; height: 8px; border-radius: 4px; background: #C792EA; opacity: 0.6"></div>
+<div style="width: 62%; height: 8px; border-radius: 4px; background: #5EC8FF; opacity: 0.55; margin-left: 28px"></div>
+<div style="width: 50%; height: 8px; border-radius: 4px; background: #9AA2AE; opacity: 0.5; margin-left: 28px"></div>
+<div style="width: 70%; height: 8px; border-radius: 4px; background: #5FD3A5; opacity: 0.5; margin-left: 56px"></div>
+<div style="width: 44%; height: 8px; border-radius: 4px; background: #9AA2AE; opacity: 0.5; margin-left: 56px"></div>
+<div style="width: 58%; height: 8px; border-radius: 4px; background: #FFB547; opacity: 0.5; margin-left: 28px"></div>
+<div style="width: 30%; height: 8px; border-radius: 4px; background: #C792EA; opacity: 0.6"></div>
+<div style="width: 66%; height: 8px; border-radius: 4px; background: #5EC8FF; opacity: 0.55; margin-left: 28px; margin-top: 12px"></div>
+<div style="width: 48%; height: 8px; border-radius: 4px; background: #9AA2AE; opacity: 0.5; margin-left: 28px"></div>
+</div>
+</div>
+</div>
+
+<div style="position: absolute; left: 0; bottom: 0; width: 100%; height: 48px; background: #12151A; border-top: 1px solid #232830; display: flex; justify-content: center; align-items: center; gap: 8px">
+<div style="width: 32px; height: 32px; border-radius: 6px; background: #2A303A"></div>
+<div style="width: 32px; height: 32px; border-radius: 6px; background: #2A303A"></div>
+<div style="width: 32px; height: 32px; border-radius: 6px; background: #2A303A"></div>
+<div style="width: 32px; height: 32px; border-radius: 6px; background: #2A303A"></div>
+</div>
+
+<div style="position: absolute; left: 900px; top: 130px; width: 480px; display: flex; flex-direction: column; gap: 8px">
+<div style="align-self: flex-end; display: flex; align-items: center; gap: 2px; padding: 4px; background: rgba(24,27,32,0.96); border: 1px solid #343A44; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.5)">
+<span style="display: flex; align-items: center; gap: 8px; padding: 0 8px; font-size: 12px; color: #A7AEB8">Opacity
+<input aria-label="Pinned capture opacity" type="range" min="20" max="100" value="{{opacity}}" style="width: 80px; accent-color: {{accent}}">
+<span style="font-family: 'JetBrains Mono',Consolas,monospace; color: #D7DBE0; width: 34px">{{opacity}}%</span></span>
+<button class="ib" aria-label="Click through" aria-pressed="false" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 8-6 2-2 6z"></path><path d="M3 21l6-6" stroke-dasharray="2 3"></path></svg></button>
+<button class="ib" aria-label="Copy" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg></button>
+<button class="ib" aria-label="Edit in Capta" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path></svg></button>
+<button class="ib" aria-label="Unpin" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div style="position: relative; border-radius: 10px; outline: 2px solid {{accent}}; outline-offset: 2px; box-shadow: 0 24px 60px rgba(0,0,0,0.6); opacity: {{opacityFrac}}">
+<div style="height: 300px; background: #FFFFFF; border-radius: 10px; display: flex; overflow: hidden; color: #1B1F24; font-size: 12px">
+<div style="width: 120px; background: #F4F5F7; padding: 16px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+<div style="font-weight: 700; padding: 0 6px 8px">Settings</div>
+<div style="padding: 6px; border-radius: 5px; color: #3F4650">General</div>
+<div style="padding: 6px; border-radius: 5px; background: #E2E7EE; font-weight: 600">Network</div>
+<div style="padding: 6px; border-radius: 5px; color: #3F4650">Privacy</div>
+</div>
+<div style="flex-grow: 1; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 17px; font-weight: 700">Network</div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border: 1px solid #E5E7EB; border-radius: 6px"><span style="font-weight: 600">Wi‑Fi</span><span style="width: 30px; height: 16px; border-radius: 8px; background: #2F6FEB"></span></div>
+<div style="position: relative; display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border: 1px solid #E5E7EB; border-radius: 6px"><span style="font-weight: 600">Proxy server</span><span style="width: 30px; height: 16px; border-radius: 8px; background: #D1D5DB"></span>
+<span style="position: absolute; left: -11px; top: 50%; margin-top: -11px; width: 22px; height: 22px; border-radius: 11px; background: {{accent}}; color: #1A1206; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #FFFFFF">1</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border: 1px solid #E5E7EB; border-radius: 6px"><span style="font-weight: 600">Metered connection</span><span style="width: 30px; height: 16px; border-radius: 8px; background: #D1D5DB"></span></div>
+</div>
+</div>
+<div style="position: absolute; right: 8px; bottom: 8px; width: 14px; height: 14px; border-right: 3px solid {{accent}}; border-bottom: 3px solid {{accent}}; border-radius: 0 0 4px 0"></div>
+</div>
+<div style="align-self: flex-end; font-size: 12px; color: #A7AEB8">Scroll to zoom · drag corner to resize · double-click to unpin</div>
+</div>
+
+<div style="position: absolute; left: 1150px; top: 600px; display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; background: rgba(24,27,32,0.96); border: 1px solid #343A44; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.5)">
+<span style="width: 36px; height: 36px; border-radius: 8px; background: #2F6FEB"></span>
+<span style="font-family: 'JetBrains Mono',Consolas,monospace; font-size: 13px">#2F6FEB</span>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6M16 6l-5 5-4-1-2 2 7 7 2-2-1-4 5-5M8 16l-4 4"></path></svg>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#FFB547","options":["#FFB547","#5EC8FF","#A795FF","#5FD3A5"]},"opacity":{"editor":"range","default":90,"min":20,"max":100,"step":5,"unit":"%"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+const opacity = this.props.opacity ?? 90;
+return { accent: this.props.accent ?? '#FFB547', opacity: opacity, opacityFrac: opacity / 100 };
+}
+}
+</script>
+</body>
+</html>
