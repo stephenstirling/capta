@@ -78,6 +78,18 @@
             <SolidColorBrush x:Key="CaptaHoverOverlayBrush" Color="{StaticResource CaptaHoverOverlayColor}" />
             <Color x:Key="CaptaPressedOverlayColor">#0AFFFFFF</Color>
             <SolidColorBrush x:Key="CaptaPressedOverlayBrush" Color="{StaticResource CaptaPressedOverlayColor}" />
+            <!-- Secondary text on floating surfaces (card subline, menu descriptions) -->
+            <Color x:Key="CaptaFloatingMutedColor">#A7AEB8</Color>
+            <SolidColorBrush x:Key="CaptaFloatingMutedBrush" Color="{StaticResource CaptaFloatingMutedColor}" />
+            <!-- Split-button dropdown half -->
+            <Color x:Key="CaptaControlRaisedColor">#353B44</Color>
+            <SolidColorBrush x:Key="CaptaControlRaisedBrush" Color="{StaticResource CaptaControlRaisedColor}" />
+            <!-- Card menus, e.g. the Copy options -->
+            <Color x:Key="CaptaMenuSurfaceColor">#22262C</Color>
+            <SolidColorBrush x:Key="CaptaMenuSurfaceBrush" Color="{StaticResource CaptaMenuSurfaceColor}" />
+            <!-- Default item in a menu: rgba(255,255,255,0.06) -->
+            <Color x:Key="CaptaMenuItemSelectedColor">#0FFFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaMenuItemSelectedBrush" Color="{StaticResource CaptaMenuItemSelectedColor}" />
             <!-- Fluent control overrides, mapped onto the tokens above. -->
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
@@ -152,6 +164,14 @@
             <SolidColorBrush x:Key="CaptaHoverOverlayBrush" Color="{StaticResource CaptaHoverOverlayColor}" />
             <Color x:Key="CaptaPressedOverlayColor">#08000000</Color>
             <SolidColorBrush x:Key="CaptaPressedOverlayBrush" Color="{StaticResource CaptaPressedOverlayColor}" />
+            <Color x:Key="CaptaFloatingMutedColor">#5B6370</Color>
+            <SolidColorBrush x:Key="CaptaFloatingMutedBrush" Color="{StaticResource CaptaFloatingMutedColor}" />
+            <Color x:Key="CaptaControlRaisedColor">#D9DCE1</Color>
+            <SolidColorBrush x:Key="CaptaControlRaisedBrush" Color="{StaticResource CaptaControlRaisedColor}" />
+            <Color x:Key="CaptaMenuSurfaceColor">#FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaMenuSurfaceBrush" Color="{StaticResource CaptaMenuSurfaceColor}" />
+            <Color x:Key="CaptaMenuItemSelectedColor">#0A000000</Color>
+            <SolidColorBrush x:Key="CaptaMenuItemSelectedBrush" Color="{StaticResource CaptaMenuItemSelectedColor}" />
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
             <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
@@ -195,6 +215,10 @@
             <SolidColorBrush x:Key="CaptaTextFaintBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
             <SolidColorBrush x:Key="CaptaHoverOverlayBrush" Color="{ThemeResource SystemColorHighlightColor}" />
             <SolidColorBrush x:Key="CaptaPressedOverlayBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaFloatingMutedBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
+            <SolidColorBrush x:Key="CaptaControlRaisedBrush" Color="{ThemeResource SystemColorButtonFaceColor}" />
+            <SolidColorBrush x:Key="CaptaMenuSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaMenuItemSelectedBrush" Color="{ThemeResource SystemColorHighlightColor}" />
 </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>

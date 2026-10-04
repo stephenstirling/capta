@@ -2,12 +2,14 @@ using System.Runtime.InteropServices;
 using Capta.Capture;
 using Microsoft.UI;
 using Microsoft.Windows.Storage.Pickers;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Media.Ocr;
 using Windows.Storage;
 using Windows.System;
 
 namespace Capta.Services;
 
-/// <summary>Edit and Save for a finished capture.</summary>
+/// <summary>Actions on a finished capture: Edit, Save, Copy variants and Ocula hand-off.</summary>
 public static partial class CaptureActions
 {
     /// <summary>
@@ -16,16 +18,63 @@ public static partial class CaptureActions
     /// </summary>
     public static async Task EditAsync(CapturedImage image)
     {
-        var folder = await ApplicationData.Current.TemporaryFolder.CreateFolderAsync("Edit", CreationCollisionOption.OpenIfExists);
-        var file = await folder.CreateFileAsync(ImageExport.DefaultFileName() + ".png", CreationCollisionOption.GenerateUniqueName);
-        await ImageExport.SaveAsync(image, file);
-
-        var ocula = new Uri($"ocula:edit?file={Uri.EscapeDataString(file.Path)}");
-        var support = await Launcher.QueryUriSupportAsync(ocula, LaunchQuerySupportType.Uri);
-        if (support == LaunchQuerySupportStatus.Available)
+        var file = await SaveTempAsync(image, "Edit");
+        var ocula = OculaUri("edit", file.Path);
+        if (await IsOculaInstalledAsync())
             await Launcher.LaunchUriAsync(ocula);
         else
             await Launcher.LaunchFileAsync(file);
+    }
+
+    /// <summary>Adds the capture to Ocula's library via <c>ocula:import?file=&lt;path&gt;</c>.</summary>
+    public static async Task SendToOculaAsync(CapturedImage image)
+    {
+        var file = await SaveTempAsync(image, "Ocula");
+        await Launcher.LaunchUriAsync(OculaUri("import", file.Path));
+    }
+
+    public static async Task<bool> IsOculaInstalledAsync() =>
+        await Launcher.QueryUriSupportAsync(new Uri("ocula:"), LaunchQuerySupportType.Uri) == LaunchQuerySupportStatus.Available;
+
+    private static Uri OculaUri(string verb, string path) => new($"ocula:{verb}?file={Uri.EscapeDataString(path)}");
+
+    /// <summary>Copies the capture as a PNG file (pastes into Explorer, email and chat apps).</summary>
+    public static async Task CopyAsFileAsync(CapturedImage image)
+    {
+        var file = await SaveTempAsync(image, "Clipboard");
+        var package = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
+        package.SetStorageItems([file]);
+        Clipboard.SetContent(package);
+        Clipboard.Flush();
+    }
+
+    public static void CopyText(string text)
+    {
+        var package = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
+        package.SetText(text);
+        Clipboard.SetContent(package);
+        Clipboard.Flush();
+    }
+
+    /// <summary>Recognises text with on-device Windows OCR and copies it. Returns the text, or null if none was found.</summary>
+    public static async Task<string?> CopyTextInImageAsync(CapturedImage image)
+    {
+        var engine = OcrEngine.TryCreateFromUserProfileLanguages()
+            ?? throw new InvalidOperationException("No OCR language is installed. Add one in Settings > Time & language.");
+        using var bitmap = image.ToSoftwareBitmap();
+        var result = await engine.RecognizeAsync(bitmap);
+        var text = string.Join(Environment.NewLine, result.Lines.Select(l => l.Text));
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        CopyText(text);
+        return text;
+    }
+
+    private static async Task<StorageFile> SaveTempAsync(CapturedImage image, string folderName)
+    {
+        var folder = await ApplicationData.Current.TemporaryFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
+        var file = await folder.CreateFileAsync(ImageExport.DefaultFileName() + ".png", CreationCollisionOption.GenerateUniqueName);
+        await ImageExport.SaveAsync(image, file);
+        return file;
     }
 
     /// <summary>Save As dialog defaulting to Pictures\Screenshots. Returns the saved path, or null if cancelled.</summary>

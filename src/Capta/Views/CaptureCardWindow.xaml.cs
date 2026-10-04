@@ -4,6 +4,7 @@ using Capta.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Graphics;
@@ -12,18 +13,19 @@ using static Capta.Interop.NativeMethods;
 namespace Capta.Views;
 
 /// <summary>
-/// Post-capture card: bottom-right of the capture's monitor, auto-hides after 6 s
-/// unless hovered. Reused across captures (hidden, never closed).
+/// After-capture card (design/mockups/Toolbar.html): bottom-right of the capture's monitor,
+/// auto-hides after 6 s unless hovered or busy. Reused across captures (hidden, never closed).
 /// </summary>
 public sealed partial class CaptureCardWindow : Window
 {
-    private const double WidthDip = 340;
-    private const double MarginDip = 12;
+    /// <summary>Gap between the panel and the work-area edges.</summary>
+    private const double MarginDip = 24;
     private static readonly TimeSpan AutoHide = TimeSpan.FromSeconds(6);
 
     private readonly DispatcherQueueTimer _timer;
     private CaptureResult? _current;
     private bool _busy;
+    private bool _hovered;
 
     public event Action<CaptureResult>? PinRequested;
 
@@ -33,7 +35,7 @@ public sealed partial class CaptureCardWindow : Window
         ExtendsContentIntoTitleBar = true;
 
         var presenter = OverlappedPresenter.Create();
-        presenter.SetBorderAndTitleBar(hasBorder: true, hasTitleBar: false);
+        presenter.SetBorderAndTitleBar(hasBorder: false, hasTitleBar: false);
         presenter.IsResizable = false;
         presenter.IsMaximizable = false;
         presenter.IsMinimizable = false;
@@ -41,11 +43,35 @@ public sealed partial class CaptureCardWindow : Window
         AppWindow.SetPresenter(presenter);
         AppWindow.IsShownInSwitchers = false;
         AppWindow.SetIcon("Assets/Capta.ico");
+        TransparentBackdrop.PrepareWindow(this);
         SetWindowDisplayAffinity(this.GetHwnd(), WDA_EXCLUDEFROMCAPTURE);
+
+        Panel.SizeChanged += (_, _) =>
+        {
+            ShadowHost.Width = Panel.ActualWidth;
+            ShadowHost.Height = Panel.ActualHeight;
+        };
+        ShadowHost.HorizontalAlignment = Panel.HorizontalAlignment = HorizontalAlignment.Left;
+        ShadowHost.VerticalAlignment = Panel.VerticalAlignment = VerticalAlignment.Top;
+        Interop.Shadow.Attach(ShadowHost, cornerRadius: 16, offsetY: 20, blur: 50, opacity: 0.55);
+
         AppWindow.Closing += (_, e) =>
         {
             e.Cancel = true;
             Hide();
+        };
+
+        CopyMenu.Opening += (_, _) =>
+        {
+            AutoCopySwitch.IsOn = Settings.AutoCopy;
+            CopyPathRow.IsEnabled = _current?.SavedPath is not null;
+            _busy = true;
+            _timer!.Stop();
+        };
+        CopyMenu.Closed += (_, _) =>
+        {
+            _busy = false;
+            if (!_hovered) RestartTimer();
         };
 
         _timer = DispatcherQueue.CreateTimer();
@@ -58,8 +84,12 @@ public sealed partial class CaptureCardWindow : Window
     {
         _current = result;
         var image = result.Image;
-        SizeText.Text = $"{image.Width} × {image.Height}";
-        SetStatus("", copied ? "Copied to clipboard" : "Capture ready");
+        DetailText.Text = $"{result.ModeName} · {image.Width} × {image.Height}" + (result.WasHdr ? " · tone-mapped from HDR" : "");
+        SetStatus(copied ? "Copied to clipboard" : "Capture ready", success: copied);
+
+        var oculaInstalled = await CaptureActions.IsOculaInstalledAsync();
+        OculaButton.IsEnabled = oculaInstalled;
+        ToolTipService.SetToolTip(OculaButton, oculaInstalled ? "Send to Ocula" : "Send to Ocula (Ocula isn't installed)");
 
         var source = new SoftwareBitmapSource();
         await source.SetBitmapAsync(image.ToSoftwareBitmap());
@@ -71,26 +101,27 @@ public sealed partial class CaptureCardWindow : Window
         RestartTimer();
     }
 
+    /// <summary>Bottom-right of the monitor's work area; the window's padding holds the shadow.</summary>
     private void PlaceOn(MonitorInfo monitor)
     {
-        // Move first so the window adopts the target monitor's DPI before sizing.
         var area = monitor.WorkArea;
+        // Move first so the window adopts the target monitor's DPI before sizing.
         AppWindow.Move(new PointInt32(area.X + area.Width / 2, area.Y + area.Height / 2));
         var scale = this.GetScale();
 
-        Root.Width = WidthDip;
-        Root.Measure(new Windows.Foundation.Size(WidthDip, double.PositiveInfinity));
-        var size = new SizeInt32((int)Math.Ceiling(WidthDip * scale), (int)Math.Ceiling(Root.DesiredSize.Height * scale));
-        var margin = (int)(MarginDip * scale);
+        Root.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+        var size = new SizeInt32((int)Math.Ceiling(Root.DesiredSize.Width * scale), (int)Math.Ceiling(Root.DesiredSize.Height * scale));
+        var pad = Root.Padding;
         AppWindow.MoveAndResize(new RectInt32(
-            area.X + area.Width - size.Width - margin,
-            area.Y + area.Height - size.Height - margin,
+            area.X + area.Width - size.Width - (int)((MarginDip - pad.Right) * scale),
+            area.Y + area.Height - size.Height - (int)((MarginDip - pad.Bottom) * scale),
             size.Width, size.Height));
     }
 
     public void Hide()
     {
         _timer.Stop();
+        CopyMenu.Hide();
         AppWindow.Hide();
     }
 
@@ -100,25 +131,104 @@ public sealed partial class CaptureCardWindow : Window
         _timer.Start();
     }
 
-    private void SetStatus(string glyph, string text)
+    private void SetStatus(string text, bool success = true)
     {
-        StatusIcon.Glyph = glyph;
         StatusText.Text = text;
+        SuccessDot.Visibility = success ? Visibility.Visible : Visibility.Collapsed;
+        NeutralDot.Visibility = success ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private void OnPointerEntered(object sender, PointerRoutedEventArgs e) => _timer.Stop();
+    // ---- Hover keeps the card open ----
+
+    private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        _hovered = true;
+        _timer.Stop();
+    }
 
     private void OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
+        _hovered = false;
         if (!_busy) RestartTimer();
     }
 
-    private async void OnCopy(object sender, RoutedEventArgs e)
+    // ---- Copy ----
+
+    private async void OnCopy(object sender, RoutedEventArgs e) => await CopyImageAsync();
+
+    private async void OnCopyImage(object sender, RoutedEventArgs e)
+    {
+        CopyMenu.Hide();
+        await CopyImageAsync();
+    }
+
+    private async Task CopyImageAsync()
     {
         if (_current is null) return;
-        await ImageExport.CopyToClipboardAsync(_current.Image);
-        SetStatus("", "Copied to clipboard");
+        await RunAsync(async () =>
+        {
+            await ImageExport.CopyToClipboardAsync(_current.Image);
+            SetStatus("Copied to clipboard");
+        });
     }
+
+    private async void OnCopyText(object sender, RoutedEventArgs e)
+    {
+        CopyMenu.Hide();
+        await CopyTextAsync();
+    }
+
+    private async Task CopyTextAsync()
+    {
+        if (_current is null) return;
+        await RunAsync(async () =>
+        {
+            var text = await CaptureActions.CopyTextInImageAsync(_current.Image);
+            if (text is null)
+            {
+                SetStatus("No text found", success: false);
+                return;
+            }
+            var lines = text.Split(Environment.NewLine).Length;
+            SetStatus(lines == 1 ? "Copied 1 line of text" : $"Copied {lines} lines of text");
+        });
+    }
+
+    private async void OnCopyAsFile(object sender, RoutedEventArgs e)
+    {
+        CopyMenu.Hide();
+        if (_current is null) return;
+        await RunAsync(async () =>
+        {
+            await CaptureActions.CopyAsFileAsync(_current.Image);
+            SetStatus("Copied as file");
+        });
+    }
+
+    private void OnCopyPath(object sender, RoutedEventArgs e)
+    {
+        CopyMenu.Hide();
+        if (_current?.SavedPath is not { } path) return;
+        CaptureActions.CopyText(path);
+        SetStatus("Copied file path");
+        RestartTimer();
+    }
+
+    private void OnAutoCopyToggled(object sender, RoutedEventArgs e) => Settings.AutoCopy = AutoCopySwitch.IsOn;
+
+    private async void OnCopyAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        await CopyImageAsync();
+    }
+
+    private async void OnCopyTextAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        await CopyTextAsync();
+    }
+
+    // ---- Edit, Save, Pin, Ocula ----
 
     private async void OnEdit(object sender, RoutedEventArgs e)
     {
@@ -136,9 +246,9 @@ public sealed partial class CaptureCardWindow : Window
         await RunAsync(async () =>
         {
             var path = await CaptureActions.SaveAsAsync(_current.Image, AppWindow.Id);
-            if (path is not null)
-                SetStatus("", $"Saved {Path.GetFileName(path)}");
-            RestartTimer();
+            if (path is null) return;
+            _current.SavedPath = path;
+            SetStatus($"Saved {Path.GetFileName(path)}");
         });
     }
 
@@ -147,6 +257,16 @@ public sealed partial class CaptureCardWindow : Window
         if (_current is null) return;
         PinRequested?.Invoke(_current);
         Hide();
+    }
+
+    private async void OnSendToOcula(object sender, RoutedEventArgs e)
+    {
+        if (_current is null) return;
+        await RunAsync(async () =>
+        {
+            await CaptureActions.SendToOculaAsync(_current.Image);
+            SetStatus("Sent to Ocula");
+        });
     }
 
     private void OnClose(object sender, RoutedEventArgs e) => Hide();
@@ -168,12 +288,13 @@ public sealed partial class CaptureCardWindow : Window
         }
         catch (Exception ex)
         {
-            SetStatus("", ex.Message);
-            RestartTimer();
+            Log.Error("Card action failed", ex);
+            SetStatus(ex.Message, success: false);
         }
         finally
         {
             _busy = false;
+            if (!_hovered) RestartTimer();
         }
     }
 }

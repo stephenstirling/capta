@@ -44,7 +44,8 @@ public sealed class CaptureCoordinator
     private async Task<CaptureResult> CaptureFullScreenAsync()
     {
         var monitor = Monitors.AtPoint(WindowHelper.CursorPosition());
-        return new CaptureResult(await _source.CaptureMonitorAsync(monitor), monitor, monitor.Bounds);
+        return new CaptureResult(await _source.CaptureMonitorAsync(monitor), monitor, monitor.Bounds,
+            CaptureMode.FullScreen, GraphicsCaptureSource.IsHdr(monitor.Handle));
     }
 
     /// <summary>The foreground window, captured live; falls back to full screen over the desktop or shell.</summary>
@@ -57,7 +58,8 @@ public sealed class CaptureCoordinator
         var image = await _source.CaptureWindowAsync(target.Handle);
         var b = target.Bounds;
         var monitor = Monitors.AtPoint(new PointInt32(b.X + b.Width / 2, b.Y + b.Height / 2));
-        return new CaptureResult(image, monitor, new RectInt32(b.X, b.Y, image.Width, image.Height));
+        return new CaptureResult(image, monitor, new RectInt32(b.X, b.Y, image.Width, image.Height),
+            CaptureMode.ActiveWindow, GraphicsCaptureSource.IsHdr(monitor.Handle));
     }
 
     private async Task<CaptureResult?> SelectAsync(CaptureMode mode)
@@ -75,7 +77,8 @@ public sealed class CaptureCoordinator
             {
                 var b = r.Monitor.Bounds;
                 var screen = new RectInt32(b.X + r.Rect.X, b.Y + r.Rect.Y, r.Rect.Width, r.Rect.Height);
-                return new CaptureResult(r.Frame.Crop(r.Rect), r.Monitor, screen);
+                return new CaptureResult(r.Frame.Crop(r.Rect), r.Monitor, screen,
+                    mode, GraphicsCaptureSource.IsHdr(r.Monitor.Handle));
             }
             case OverlayResult.WindowSelected w:
             {
@@ -83,7 +86,8 @@ public sealed class CaptureCoordinator
                 var image = await _source.CaptureWindowAsync(w.Target.Handle);
                 var b = w.Target.Bounds;
                 var monitor = Monitors.AtPoint(new PointInt32(b.X + b.Width / 2, b.Y + b.Height / 2));
-                return new CaptureResult(image, monitor, new RectInt32(b.X, b.Y, image.Width, image.Height));
+                return new CaptureResult(image, monitor, new RectInt32(b.X, b.Y, image.Width, image.Height),
+                    mode, GraphicsCaptureSource.IsHdr(monitor.Handle));
             }
             default:
                 return null;
