@@ -7,7 +7,7 @@
 
     <Grid
         x:Name="Root"
-        Background="Black"
+        Background="{ThemeResource CaptaBackgroundBrush}"
         PointerPressed="OnPointerPressed"
         PointerMoved="OnPointerMoved"
         PointerReleased="OnPointerReleased"
@@ -40,14 +40,14 @@
             Padding="6,2"
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom"
-            Background="#B31E1A14"
+            Background="{ThemeResource CaptaReadoutSurfaceBrush}"
             CornerRadius="4"
             IsHitTestVisible="False"
             Opacity="0">
             <Border.OpacityTransition>
                 <ScalarTransition />
             </Border.OpacityTransition>
-            <TextBlock x:Name="ZoomText" FontFamily="Cascadia Mono, Consolas" FontSize="11" Foreground="White" />
+            <TextBlock x:Name="ZoomText" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingTextBrush}" />
         </Border>
     </Grid>
 </Window>

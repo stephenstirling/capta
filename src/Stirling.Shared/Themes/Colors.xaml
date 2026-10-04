@@ -90,6 +90,29 @@
             <!-- Default item in a menu: rgba(255,255,255,0.06) -->
             <Color x:Key="CaptaMenuItemSelectedColor">#0FFFFFFF</Color>
             <SolidColorBrush x:Key="CaptaMenuItemSelectedBrush" Color="{StaticResource CaptaMenuItemSelectedColor}" />
+            <!-- Badges and readout pills on captures (loupe readout, pin zoom): rgba(20,23,28,0.95). The capture overlay is always dark, so both themes match. -->
+            <Color x:Key="CaptaReadoutSurfaceColor">#F214171C</Color>
+            <SolidColorBrush x:Key="CaptaReadoutSurfaceBrush" Color="{StaticResource CaptaReadoutSurfaceColor}" />
+            <!-- Behind the frozen frame in the capture overlay, before it paints -->
+            <Color x:Key="CaptaOverlayBackgroundColor">#0F1114</Color>
+            <SolidColorBrush x:Key="CaptaOverlayBackgroundBrush" Color="{StaticResource CaptaOverlayBackgroundColor}" />
+            <!-- Selection handles and loupe ring (mockups/Main.html) -->
+            <Color x:Key="CaptaOverlayHandleColor">#FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaOverlayHandleBrush" Color="{StaticResource CaptaOverlayHandleColor}" />
+            <!-- Rule-of-thirds guides: rgba(255,255,255,0.22) -->
+            <Color x:Key="CaptaOverlayGuideColor">#38FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaOverlayGuideBrush" Color="{StaticResource CaptaOverlayGuideColor}" />
+            <!-- Loupe pixel grid: rgba(255,255,255,0.09) -->
+            <Color x:Key="CaptaLoupeGridColor">#17FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaLoupeGridBrush" Color="{StaticResource CaptaLoupeGridColor}" />
+            <!-- Key hints in the overlay (Space, Shift, Enter, Esc) -->
+            <Color x:Key="CaptaKeyCapSurfaceColor">#2A2F37</Color>
+            <SolidColorBrush x:Key="CaptaKeyCapSurfaceBrush" Color="{StaticResource CaptaKeyCapSurfaceColor}" />
+            <Color x:Key="CaptaKeyCapBorderColor">#3D434D</Color>
+            <SolidColorBrush x:Key="CaptaKeyCapBorderBrush" Color="{StaticResource CaptaKeyCapBorderColor}" />
+            <!-- Outline round colour swatches -->
+            <Color x:Key="CaptaSwatchBorderColor">#5A616C</Color>
+            <SolidColorBrush x:Key="CaptaSwatchBorderBrush" Color="{StaticResource CaptaSwatchBorderColor}" />
             <!-- Fluent control overrides, mapped onto the tokens above. -->
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
@@ -172,6 +195,22 @@
             <SolidColorBrush x:Key="CaptaMenuSurfaceBrush" Color="{StaticResource CaptaMenuSurfaceColor}" />
             <Color x:Key="CaptaMenuItemSelectedColor">#0A000000</Color>
             <SolidColorBrush x:Key="CaptaMenuItemSelectedBrush" Color="{StaticResource CaptaMenuItemSelectedColor}" />
+            <Color x:Key="CaptaReadoutSurfaceColor">#F214171C</Color>
+            <SolidColorBrush x:Key="CaptaReadoutSurfaceBrush" Color="{StaticResource CaptaReadoutSurfaceColor}" />
+            <Color x:Key="CaptaOverlayBackgroundColor">#0F1114</Color>
+            <SolidColorBrush x:Key="CaptaOverlayBackgroundBrush" Color="{StaticResource CaptaOverlayBackgroundColor}" />
+            <Color x:Key="CaptaOverlayHandleColor">#FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaOverlayHandleBrush" Color="{StaticResource CaptaOverlayHandleColor}" />
+            <Color x:Key="CaptaOverlayGuideColor">#38FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaOverlayGuideBrush" Color="{StaticResource CaptaOverlayGuideColor}" />
+            <Color x:Key="CaptaLoupeGridColor">#17FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaLoupeGridBrush" Color="{StaticResource CaptaLoupeGridColor}" />
+            <Color x:Key="CaptaKeyCapSurfaceColor">#2A2F37</Color>
+            <SolidColorBrush x:Key="CaptaKeyCapSurfaceBrush" Color="{StaticResource CaptaKeyCapSurfaceColor}" />
+            <Color x:Key="CaptaKeyCapBorderColor">#3D434D</Color>
+            <SolidColorBrush x:Key="CaptaKeyCapBorderBrush" Color="{StaticResource CaptaKeyCapBorderColor}" />
+            <Color x:Key="CaptaSwatchBorderColor">#5A616C</Color>
+            <SolidColorBrush x:Key="CaptaSwatchBorderBrush" Color="{StaticResource CaptaSwatchBorderColor}" />
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
             <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
@@ -219,6 +258,14 @@
             <SolidColorBrush x:Key="CaptaControlRaisedBrush" Color="{ThemeResource SystemColorButtonFaceColor}" />
             <SolidColorBrush x:Key="CaptaMenuSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="CaptaMenuItemSelectedBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaReadoutSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaOverlayBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaOverlayHandleBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+            <SolidColorBrush x:Key="CaptaOverlayGuideBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+            <SolidColorBrush x:Key="CaptaLoupeGridBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaKeyCapSurfaceBrush" Color="{ThemeResource SystemColorButtonFaceColor}" />
+            <SolidColorBrush x:Key="CaptaKeyCapBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaSwatchBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
 </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>
