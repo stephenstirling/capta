@@ -120,5 +120,16 @@ public static class Settings
         EmbedColourProfile = EmbedColourProfile,
     };
 
+    // ---- Shortcuts (see Shortcuts) ----
+
+    public static string? GetShortcut(HotkeyAction action) => Get<string?>("Shortcut." + action, null);
+
+    /// <summary>Null clears the override, restoring the default.</summary>
+    public static void SetShortcut(HotkeyAction action, string? chord)
+    {
+        if (chord is null) Values.Remove("Shortcut." + action);
+        else Values["Shortcut." + action] = chord;
+    }
+
     private static T Get<T>(string key, T fallback) => Values.TryGetValue(key, out var v) && v is T t ? t : fallback;
 }

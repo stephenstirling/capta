@@ -68,10 +68,29 @@
                     <Setter Property="Padding" Value="0" />
                     <Setter Property="CornerRadius" Value="8" />
                     <Setter Property="BorderThickness" Value="0" />
-                    <Setter Property="IsEnabled" Value="False" />
-                    <Setter Property="ToolTipService.ToolTip" Value="Changing shortcuts is coming soon" />
                 </Style>
                 <SolidColorBrush x:Key="HyperlinkButtonBackground" Color="Transparent" />
+                <Style x:Key="ShortcutRow" TargetType="Grid">
+                    <Setter Property="MinHeight" Value="48" />
+                    <Setter Property="Padding" Value="14,0" />
+                    <Setter Property="ColumnSpacing" Value="12" />
+                    <Setter Property="BorderBrush" Value="{ThemeResource CaptaBorderBrush}" />
+                </Style>
+                <Style x:Key="ShortcutLabel" TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="13.5" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+                <Style x:Key="ShortcutHint" TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="12" />
+                    <Setter Property="Foreground" Value="{ThemeResource CaptaFloatingMutedBrush}" />
+                </Style>
+                <Style x:Key="KeyComboText" TargetType="TextBlock">
+                    <Setter Property="FontFamily" Value="{StaticResource CaptaMonoFont}" />
+                    <Setter Property="FontSize" Value="12" />
+                </Style>
+                <Style x:Key="KeyComboRecording" TargetType="Border" BasedOn="{StaticResource KeyCombo}">
+                    <Setter Property="BorderBrush" Value="{ThemeResource CaptaAccentBrush}" />
+                </Style>
                 <Style x:Key="FooterLink" TargetType="HyperlinkButton">
                     <Setter Property="Padding" Value="8,6" />
                     <Setter Property="FontSize" Value="12.5" />
@@ -220,76 +239,32 @@
                                     </Grid>
                                 </Border>
 
-                                <!-- Shortcuts (DESIGN.md, Decisions 1). -->
+                                <!-- Shortcuts: rows are built in code from Shortcuts (defaults: DESIGN.md Decisions 1). -->
                                 <Border
                                     Background="{ThemeResource CaptaSurfaceRaisedBrush}"
                                     BorderBrush="{ThemeResource CaptaListBorderBrush}"
                                     BorderThickness="1"
                                     CornerRadius="12">
-                                    <StackPanel>
-                                        <StackPanel.Resources>
-                                            <Style TargetType="Grid">
-                                                <Setter Property="MinHeight" Value="48" />
-                                                <Setter Property="Padding" Value="14,0" />
-                                                <Setter Property="ColumnSpacing" Value="12" />
-                                            </Style>
-                                        </StackPanel.Resources>
-                                        <Grid BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,0,0,1">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock VerticalAlignment="Center" FontSize="13.5" Text="Region capture" />
-                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="PrtSc" /></Border>
-                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
-                                        </Grid>
-                                        <Grid BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,0,0,1">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock VerticalAlignment="Center" FontSize="13.5" Text="Full screen, straight to clipboard" />
-                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Shift + PrtSc" /></Border>
-                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
-                                        </Grid>
-                                        <Grid BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,0,0,1">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock VerticalAlignment="Center" FontSize="13.5" Text="Active window" />
-                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Alt + PrtSc" /></Border>
-                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
-                                        </Grid>
-                                        <Grid BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,0,0,1">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel VerticalAlignment="Center">
-                                                <TextBlock FontSize="13.5" Text="Show the floating toolbar" />
-                                                <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Becomes Record video once video capture is available" />
-                                            </StackPanel>
-                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Ctrl + PrtSc" /></Border>
-                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
-                                        </Grid>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock VerticalAlignment="Center" FontSize="13.5" Text="Grab text from screen" />
-                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Ctrl + Shift + PrtSc" /></Border>
-                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
-                                        </Grid>
-                                    </StackPanel>
+                                    <StackPanel x:Name="ShortcutList" />
                                 </Border>
-
+                                <Grid>
+                                    <TextBlock
+                                        x:Name="ShortcutMessage"
+                                        Margin="0,0,140,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        Foreground="{ThemeResource CaptaFloatingMutedBrush}"
+                                        TextWrapping="Wrap" />
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        Height="32"
+                                        Padding="10,0"
+                                        CornerRadius="8"
+                                        BorderThickness="0"
+                                        FontSize="12.5"
+                                        Click="OnResetShortcuts"
+                                        Content="Reset shortcuts" />
+                                </Grid>
                                 <TextBlock
                                     FontSize="12"
                                     Foreground="{ThemeResource CaptaTextMutedBrush}"

@@ -18,6 +18,7 @@ public sealed class TrayIconService : IDisposable
     private MenuFlyoutItem? _printScreenWarning;
     private MenuFlyoutSeparator? _printScreenWarningSeparator;
     private MenuFlyoutItem? _clickThroughItem;
+    private readonly List<(MenuFlyoutItem Item, HotkeyAction Action)> _shortcutItems = [];
 
     public TrayIconService(App app) => _app = app;
 
@@ -33,8 +34,8 @@ public sealed class TrayIconService : IDisposable
         {
             Text = "Show toolbar",
             Icon = new FontIcon { Glyph = "" },
-            KeyboardAcceleratorTextOverride = "Ctrl+PrtSc",
         };
+        _shortcutItems.Add((toolbar, HotkeyAction.ShowToolbar));
         toolbar.Click += (_, _) => _app.ShowToolbar();
 
         _printScreenWarning = new MenuFlyoutItem
@@ -68,9 +69,9 @@ public sealed class TrayIconService : IDisposable
             Items =
             {
                 _printScreenWarning, _printScreenWarningSeparator,
-                CaptureItem("Region", "", "PrtSc", CaptureMode.Region),
-                CaptureItem("Window", "", "", CaptureMode.Window),
-                CaptureItem("Full screen", "", "Shift+PrtSc", CaptureMode.FullScreen),
+                CaptureItem("Region", "", HotkeyAction.Region, CaptureMode.Region),
+                CaptureItem("Window", "", null, CaptureMode.Window),
+                CaptureItem("Full screen", "", HotkeyAction.FullScreen, CaptureMode.FullScreen),
                 toolbar,
                 _clickThroughItem,
                 new MenuFlyoutSeparator(),
@@ -78,6 +79,8 @@ public sealed class TrayIconService : IDisposable
             },
         };
         menu.Opening += async (_, _) => await RefreshStartupStateAsync();
+        UpdateShortcutLabels();
+        Shortcuts.Changed += UpdateShortcutLabels;
 
         _icon = new TaskbarIcon
         {
@@ -91,17 +94,20 @@ public sealed class TrayIconService : IDisposable
         _icon.ForceCreate(enablesEfficiencyMode: false);
     }
 
-    private MenuFlyoutItem CaptureItem(string text, string glyph, string shortcut, CaptureMode mode)
+    private MenuFlyoutItem CaptureItem(string text, string glyph, HotkeyAction? shortcut, CaptureMode mode)
     {
-        var item = new MenuFlyoutItem
-        {
-            Text = text,
-            Icon = new FontIcon { Glyph = glyph },
-            KeyboardAcceleratorTextOverride = shortcut, // display only; the hook owns the keys
-        };
+        var item = new MenuFlyoutItem { Text = text, Icon = new FontIcon { Glyph = glyph } };
+        if (shortcut is { } action) _shortcutItems.Add((item, action));
         // Let the menu window close before the overlay freezes the screen.
         item.Click += (_, _) => _app.Dispatcher.TryEnqueue(DispatcherQueuePriority.Low, () => _app.StartCapture(mode));
         return item;
+    }
+
+    /// <summary>Shortcut text in the menu (display only; the hook owns the keys).</summary>
+    private void UpdateShortcutLabels()
+    {
+        foreach (var (item, action) in _shortcutItems)
+            item.KeyboardAcceleratorTextOverride = Shortcuts.For(action).Compact;
     }
 
     public async Task RefreshStartupStateAsync()

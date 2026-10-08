@@ -3,6 +3,7 @@ using Capta.Interop;
 using Capta.Services;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Windows.Graphics;
@@ -87,6 +88,9 @@ public sealed partial class ToolbarWindow : Window
         var cursor = WindowHelper.CursorPosition();
         UpdateHdrBadge(cursor);
         ApplyDelay(Settings.CaptureDelaySeconds); // may have changed in the tray flyout
+        ToolTipService.SetToolTip(RegionMode, $"Region ({Shortcuts.For(HotkeyAction.Region).Compact})");
+        ToolTipService.SetToolTip(WindowMode, $"Window ({Shortcuts.For(HotkeyAction.ActiveWindow).Compact} captures the active window)");
+        ToolTipService.SetToolTip(FullScreenMode, $"Full screen ({Shortcuts.For(HotkeyAction.FullScreen).Compact})");
 
         var area = WindowHelper.CursorWorkArea();
         // Move onto the target monitor first so the window adopts its DPI before sizing.

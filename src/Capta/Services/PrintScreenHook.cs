@@ -5,12 +5,13 @@ using static Capta.Interop.NativeMethods;
 namespace Capta.Services;
 
 /// <summary>
-/// Low-level keyboard hook that claims Print Screen and its Shift/Alt/Ctrl chords (see <see cref="HotkeyAction"/>).
-/// Win+PrtSc is left alone so the Windows "save screenshot" shortcut keeps working.
+/// Low-level keyboard hook for Capta's shortcuts (Print Screen chords by default; see
+/// <see cref="Shortcuts"/>). Chords with the Win key are left alone, so Windows keeps
+/// Win+PrtSc and Win+Shift+S.
 /// </summary>
 /// <remarks>
-/// The hook runs on the UI thread (it needs a message loop) and must return quickly,
-/// so it only classifies the chord and posts the action back to the dispatcher.
+/// The hook runs on the UI thread (it needs a message loop) and must return quickly, so it
+/// only matches the chord and posts the result back to the dispatcher.
 /// </remarks>
 public sealed class PrintScreenHook : IDisposable
 {
@@ -18,7 +19,8 @@ public sealed class PrintScreenHook : IDisposable
 
     private readonly DispatcherQueue _dispatcher;
     private nint _hook;
-    private bool _swallowingKeyUp;
+    private int _swallowingKeyUp; // vk whose key-up we swallow, or 0
+    private Action<Chord?>? _recorder;
 
     public event Action<HotkeyAction>? Pressed;
 
@@ -33,6 +35,14 @@ public sealed class PrintScreenHook : IDisposable
             throw new System.ComponentModel.Win32Exception(Marshal.GetLastPInvokeError());
     }
 
+    /// <summary>
+    /// Captures the next chord instead of acting on it (for changing a shortcut). The callback
+    /// gets the chord, or null if Esc was pressed. Recording ends after one chord.
+    /// </summary>
+    public void Record(Action<Chord?> callback) => _recorder = callback;
+
+    public void CancelRecording() => _recorder = null;
+
     [UnmanagedCallersOnly]
     private static nint HookProc(int nCode, nint wParam, nint lParam)
     {
@@ -45,36 +55,52 @@ public sealed class PrintScreenHook : IDisposable
     private unsafe bool Handle(int message, nint lParam)
     {
         ref var info = ref *(KBDLLHOOKSTRUCT*)lParam;
-        if (info.vkCode != VK_SNAPSHOT || (info.flags & LLKHF_INJECTED) != 0)
-            return false;
+        var vk = (int)info.vkCode;
 
+        // Key-ups first, injected or not, so the release of a swallowed key always clears it.
         if (message is WM_KEYUP or WM_SYSKEYUP)
         {
-            var swallow = _swallowingKeyUp;
-            _swallowingKeyUp = false;
-            return swallow;
+            if (vk != _swallowingKeyUp) return false;
+            _swallowingKeyUp = 0;
+            return true;
         }
 
-        if (message is not (WM_KEYDOWN or WM_SYSKEYDOWN))
+        // Synthetic input never triggers a capture, but it can set a shortcut while recording
+        // (e.g. from the on-screen keyboard).
+        if ((info.flags & LLKHF_INJECTED) != 0 && _recorder is null)
             return false;
 
+        if (message is not (WM_KEYDOWN or WM_SYSKEYDOWN) || IsModifier(vk))
+            return false;
         if (IsKeyDown(VK_LWIN) || IsKeyDown(VK_RWIN))
             return false;
 
         // Auto-repeat: keep swallowing, but only act on the first press.
-        if (_swallowingKeyUp)
+        if (vk == _swallowingKeyUp)
             return true;
 
-        var action = IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT) ? HotkeyAction.GrabText
-            : IsKeyDown(VK_CONTROL) ? HotkeyAction.ShowToolbar
-            : IsKeyDown(VK_MENU) ? HotkeyAction.ActiveWindow
-            : IsKeyDown(VK_SHIFT) ? HotkeyAction.FullScreen
-            : HotkeyAction.Region;
+        var chord = new Chord(IsKeyDown(VK_CONTROL), IsKeyDown(VK_SHIFT), IsKeyDown(VK_MENU), vk);
 
-        _swallowingKeyUp = true;
+        if (_recorder is { } recorder)
+        {
+            _recorder = null;
+            _swallowingKeyUp = vk;
+            Chord? recorded = vk == 0x1B && !chord.Ctrl && !chord.Shift && !chord.Alt ? null : chord; // Esc cancels
+            _dispatcher.TryEnqueue(() => recorder(recorded));
+            return true;
+        }
+
+        if (Shortcuts.ActionFor(chord) is not { } action)
+            return false;
+
+        _swallowingKeyUp = vk;
         _dispatcher.TryEnqueue(() => Pressed?.Invoke(action));
         return true;
     }
+
+    private static bool IsModifier(int vk) => vk is
+        VK_SHIFT or VK_CONTROL or VK_MENU or VK_LWIN or VK_RWIN
+        or 0xA0 or 0xA1 or 0xA2 or 0xA3 or 0xA4 or 0xA5; // left/right Shift, Ctrl, Alt
 
     public void Dispose()
     {

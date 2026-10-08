@@ -63,6 +63,8 @@ public sealed partial class TrayFlyoutWindow : Window
     public async void ShowNearTray(IReadOnlyList<CaptureResult> recent)
     {
         ApplyDelay(Settings.CaptureDelaySeconds);
+        RegionKeys.Text = Shortcuts.For(HotkeyAction.Region).Compact;
+        WindowKeys.Text = Shortcuts.For(HotkeyAction.ActiveWindow).Compact;
         OculaButton.IsEnabled = await CaptureActions.IsOculaInstalledAsync();
         ToolTipService.SetToolTip(OculaButton, OculaButton.IsEnabled ? null : "Ocula isn't installed yet");
         await FillRecentAsync(recent);

@@ -96,6 +96,7 @@ public sealed partial class OverlayWindow : Window
         Root.SizeChanged += (_, _) => UpdateSelectionVisuals();
         Root.Cursor = InputSystemCursor.Create(InputSystemCursorShape.Cross);
         ApplyMode(mode);
+        ToolTipService.SetToolTip(GrabTextMode, $"Copy the text in a region ({Shortcuts.For(HotkeyAction.GrabText).Compact})");
         var delay = Settings.CaptureDelaySeconds;
         DelayText.Text = delay == 0 ? "No delay" : $"{delay}s delay";
     }

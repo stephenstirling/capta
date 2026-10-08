@@ -171,14 +171,14 @@
                             <Grid>
                                 <c:LineIcon HorizontalAlignment="Left" VerticalAlignment="Top" Data="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" Dashed="True" />
                                 <TextBlock VerticalAlignment="Bottom" Text="Region" />
-                                <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" FontWeight="SemiBold" Text="PrtSc" />
+                                <TextBlock x:Name="RegionKeys" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" FontWeight="SemiBold" Text="PrtSc" />
                             </Grid>
                         </Button>
                         <Button Grid.Column="1" Style="{StaticResource Tile}" Click="OnWindow" ToolTipService.ToolTip="Pick a window (Alt+PrtSc captures the active window)">
                             <Grid>
                                 <c:LineIcon HorizontalAlignment="Left" VerticalAlignment="Top" Data="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM3 9h18" />
                                 <TextBlock VerticalAlignment="Bottom" Text="Window" />
-                                <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Alt+PrtSc" />
+                                <TextBlock x:Name="WindowKeys" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Alt+PrtSc" />
                             </Grid>
                         </Button>
                         <Button Grid.Row="1" Style="{StaticResource Tile}" Click="OnFullScreen" ToolTipService.ToolTip="Full screen (Shift+PrtSc)">

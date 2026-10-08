@@ -55,6 +55,7 @@ public partial class App : Application
         _tray = new TrayIconService(this);
         _tray.Create();
 
+        Shortcuts.Load();
         _hook = new PrintScreenHook(Dispatcher);
         _hook.Pressed += OnHotkey;
         _hook.Install();
@@ -261,6 +262,11 @@ public partial class App : Application
         _settings ??= new StartupSettingsWindow(this);
         _settings.ShowCentered(_ownership?.WindowsOwnsKey ?? false);
     }
+
+    /// <summary>Captures the next key chord for changing a shortcut (null = cancelled with Esc).</summary>
+    public void RecordShortcut(Action<Chord?> callback) => _hook?.Record(callback);
+
+    public void CancelShortcutRecording() => _hook?.CancelRecording();
 
     public Task RefreshTrayAsync() => _tray?.RefreshStartupStateAsync() ?? Task.CompletedTask;
 
