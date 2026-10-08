@@ -29,6 +29,8 @@ public sealed partial class CaptureCardWindow : Window
 
     public event Action<CaptureResult>? PinRequested;
 
+    private Flyout CopyMenu => (Flyout)CopySplit.Resources["CopyMenuFlyout"];
+
     public CaptureCardWindow()
     {
         InitializeComponent();
@@ -50,6 +52,9 @@ public sealed partial class CaptureCardWindow : Window
         {
             ShadowHost.Width = Panel.ActualWidth;
             ShadowHost.Height = Panel.ActualHeight;
+            // The first measure can run before the content has laid out; re-anchor to the real size.
+            if (_current is not null && AppWindow.IsVisible)
+                PlaceOn(_current.Monitor);
         };
         ShadowHost.HorizontalAlignment = Panel.HorizontalAlignment = HorizontalAlignment.Left;
         ShadowHost.VerticalAlignment = Panel.VerticalAlignment = VerticalAlignment.Top;
@@ -110,12 +115,15 @@ public sealed partial class CaptureCardWindow : Window
         var scale = this.GetScale();
 
         Root.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
-        var size = new SizeInt32((int)Math.Ceiling(Root.DesiredSize.Width * scale), (int)Math.Ceiling(Root.DesiredSize.Height * scale));
         var pad = Root.Padding;
-        AppWindow.MoveAndResize(new RectInt32(
+        var width = Math.Max(Root.DesiredSize.Width, Panel.ActualWidth + pad.Left + pad.Right);
+        var height = Math.Max(Root.DesiredSize.Height, Panel.ActualHeight + pad.Top + pad.Bottom);
+        // Size the client area: even a borderless window keeps a thin frame in its outer size.
+        AppWindow.ResizeClient(new SizeInt32((int)Math.Ceiling(width * scale), (int)Math.Ceiling(height * scale)));
+        var size = AppWindow.Size;
+        AppWindow.Move(new PointInt32(
             area.X + area.Width - size.Width - (int)((MarginDip - pad.Right) * scale),
-            area.Y + area.Height - size.Height - (int)((MarginDip - pad.Bottom) * scale),
-            size.Width, size.Height));
+            area.Y + area.Height - size.Height - (int)((MarginDip - pad.Bottom) * scale)));
     }
 
     public void Hide()
@@ -155,6 +163,8 @@ public sealed partial class CaptureCardWindow : Window
     // ---- Copy ----
 
     private async void OnCopy(object sender, RoutedEventArgs e) => await CopyImageAsync();
+
+    private void OnCopyMenuClick(object sender, RoutedEventArgs e) => CopyMenu.ShowAt(CopySplit);
 
     private async void OnCopyImage(object sender, RoutedEventArgs e)
     {

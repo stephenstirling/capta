@@ -32,10 +32,11 @@ internal static partial class WindowHelper
     public static RectInt32 CursorWorkArea() =>
         DisplayArea.GetFromPoint(CursorPosition(), DisplayAreaFallback.Primary).WorkArea;
 
+    /// <summary>Sizes the client area (what XAML lays out in), not the outer frame.</summary>
     public static void ResizeDip(this Window window, double width, double height)
     {
         var scale = window.GetScale();
-        window.AppWindow.Resize(new SizeInt32((int)Math.Round(width * scale), (int)Math.Round(height * scale)));
+        window.AppWindow.ResizeClient(new SizeInt32((int)Math.Round(width * scale), (int)Math.Round(height * scale)));
     }
 
     public static void CenterOnCursorMonitor(this Window window)

@@ -69,7 +69,7 @@
                                 </Grid>
                                 <TextBlock x:Name="StatusText" FontSize="14" FontWeight="Bold" Foreground="{ThemeResource CaptaTextBrush}" Text="Copied to clipboard" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
-                            <TextBlock x:Name="DetailText" Margin="0,3,0,0" FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock x:Name="DetailText" Margin="0,3,0,0" FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" MaxLines="2" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
                         </StackPanel>
                         <Button
                             Grid.Column="2"
@@ -90,6 +90,7 @@
                             <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlHoverBrush" />
                             <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaControlRaisedBrush" />
                             <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaControlHoverBrush" />
+                            <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="CaptaControlHoverBrush" />
                             <StaticResource x:Key="ButtonForeground" ResourceKey="CaptaTextBrush" />
                             <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="CaptaTextBrush" />
                             <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="CaptaTextBrush" />
@@ -102,30 +103,10 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Orientation="Horizontal">
-                            <Button Height="40" Padding="12,0" CornerRadius="10,0,0,10" BorderThickness="0" FontWeight="SemiBold" Click="OnCopy" ToolTipService.ToolTip="Copy image (Ctrl+C)">
-                                <StackPanel Orientation="Horizontal" Spacing="7">
-                                    <c:LineIcon Size="16" Data="M10 8h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2zM16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
-                                    <TextBlock Text="Copy" />
-                                </StackPanel>
-                            </Button>
-                            <Button
-                                x:Name="CopyMenuButton"
-                                Width="30"
-                                Height="40"
-                                Padding="0"
-                                CornerRadius="0,10,10,0"
-                                BorderThickness="1,0,0,0"
-                                ToolTipService.ToolTip="Copy options">
-                                <Button.Resources>
-                                    <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlRaisedBrush" />
-                                    <StaticResource x:Key="ButtonBorderBrush" ResourceKey="CaptaDividerBrush" />
-                                    <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="CaptaDividerBrush" />
-                                    <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="CaptaDividerBrush" />
-                                </Button.Resources>
-                                <c:LineIcon Size="13" StrokeWidth="2.2" Data="M18 15l-6-6-6 6" />
-                                <Button.Flyout>
-                                    <Flyout x:Name="CopyMenu" Placement="TopEdgeAlignedLeft" ShouldConstrainToRootBounds="False">
+                        <!-- The Copy menu opens above the whole split button, aligned to its left edge. -->
+                        <StackPanel x:Name="CopySplit" Orientation="Horizontal">
+                            <StackPanel.Resources>
+                                    <Flyout x:Key="CopyMenuFlyout" Placement="TopEdgeAlignedLeft" ShouldConstrainToRootBounds="False">
                                         <Flyout.FlyoutPresenterStyle>
                                             <Style TargetType="FlyoutPresenter">
                                                 <Setter Property="Background" Value="{ThemeResource CaptaMenuSurfaceBrush}" />
@@ -148,6 +129,13 @@
                                                 <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="Transparent" />
                                                 <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="Transparent" />
                                                 <StaticResource x:Key="ButtonForegroundDisabled" ResourceKey="CaptaTextFaintBrush" />
+                                                <!-- Switch: amber track with a near-black knob when on. -->
+                                                <StaticResource x:Key="ToggleSwitchFillOn" ResourceKey="CaptaAccentBrush" />
+                                                <StaticResource x:Key="ToggleSwitchFillOnPointerOver" ResourceKey="CaptaAccentBrush" />
+                                                <StaticResource x:Key="ToggleSwitchFillOnPressed" ResourceKey="CaptaAccentBrush" />
+                                                <StaticResource x:Key="ToggleSwitchKnobFillOn" ResourceKey="CaptaOnAccentBrush" />
+                                                <StaticResource x:Key="ToggleSwitchKnobFillOnPointerOver" ResourceKey="CaptaOnAccentBrush" />
+                                                <StaticResource x:Key="ToggleSwitchKnobFillOnPressed" ResourceKey="CaptaOnAccentBrush" />
                                             </StackPanel.Resources>
 
                                             <!-- Default action: highlighted, with a check. -->
@@ -200,7 +188,29 @@
                                             </Grid>
                                         </StackPanel>
                                     </Flyout>
-                                </Button.Flyout>
+                            </StackPanel.Resources>
+                            <Button Height="40" Padding="12,0" CornerRadius="10,0,0,10" BorderThickness="0" FontWeight="SemiBold" Click="OnCopy" ToolTipService.ToolTip="Copy image (Ctrl+C)">
+                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                    <c:LineIcon Size="16" Data="M10 8h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2zM16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+                                    <TextBlock Text="Copy" />
+                                </StackPanel>
+                            </Button>
+                            <Button
+                                x:Name="CopyMenuButton"
+                                Click="OnCopyMenuClick"
+                                Width="30"
+                                Height="40"
+                                Padding="0"
+                                CornerRadius="0,10,10,0"
+                                BorderThickness="1,0,0,0"
+                                ToolTipService.ToolTip="Copy options">
+                                <Button.Resources>
+                                    <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlRaisedBrush" />
+                                    <StaticResource x:Key="ButtonBorderBrush" ResourceKey="CaptaDividerBrush" />
+                                    <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="CaptaDividerBrush" />
+                                    <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="CaptaDividerBrush" />
+                                </Button.Resources>
+                                <c:LineIcon Size="13" StrokeWidth="2.2" Data="M18 15l-6-6-6 6" />
                             </Button>
                         </StackPanel>
 
