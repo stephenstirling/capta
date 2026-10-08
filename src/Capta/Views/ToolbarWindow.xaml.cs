@@ -25,6 +25,11 @@ public sealed partial class ToolbarWindow : Window
     /// <summary>New was pressed: capture in this mode after this many seconds.</summary>
     public event Action<CaptureMode, int>? CaptureRequested;
 
+    public event Action? SettingsRequested;
+
+    /// <summary>The × button (or Esc); App decides whether that hides or exits.</summary>
+    public event Action? CloseRequested;
+
     public ToolbarWindow()
     {
         InitializeComponent();
@@ -174,9 +179,17 @@ public sealed partial class ToolbarWindow : Window
 
     private void OnHide(object sender, RoutedEventArgs e) => Hide();
 
+    private void OnClose(object sender, RoutedEventArgs e) => CloseRequested?.Invoke();
+
+    private void OnSettings(object sender, RoutedEventArgs e)
+    {
+        Hide();
+        SettingsRequested?.Invoke();
+    }
+
     private void OnEscape(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         args.Handled = true;
-        Hide();
+        CloseRequested?.Invoke();
     }
 }

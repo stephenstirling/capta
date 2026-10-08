@@ -43,7 +43,10 @@ public sealed class TrayIconService : IDisposable
             Icon = new FontIcon { Glyph = "" },
             Visibility = Visibility.Collapsed,
         };
-        _printScreenWarning.Click += (_, _) => _app.ShowPrintScreenNotice();
+        _printScreenWarning.Click += (_, _) => _app.ShowSettings();
+
+        var settings = new MenuFlyoutItem { Text = "Startup & shortcuts…", Icon = new FontIcon { Glyph = "" } };
+        settings.Click += (_, _) => _app.ShowSettings();
         _printScreenWarningSeparator = new MenuFlyoutSeparator { Visibility = Visibility.Collapsed };
 
         _clickThroughItem = new MenuFlyoutItem
@@ -65,7 +68,7 @@ public sealed class TrayIconService : IDisposable
                 toolbar,
                 _clickThroughItem,
                 new MenuFlyoutSeparator(),
-                _startupItem, new MenuFlyoutSeparator(), exit,
+                _startupItem, settings, new MenuFlyoutSeparator(), exit,
             },
         };
         menu.Opening += async (_, _) => await RefreshStartupStateAsync();

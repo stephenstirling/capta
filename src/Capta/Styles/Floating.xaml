@@ -61,4 +61,21 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
+
+    <!-- Switches (mockups' toggle): amber track with a near-black knob when on; flat grey when off. -->
+    <StaticResource x:Key="ToggleSwitchFillOn" ResourceKey="CaptaAccentBrush" />
+    <StaticResource x:Key="ToggleSwitchFillOnPointerOver" ResourceKey="CaptaAccentBrush" />
+    <StaticResource x:Key="ToggleSwitchFillOnPressed" ResourceKey="CaptaAccentBrush" />
+    <StaticResource x:Key="ToggleSwitchKnobFillOn" ResourceKey="CaptaOnAccentBrush" />
+    <StaticResource x:Key="ToggleSwitchKnobFillOnPointerOver" ResourceKey="CaptaOnAccentBrush" />
+    <StaticResource x:Key="ToggleSwitchKnobFillOnPressed" ResourceKey="CaptaOnAccentBrush" />
+    <StaticResource x:Key="ToggleSwitchFillOff" ResourceKey="CaptaDividerBrush" />
+    <StaticResource x:Key="ToggleSwitchFillOffPointerOver" ResourceKey="CaptaDividerBrush" />
+    <StaticResource x:Key="ToggleSwitchFillOffPressed" ResourceKey="CaptaDividerBrush" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOff" Color="Transparent" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOffPointerOver" Color="Transparent" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOffPressed" Color="Transparent" />
+    <StaticResource x:Key="ToggleSwitchKnobFillOff" ResourceKey="CaptaTextSecondaryBrush" />
+    <StaticResource x:Key="ToggleSwitchKnobFillOffPointerOver" ResourceKey="CaptaTextBrush" />
+    <StaticResource x:Key="ToggleSwitchKnobFillOffPressed" ResourceKey="CaptaTextSecondaryBrush" />
 </ResourceDictionary>

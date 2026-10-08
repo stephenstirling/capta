@@ -129,13 +129,6 @@
                                                 <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="Transparent" />
                                                 <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="Transparent" />
                                                 <StaticResource x:Key="ButtonForegroundDisabled" ResourceKey="CaptaTextFaintBrush" />
-                                                <!-- Switch: amber track with a near-black knob when on. -->
-                                                <StaticResource x:Key="ToggleSwitchFillOn" ResourceKey="CaptaAccentBrush" />
-                                                <StaticResource x:Key="ToggleSwitchFillOnPointerOver" ResourceKey="CaptaAccentBrush" />
-                                                <StaticResource x:Key="ToggleSwitchFillOnPressed" ResourceKey="CaptaAccentBrush" />
-                                                <StaticResource x:Key="ToggleSwitchKnobFillOn" ResourceKey="CaptaOnAccentBrush" />
-                                                <StaticResource x:Key="ToggleSwitchKnobFillOnPointerOver" ResourceKey="CaptaOnAccentBrush" />
-                                                <StaticResource x:Key="ToggleSwitchKnobFillOnPressed" ResourceKey="CaptaOnAccentBrush" />
                                             </StackPanel.Resources>
 
                                             <!-- Default action: highlighted, with a check. -->

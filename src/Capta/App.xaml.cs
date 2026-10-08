@@ -11,12 +11,13 @@ namespace Capta;
 
 public partial class App : Application
 {
+    // Unchanged from the old notice window so existing installs don't see the explanation twice.
     private const string NoticeShownKey = "PrintScreenNotice.Shown";
 
     private TrayIconService? _tray;
     private PrintScreenHook? _hook;
     private PrintScreenOwnership? _ownership;
-    private PrintScreenNoticeWindow? _notice;
+    private StartupSettingsWindow? _settings;
     private ToolbarWindow? _toolbar;
     private CaptureCoordinator? _capture;
     private readonly GraphicsCaptureSource _screenSource = new();
@@ -37,7 +38,7 @@ public partial class App : Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        // Start hidden, whether launched by the startup task or from Start.
+        // Starts in the tray; which windows appear is governed by Startup & shortcuts.
         _capture = new CaptureCoordinator(_screenSource);
         _capture.Captured += OnCaptured;
 
@@ -55,13 +56,15 @@ public partial class App : Application
         Log.Info($"Windows owns Print Screen: {_ownership.WindowsOwnsKey}");
         OnPrintScreenOwnershipChanged(_ownership.WindowsOwnsKey);
 
-        // Pop the explanation once; afterwards the tray menu carries the warning.
+        // Explain the Print Screen conflict once; afterwards the tray menu carries the warning.
         var settings = ApplicationData.Current.LocalSettings.Values;
-        if (_ownership.WindowsOwnsKey && !settings.ContainsKey(NoticeShownKey))
-        {
+        var explainConflict = _ownership.WindowsOwnsKey && !settings.ContainsKey(NoticeShownKey);
+        if (explainConflict)
             settings[NoticeShownKey] = true;
-            ShowPrintScreenNotice();
-        }
+        if (explainConflict || !Settings.StartQuietly)
+            ShowSettings();
+        if (Settings.ShowToolbarAtStartup)
+            ShowToolbar();
 
         await StartupTaskService.EnsureEnabledOnFirstRunAsync();
         await _tray.RefreshStartupStateAsync();
@@ -85,6 +88,8 @@ public partial class App : Application
         {
             _toolbar = new ToolbarWindow();
             _toolbar.CaptureRequested += StartCapture;
+            _toolbar.SettingsRequested += ShowSettings;
+            _toolbar.CloseRequested += OnToolbarCloseRequested;
         }
         _toolbar.ShowOnCursorMonitor();
     }
@@ -157,22 +162,28 @@ public partial class App : Application
             pin.SetClickThrough(false);
     }
 
+    private void OnToolbarCloseRequested()
+    {
+        if (Settings.KeepRunningWhenToolbarClosed)
+            _toolbar?.Hide();
+        else
+            Quit();
+    }
+
     private void OnPrintScreenOwnershipChanged(bool windowsOwnsKey)
     {
         _tray?.SetPrintScreenWarning(windowsOwnsKey);
-        if (!windowsOwnsKey)
-            _notice?.Close();
+        _settings?.SetPrintScreenOwnership(windowsOwnsKey);
     }
 
-    public void ShowPrintScreenNotice()
+    /// <summary>Startup &amp; shortcuts, which also explains the Print Screen conflict.</summary>
+    public void ShowSettings()
     {
-        if (_notice is null)
-        {
-            _notice = new PrintScreenNoticeWindow();
-            _notice.Closed += (_, _) => _notice = null;
-        }
-        _notice.BringToFront();
+        _settings ??= new StartupSettingsWindow(this);
+        _settings.ShowCentered(_ownership?.WindowsOwnsKey ?? false);
     }
+
+    public Task RefreshTrayAsync() => _tray?.RefreshStartupStateAsync() ?? Task.CompletedTask;
 
     /// <summary>Called on a background thread when a second instance redirects to us.</summary>
     internal void OnRedirectedActivation(AppActivationArguments args)
@@ -184,7 +195,7 @@ public partial class App : Application
     {
         _hook?.Dispose();
         _ownership?.Dispose();
-        _notice?.Close();
+        _settings?.Close();
         _toolbar?.Close();
         _card?.Close();
         foreach (var pin in _pins.ToArray()) pin.Close();

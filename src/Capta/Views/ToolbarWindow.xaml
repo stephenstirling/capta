@@ -165,13 +165,13 @@
                 <ToggleButton x:Name="KeepOnTopToggle" Style="{StaticResource ToolToggle}" Padding="0" Click="OnKeepOnTopClick" ToolTipService.ToolTip="Keep on top">
                     <c:LineIcon Size="17" Data="M9 4h6l-1 5 3 3H7l3-3zM12 12v8" />
                 </ToggleButton>
-                <Button Style="{StaticResource ToolButton}" Padding="0" IsEnabled="False" ToolTipService.ToolTip="Settings (coming soon)">
+                <Button Style="{StaticResource ToolButton}" Padding="0" Click="OnSettings" ToolTipService.ToolTip="Startup &amp; shortcuts">
                     <c:LineIcon Size="17" Data="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M18 6a2 2 0 1 1-4 0a2 2 0 1 1 4 0zM12 12a2 2 0 1 1-4 0a2 2 0 1 1 4 0zM20 18a2 2 0 1 1-4 0a2 2 0 1 1 4 0z" />
                 </Button>
                 <Button Style="{StaticResource ToolButton}" Padding="0" Click="OnHide" ToolTipService.ToolTip="Hide to tray">
                     <c:LineIcon Size="16" Data="M5 12h14" />
                 </Button>
-                <Button Style="{StaticResource ToolButton}" Padding="0" Click="OnHide" ToolTipService.ToolTip="Close (Esc)">
+                <Button Style="{StaticResource ToolButton}" Padding="0" Click="OnClose" ToolTipService.ToolTip="Close (Esc)">
                     <c:LineIcon Size="16" Data="M6 6l12 12M18 6L6 18" />
                 </Button>
             </StackPanel>

@@ -35,5 +35,25 @@ public static class Settings
         set => Values[nameof(ToolbarKeepOnTop)] = value;
     }
 
+    /// <summary>Launch without opening a window (Print Screen still works). On by default.</summary>
+    public static bool StartQuietly
+    {
+        get => Get(nameof(StartQuietly), true);
+        set => Values[nameof(StartQuietly)] = value;
+    }
+
+    public static bool ShowToolbarAtStartup
+    {
+        get => Get(nameof(ShowToolbarAtStartup), false);
+        set => Values[nameof(ShowToolbarAtStartup)] = value;
+    }
+
+    /// <summary>When off, closing the toolbar (×) exits Capta. Hide to tray always keeps it running.</summary>
+    public static bool KeepRunningWhenToolbarClosed
+    {
+        get => Get(nameof(KeepRunningWhenToolbarClosed), true);
+        set => Values[nameof(KeepRunningWhenToolbarClosed)] = value;
+    }
+
     private static T Get<T>(string key, T fallback) => Values.TryGetValue(key, out var v) && v is T t ? t : fallback;
 }

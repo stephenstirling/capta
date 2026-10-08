@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Startup & shortcuts: design/mockups/Startup.html and screenshots/06-startup-and-shortcuts.png. -->
+<Window
+    x:Class="Capta.Views.StartupSettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:Capta.Controls"
+    Title="Capta: Startup &amp; shortcuts">
+
+    <!-- Transparent window; the padding leaves room for the dialog's shadow. -->
+    <Grid x:Name="Root" Padding="24,12,24,36">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Escape" Invoked="OnEscape" />
+        </Grid.KeyboardAccelerators>
+        <Grid.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="ms-appx:///Styles/Floating.xaml" />
+                </ResourceDictionary.MergedDictionaries>
+                <Style x:Key="SectionLabel" TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="11" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="CharacterSpacing" Value="80" />
+                    <Setter Property="Foreground" Value="{ThemeResource CaptaTextMutedBrush}" />
+                </Style>
+                <Style x:Key="Switch" TargetType="ToggleSwitch" BasedOn="{StaticResource DefaultToggleSwitchStyle}">
+                    <Setter Property="MinWidth" Value="0" />
+                    <Setter Property="OnContent" Value="" />
+                    <Setter Property="OffContent" Value="" />
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0,0,-12,0" />
+                </Style>
+                <Style x:Key="KeyCombo" TargetType="Border">
+                    <Setter Property="Padding" Value="8,4" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Background" Value="{ThemeResource CaptaKeyCapSurfaceBrush}" />
+                    <Setter Property="BorderBrush" Value="{ThemeResource CaptaKeyCapBorderBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="6" />
+                </Style>
+                <Style x:Key="EditShortcut" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                    <Setter Property="Width" Value="40" />
+                    <Setter Property="Height" Value="40" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="CornerRadius" Value="8" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="IsEnabled" Value="False" />
+                    <Setter Property="ToolTipService.ToolTip" Value="Changing shortcuts is coming soon" />
+                </Style>
+                <StaticResource x:Key="HyperlinkButtonForeground" ResourceKey="CaptaTextMutedBrush" />
+                <StaticResource x:Key="HyperlinkButtonForegroundPointerOver" ResourceKey="CaptaAccentTextBrush" />
+                <StaticResource x:Key="HyperlinkButtonForegroundPressed" ResourceKey="CaptaAccentTextBrush" />
+                <SolidColorBrush x:Key="HyperlinkButtonBackground" Color="Transparent" />
+                <StaticResource x:Key="HyperlinkButtonBackgroundPointerOver" ResourceKey="CaptaHoverOverlayBrush" />
+                <StaticResource x:Key="HyperlinkButtonBackgroundPressed" ResourceKey="CaptaPressedOverlayBrush" />
+                <Style x:Key="FooterLink" TargetType="HyperlinkButton">
+                    <Setter Property="Padding" Value="8,6" />
+                    <Setter Property="FontSize" Value="12.5" />
+                    <Setter Property="Foreground" Value="{ThemeResource CaptaTextMutedBrush}" />
+                </Style>
+            </ResourceDictionary>
+        </Grid.Resources>
+
+        <Grid x:Name="ShadowHost" />
+
+        <Border
+            x:Name="Panel"
+            Width="680"
+            Background="{ThemeResource CaptaSurfaceBrush}"
+            BorderBrush="{ThemeResource CaptaBorderStrongBrush}"
+            BorderThickness="1"
+            CornerRadius="{StaticResource CaptaRadiusWindow}">
+            <ContentPresenter FontFamily="{StaticResource CaptaFont}" FontSize="14" Foreground="{ThemeResource CaptaTextBrush}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Title row; also the drag region. -->
+                    <Grid x:Name="TitleRow" Padding="24,22,24,10" Background="Transparent" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Text="Startup &amp; shortcuts" />
+                        <Button
+                            x:Name="CloseButton"
+                            Grid.Column="1"
+                            Width="44"
+                            Height="44"
+                            Padding="0"
+                            CornerRadius="10"
+                            BorderThickness="0"
+                            Click="OnDone"
+                            ToolTipService.ToolTip="Close (Esc)">
+                            <c:LineIcon Size="16" Data="M6 6l12 12M18 6L6 18" />
+                        </Button>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" Padding="24,0,24,16" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="20">
+
+                            <!-- Startup -->
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="STARTUP" />
+                                <Grid MinHeight="48">
+                                    <TextBlock VerticalAlignment="Center" Text="Start Capta when Windows starts" />
+                                    <ToggleSwitch x:Name="StartWithWindows" Style="{StaticResource Switch}" Toggled="OnStartWithWindows" />
+                                </Grid>
+                                <Grid MinHeight="48">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Start quietly in the system tray" />
+                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Ready on Print Screen without opening a window" />
+                                    </StackPanel>
+                                    <ToggleSwitch x:Name="StartQuietly" Style="{StaticResource Switch}" Toggled="OnStartQuietly" />
+                                </Grid>
+                                <Grid MinHeight="48">
+                                    <TextBlock VerticalAlignment="Center" Text="Show the floating toolbar at startup" />
+                                    <ToggleSwitch x:Name="ShowToolbarAtStartup" Style="{StaticResource Switch}" Toggled="OnShowToolbarAtStartup" />
+                                </Grid>
+                                <Grid MinHeight="48">
+                                    <TextBlock VerticalAlignment="Center" Text="Keep running in the tray when the toolbar is closed" />
+                                    <ToggleSwitch x:Name="KeepRunning" Style="{StaticResource Switch}" Toggled="OnKeepRunning" />
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Print Screen key -->
+                            <StackPanel Spacing="12">
+                                <TextBlock Style="{StaticResource SectionLabel}" Text="PRINT SCREEN KEY" />
+
+                                <Border
+                                    x:Name="ConflictCard"
+                                    Padding="16,14"
+                                    Background="{ThemeResource CaptaWarningSurfaceBrush}"
+                                    BorderBrush="{ThemeResource CaptaWarningBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="12">
+                                    <StackPanel Spacing="12">
+                                        <Grid ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <c:LineIcon VerticalAlignment="Top" Size="20" Data="M12 3l10 18H2zM12 10v5M12 18v.5" Foreground="{ThemeResource CaptaAccentTextBrush}" />
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock FontWeight="Bold" Text="Windows is using Print Screen for the Snipping Tool" TextWrapping="Wrap" />
+                                                <TextBlock
+                                                    Margin="0,3,0,0"
+                                                    FontSize="12.5"
+                                                    Foreground="{ThemeResource CaptaWarningMutedBrush}"
+                                                    LineHeight="19"
+                                                    Text="Turn off &quot;Use the Print screen key to open screen capture&quot; in Windows settings. Capta notices the change automatically."
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Button
+                                            Height="40"
+                                            Margin="32,0,0,0"
+                                            Padding="16,0"
+                                            CornerRadius="10"
+                                            FontSize="13"
+                                            FontWeight="Bold"
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            Click="OnOpenKeyboardSettings"
+                                            Content="Open keyboard settings" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border
+                                    x:Name="OwnedCard"
+                                    Padding="16,14"
+                                    Background="{ThemeResource CaptaSuccessSurfaceBrush}"
+                                    BorderBrush="{ThemeResource CaptaSuccessBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="12"
+                                    Visibility="Collapsed">
+                                    <Grid ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <c:LineIcon VerticalAlignment="Center" Size="20" StrokeWidth="2.2" Data="M5 12l5 5 9-10" Foreground="{ThemeResource CaptaSuccessBrush}" />
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock FontWeight="Bold" Text="Print Screen opens Capta" />
+                                            <TextBlock Margin="0,2,0,0" FontSize="12.5" Foreground="{ThemeResource CaptaSuccessMutedBrush}" Text="Works even when the toolbar is hidden." />
+                                        </StackPanel>
+                                        <Button
+                                            Grid.Column="2"
+                                            Height="40"
+                                            Padding="12,0"
+                                            CornerRadius="10"
+                                            BorderThickness="0"
+                                            FontSize="13"
+                                            FontWeight="SemiBold"
+                                            Click="OnOpenKeyboardSettings"
+                                            Content="Give back to Windows…"
+                                            ToolTipService.ToolTip="Turn on &quot;Use the Print screen key to open screen capture&quot; in Windows settings" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Shortcuts (DESIGN.md, Decisions 1). -->
+                                <Border
+                                    Background="{ThemeResource CaptaSurfaceRaisedBrush}"
+                                    BorderBrush="{ThemeResource CaptaListBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="12">
+                                    <StackPanel>
+                                        <StackPanel.Resources>
+                                            <Style TargetType="Grid">
+                                                <Setter Property="MinHeight" Value="48" />
+                                                <Setter Property="Padding" Value="14,0" />
+                                                <Setter Property="ColumnSpacing" Value="12" />
+                                            </Style>
+                                        </StackPanel.Resources>
+                                        <Grid BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,0,0,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock VerticalAlignment="Center" FontSize="13.5" Text="Region capture" />
+                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="PrtSc" /></Border>
+                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
+                                        </Grid>
+                                        <Grid BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,0,0,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock VerticalAlignment="Center" FontSize="13.5" Text="Full screen, straight to clipboard" />
+                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Shift + PrtSc" /></Border>
+                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
+                                        </Grid>
+                                        <Grid BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,0,0,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock VerticalAlignment="Center" FontSize="13.5" Text="Active window" />
+                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Alt + PrtSc" /></Border>
+                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
+                                        </Grid>
+                                        <Grid BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,0,0,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock FontSize="13.5" Text="Show the floating toolbar" />
+                                                <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Becomes Record video once video capture is available" />
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Ctrl + PrtSc" /></Border>
+                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
+                                        </Grid>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock FontSize="13.5" Text="Grab text from screen" />
+                                                <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Coming soon" />
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Opacity="0.5" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Ctrl + Shift + PrtSc" /></Border>
+                                            <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="{ThemeResource CaptaTextMutedBrush}"
+                                    LineHeight="18"
+                                    Text="Win + Shift + S is reserved by Windows and will still open the Snipping Tool."
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Footer: author links on the left (not in the mockup), Done on the right. -->
+                    <Grid Grid.Row="2" Padding="16,14,24,14" BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,1,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                            <HyperlinkButton Style="{StaticResource FooterLink}" Click="OnGitHub" ToolTipService.ToolTip="github.com/stephenstirling">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <c:LineIcon Size="15" Data="M9 19c-4 1.5-4-2-6-2.5M15 21v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
+                                    <TextBlock Text="GitHub" />
+                                </StackPanel>
+                            </HyperlinkButton>
+                            <HyperlinkButton Style="{StaticResource FooterLink}" Click="OnBuyMeACoffee" ToolTipService.ToolTip="buymeacoffee.com/stephenstirling">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <c:LineIcon Size="15" Data="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3v3M12 3v3" />
+                                    <TextBlock Text="Buy me a coffee" />
+                                </StackPanel>
+                            </HyperlinkButton>
+                        </StackPanel>
+                        <Button
+                            HorizontalAlignment="Right"
+                            Height="40"
+                            Padding="22,0"
+                            CornerRadius="10"
+                            FontSize="13"
+                            FontWeight="Bold"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Click="OnDone"
+                            Content="Done" />
+                    </Grid>
+                </Grid>
+            </ContentPresenter>
+        </Border>
+    </Grid>
+</Window>

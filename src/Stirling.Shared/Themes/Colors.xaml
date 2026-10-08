@@ -113,6 +113,21 @@
             <!-- Outline round colour swatches -->
             <Color x:Key="CaptaSwatchBorderColor">#5A616C</Color>
             <SolidColorBrush x:Key="CaptaSwatchBorderBrush" Color="{StaticResource CaptaSwatchBorderColor}" />
+            <!-- Warning card (mockups/Startup.html): border and secondary text; surface is CaptaWarningSurface -->
+            <Color x:Key="CaptaWarningBorderColor">#5C4A25</Color>
+            <SolidColorBrush x:Key="CaptaWarningBorderBrush" Color="{StaticResource CaptaWarningBorderColor}" />
+            <Color x:Key="CaptaWarningMutedColor">#D7CDBA</Color>
+            <SolidColorBrush x:Key="CaptaWarningMutedBrush" Color="{StaticResource CaptaWarningMutedColor}" />
+            <!-- Success card: "Print Screen opens Capta" -->
+            <Color x:Key="CaptaSuccessSurfaceColor">#172420</Color>
+            <SolidColorBrush x:Key="CaptaSuccessSurfaceBrush" Color="{StaticResource CaptaSuccessSurfaceColor}" />
+            <Color x:Key="CaptaSuccessBorderColor">#2C5245</Color>
+            <SolidColorBrush x:Key="CaptaSuccessBorderBrush" Color="{StaticResource CaptaSuccessBorderColor}" />
+            <Color x:Key="CaptaSuccessMutedColor">#B9CFC6</Color>
+            <SolidColorBrush x:Key="CaptaSuccessMutedBrush" Color="{StaticResource CaptaSuccessMutedColor}" />
+            <!-- Grouped list panels, e.g. the shortcut list -->
+            <Color x:Key="CaptaListBorderColor">#2A2E35</Color>
+            <SolidColorBrush x:Key="CaptaListBorderBrush" Color="{StaticResource CaptaListBorderColor}" />
             <!-- Fluent control overrides, mapped onto the tokens above. -->
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
@@ -211,6 +226,18 @@
             <SolidColorBrush x:Key="CaptaKeyCapBorderBrush" Color="{StaticResource CaptaKeyCapBorderColor}" />
             <Color x:Key="CaptaSwatchBorderColor">#5A616C</Color>
             <SolidColorBrush x:Key="CaptaSwatchBorderBrush" Color="{StaticResource CaptaSwatchBorderColor}" />
+            <Color x:Key="CaptaWarningBorderColor">#E8C98A</Color>
+            <SolidColorBrush x:Key="CaptaWarningBorderBrush" Color="{StaticResource CaptaWarningBorderColor}" />
+            <Color x:Key="CaptaWarningMutedColor">#6B5A3A</Color>
+            <SolidColorBrush x:Key="CaptaWarningMutedBrush" Color="{StaticResource CaptaWarningMutedColor}" />
+            <Color x:Key="CaptaSuccessSurfaceColor">#E6F5EE</Color>
+            <SolidColorBrush x:Key="CaptaSuccessSurfaceBrush" Color="{StaticResource CaptaSuccessSurfaceColor}" />
+            <Color x:Key="CaptaSuccessBorderColor">#A9D9C3</Color>
+            <SolidColorBrush x:Key="CaptaSuccessBorderBrush" Color="{StaticResource CaptaSuccessBorderColor}" />
+            <Color x:Key="CaptaSuccessMutedColor">#3F6B5A</Color>
+            <SolidColorBrush x:Key="CaptaSuccessMutedBrush" Color="{StaticResource CaptaSuccessMutedColor}" />
+            <Color x:Key="CaptaListBorderColor">#E3E5E9</Color>
+            <SolidColorBrush x:Key="CaptaListBorderBrush" Color="{StaticResource CaptaListBorderColor}" />
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
             <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
@@ -266,6 +293,12 @@
             <SolidColorBrush x:Key="CaptaKeyCapSurfaceBrush" Color="{ThemeResource SystemColorButtonFaceColor}" />
             <SolidColorBrush x:Key="CaptaKeyCapBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="CaptaSwatchBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaWarningBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaWarningMutedBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaSuccessSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaSuccessBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaSuccessMutedBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaListBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
 </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>
