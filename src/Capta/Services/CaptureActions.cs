@@ -3,7 +3,6 @@ using Capta.Capture;
 using Microsoft.UI;
 using Microsoft.Windows.Storage.Pickers;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Media.Ocr;
 using Windows.Storage;
 using Windows.System;
 
@@ -16,9 +15,9 @@ public static partial class CaptureActions
     /// Hands the capture to Ocula via <c>ocula:edit?file=&lt;path&gt;</c>. Until Ocula is
     /// installed (nothing handles the scheme), opens the default image app instead.
     /// </summary>
-    public static async Task EditAsync(CapturedImage image)
+    public static async Task EditAsync(CaptureResult capture)
     {
-        var file = await SaveTempAsync(image, "Edit");
+        var file = await SaveTempAsync(capture, "Edit");
         var ocula = OculaUri("edit", file.Path);
         if (await IsOculaInstalledAsync())
             await Launcher.LaunchUriAsync(ocula);
@@ -27,9 +26,9 @@ public static partial class CaptureActions
     }
 
     /// <summary>Adds the capture to Ocula's library via <c>ocula:import?file=&lt;path&gt;</c>.</summary>
-    public static async Task SendToOculaAsync(CapturedImage image)
+    public static async Task SendToOculaAsync(CaptureResult capture)
     {
-        var file = await SaveTempAsync(image, "Ocula");
+        var file = await SaveTempAsync(capture, "Ocula");
         await Launcher.LaunchUriAsync(OculaUri("import", file.Path));
     }
 
@@ -39,9 +38,9 @@ public static partial class CaptureActions
     private static Uri OculaUri(string verb, string path) => new($"ocula:{verb}?file={Uri.EscapeDataString(path)}");
 
     /// <summary>Copies the capture as a PNG file (pastes into Explorer, email and chat apps).</summary>
-    public static async Task CopyAsFileAsync(CapturedImage image)
+    public static async Task CopyAsFileAsync(CaptureResult capture)
     {
-        var file = await SaveTempAsync(image, "Clipboard");
+        var file = await SaveTempAsync(capture, "Clipboard");
         var package = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
         package.SetStorageItems([file]);
         Clipboard.SetContent(package);
@@ -59,26 +58,28 @@ public static partial class CaptureActions
     /// <summary>Recognises text with on-device Windows OCR and copies it. Returns the text, or null if none was found.</summary>
     public static async Task<string?> CopyTextInImageAsync(CapturedImage image)
     {
-        var engine = OcrEngine.TryCreateFromUserProfileLanguages()
-            ?? throw new InvalidOperationException("No OCR language is installed. Add one in Settings > Time & language.");
-        using var bitmap = image.ToSoftwareBitmap();
-        var result = await engine.RecognizeAsync(bitmap);
-        var text = string.Join(Environment.NewLine, result.Lines.Select(l => l.Text));
-        if (string.IsNullOrWhiteSpace(text)) return null;
-        CopyText(text);
+        var text = await Ocr.RecognizeAsync(image);
+        if (text is not null) CopyText(text);
         return text;
     }
 
-    private static async Task<StorageFile> SaveTempAsync(CapturedImage image, string folderName)
+    private static async Task<StorageFile> SaveTempAsync(CaptureResult capture, string folderName)
     {
         var folder = await ApplicationData.Current.TemporaryFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
         var file = await folder.CreateFileAsync(ImageExport.DefaultFileName() + ".png", CreationCollisionOption.GenerateUniqueName);
-        await ImageExport.SaveAsync(image, file);
+        await SaveWithMetadataAsync(capture, file);
         return file;
     }
 
+    /// <summary>Saves a PNG carrying the capture's metadata (source, title, mode, OCR text).</summary>
+    public static async Task SaveWithMetadataAsync(CaptureResult capture, StorageFile file)
+    {
+        var metadata = await CaptureMetadata.ForAsync(capture);
+        await ImageExport.SaveAsync(capture.Image, file, metadata.ToJson());
+    }
+
     /// <summary>Save As dialog defaulting to Pictures\Screenshots. Returns the saved path, or null if cancelled.</summary>
-    public static async Task<string?> SaveAsAsync(CapturedImage image, WindowId owner)
+    public static async Task<string?> SaveAsAsync(CaptureResult capture, WindowId owner)
     {
         var picker = new FileSavePicker(owner)
         {
@@ -92,7 +93,7 @@ public static partial class CaptureActions
         if (result is null) return null;
 
         var file = await StorageFile.GetFileFromPathAsync(EnsureFileExists(result.Path));
-        await ImageExport.SaveAsync(image, file);
+        await SaveWithMetadataAsync(capture, file);
         return result.Path;
     }
 

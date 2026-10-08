@@ -215,7 +215,7 @@ public sealed partial class CaptureCardWindow : Window
         if (_current is null) return;
         await RunAsync(async () =>
         {
-            await CaptureActions.CopyAsFileAsync(_current.Image);
+            await CaptureActions.CopyAsFileAsync(_current);
             SetStatus("Copied as file");
         });
     }
@@ -250,7 +250,7 @@ public sealed partial class CaptureCardWindow : Window
         if (_current is null) return;
         await RunAsync(async () =>
         {
-            await CaptureActions.EditAsync(_current.Image);
+            await CaptureActions.EditAsync(_current);
             Hide();
         });
     }
@@ -260,7 +260,7 @@ public sealed partial class CaptureCardWindow : Window
         if (_current is null) return;
         await RunAsync(async () =>
         {
-            var path = await CaptureActions.SaveAsAsync(_current.Image, AppWindow.Id);
+            var path = await CaptureActions.SaveAsAsync(_current, AppWindow.Id);
             if (path is null) return;
             _current.SavedPath = path;
             SetStatus($"Saved {Path.GetFileName(path)}");
@@ -279,7 +279,7 @@ public sealed partial class CaptureCardWindow : Window
         if (_current is null) return;
         await RunAsync(async () =>
         {
-            await CaptureActions.SendToOculaAsync(_current.Image);
+            await CaptureActions.SendToOculaAsync(_current);
             SetStatus("Sent to Ocula");
         });
     }

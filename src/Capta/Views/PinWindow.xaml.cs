@@ -27,6 +27,7 @@ public sealed partial class PinWindow : Window
     /// <summary>Stage extends this far past the image on each side, to hold the offset outline.</summary>
     private const double Inset = 4;
 
+    private readonly CaptureResult _capture;
     private readonly CapturedImage _image;
     private readonly DispatcherQueueTimer _badgeTimer;
     private double _zoom = 1;
@@ -45,6 +46,7 @@ public sealed partial class PinWindow : Window
 
     public PinWindow(CaptureResult capture)
     {
+        _capture = capture;
         _image = capture.Image;
         _imageOrigin = new PointInt32(capture.ScreenBounds.X, capture.ScreenBounds.Y);
         InitializeComponent();
@@ -247,7 +249,7 @@ public sealed partial class PinWindow : Window
     {
         try
         {
-            await CaptureActions.EditAsync(_image);
+            await CaptureActions.EditAsync(_capture);
         }
         catch (Exception ex)
         {

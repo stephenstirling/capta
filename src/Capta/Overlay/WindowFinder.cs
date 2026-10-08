@@ -61,6 +61,29 @@ public static class WindowFinder
         return new WindowTarget(hwnd, new RectInt32(r.Left, r.Top, r.Width, r.Height));
     }
 
+    /// <summary>Process name and title of a window, for capture metadata.</summary>
+    public static unsafe (string? App, string? Title) Describe(nint hwnd)
+    {
+        string? app = null, title = null;
+        try
+        {
+            GetWindowThreadProcessId(hwnd, out var pid);
+            using var process = System.Diagnostics.Process.GetProcessById((int)pid);
+            app = process.ProcessName;
+        }
+        catch
+        {
+            // Protected or exited process: leave it out.
+        }
+        var buffer = stackalloc char[512];
+        var n = GetWindowText(hwnd, buffer, 512);
+        if (n > 0) title = new string(buffer, 0, n);
+        return (app, title);
+    }
+
+    /// <summary>The window under a point on the current desktop (after the overlay has closed).</summary>
+    public static WindowTarget? At(PointInt32 p) => HitTest(Snapshot(), p);
+
     /// <summary>Topmost window whose frame contains <paramref name="p"/>.</summary>
     public static WindowTarget? HitTest(IReadOnlyList<WindowTarget> windows, PointInt32 p)
     {

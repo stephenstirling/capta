@@ -9,7 +9,8 @@ namespace Capta.Services;
 /// <summary>PNG encoding and clipboard/file output for captures.</summary>
 public static class ImageExport
 {
-    public static async Task<InMemoryRandomAccessStream> EncodePngAsync(CapturedImage image)
+    /// <param name="captaJson">Capture metadata for the "Capta" tEXt chunk (saved files only).</param>
+    public static async Task<InMemoryRandomAccessStream> EncodePngAsync(CapturedImage image, string? captaJson = null)
     {
         var stream = new InMemoryRandomAccessStream();
         var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
@@ -28,6 +29,20 @@ public static class ImageExport
             catch (Exception)
             {
                 // The encoder doesn't support the tag here; the PNG is still sRGB.
+            }
+        }
+        if (captaJson is not null)
+        {
+            try
+            {
+                await encoder.BitmapProperties.SetPropertiesAsync(new Dictionary<string, BitmapTypedValue>
+                {
+                    ["/tEXt/{str=" + CaptureMetadata.PngKeyword + "}"] = new BitmapTypedValue(captaJson, Windows.Foundation.PropertyType.String),
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Couldn't write capture metadata", ex);
             }
         }
         await encoder.FlushAsync();
@@ -51,9 +66,9 @@ public static class ImageExport
         Clipboard.Flush();
     }
 
-    public static async Task SaveAsync(CapturedImage image, StorageFile file)
+    public static async Task SaveAsync(CapturedImage image, StorageFile file, string? captaJson = null)
     {
-        using var png = await EncodePngAsync(image);
+        using var png = await EncodePngAsync(image, captaJson);
         using var output = await file.OpenAsync(FileAccessMode.ReadWrite);
         output.Size = 0;
         await RandomAccessStream.CopyAndCloseAsync(png.GetInputStreamAt(0), output.GetOutputStreamAt(0));

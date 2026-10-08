@@ -58,8 +58,13 @@ public sealed class CaptureCoordinator
         var image = await _source.CaptureWindowAsync(target.Handle);
         var b = target.Bounds;
         var monitor = Monitors.AtPoint(new PointInt32(b.X + b.Width / 2, b.Y + b.Height / 2));
+        var (app, title) = WindowFinder.Describe(target.Handle);
         return new CaptureResult(image, monitor, new RectInt32(b.X, b.Y, image.Width, image.Height),
-            CaptureMode.ActiveWindow, GraphicsCaptureSource.IsHdr(monitor.Handle));
+            CaptureMode.ActiveWindow, GraphicsCaptureSource.IsHdr(monitor.Handle))
+        {
+            SourceApp = app,
+            WindowTitle = title,
+        };
     }
 
     private async Task<CaptureResult?> SelectAsync(CaptureMode mode)
@@ -89,8 +94,15 @@ public sealed class CaptureCoordinator
             {
                 var b = r.Monitor.Bounds;
                 var screen = new RectInt32(b.X + r.Rect.X, b.Y + r.Rect.Y, r.Rect.Width, r.Rect.Height);
+                // Attribute the region to the window under its centre (the overlay has closed).
+                var under = WindowFinder.At(new PointInt32(screen.X + screen.Width / 2, screen.Y + screen.Height / 2));
+                var (app, title) = under is null ? (null, null) : WindowFinder.Describe(under.Handle);
                 return new CaptureResult(r.Frame.Crop(r.Rect), r.Monitor, screen,
-                    r.Mode, GraphicsCaptureSource.IsHdr(r.Monitor.Handle));
+                    r.Mode, GraphicsCaptureSource.IsHdr(r.Monitor.Handle))
+                {
+                    SourceApp = app,
+                    WindowTitle = title,
+                };
             }
             case OverlayResult.WindowSelected w:
             {
@@ -98,8 +110,13 @@ public sealed class CaptureCoordinator
                 var image = await _source.CaptureWindowAsync(w.Target.Handle);
                 var b = w.Target.Bounds;
                 var monitor = Monitors.AtPoint(new PointInt32(b.X + b.Width / 2, b.Y + b.Height / 2));
+                var (app, title) = WindowFinder.Describe(w.Target.Handle);
                 return new CaptureResult(image, monitor, new RectInt32(b.X, b.Y, image.Width, image.Height),
-                    mode, GraphicsCaptureSource.IsHdr(monitor.Handle));
+                    mode, GraphicsCaptureSource.IsHdr(monitor.Handle))
+                {
+                    SourceApp = app,
+                    WindowTitle = title,
+                };
             }
             default:
                 return null;
