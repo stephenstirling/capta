@@ -86,12 +86,16 @@ public sealed partial class CaptureCardWindow : Window
         _timer.Tick += (_, _) => Hide();
     }
 
-    public async void Show(CaptureResult result, bool copied)
+    /// <param name="status">Overrides the status line (e.g. Grab text's result).</param>
+    public async void Show(CaptureResult result, bool copied, string? status = null, bool success = true)
     {
         _current = result;
         var image = result.Image;
         DetailText.Text = $"{result.ModeName} · {image.Width} × {image.Height}" + (result.WasHdr ? " · tone-mapped from HDR" : "");
-        SetStatus(copied ? "Copied to clipboard" : "Capture ready", success: copied);
+        if (status is not null)
+            SetStatus(status, success);
+        else
+            SetStatus(copied ? "Copied to clipboard" : "Capture ready", success: copied);
 
         var oculaInstalled = await CaptureActions.IsOculaInstalledAsync();
         OculaButton.IsEnabled = oculaInstalled;

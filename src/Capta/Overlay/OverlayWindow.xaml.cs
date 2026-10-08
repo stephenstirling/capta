@@ -47,6 +47,9 @@ public sealed partial class OverlayWindow : Window
     private readonly Border[] _handles;
 
     private CaptureMode _mode;
+
+    /// <summary>Region and Grab text both draw an editable selection.</summary>
+    private bool IsRegionLike => _mode is CaptureMode.Region or CaptureMode.GrabText;
     private RectInt32 _selection;
     private WindowTarget? _hoverWindow;
 
@@ -122,7 +125,13 @@ public sealed partial class OverlayWindow : Window
         _mode = mode;
         RegionMode.IsChecked = mode == CaptureMode.Region;
         WindowMode.IsChecked = mode == CaptureMode.Window;
-        HintLead.Text = mode == CaptureMode.Window ? "Click a window" : "Drag to select";
+        GrabTextMode.IsChecked = mode == CaptureMode.GrabText;
+        HintLead.Text = mode switch
+        {
+            CaptureMode.Window => "Click a window",
+            CaptureMode.GrabText => "Select the text to copy",
+            _ => "Drag to select",
+        };
         RegionHints.Visibility = mode == CaptureMode.Window ? Visibility.Collapsed : Visibility.Visible;
         _selection = default;
         _hoverWindow = null;
@@ -266,7 +275,7 @@ public sealed partial class OverlayWindow : Window
 
     private void OnDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
-        if (_mode == CaptureMode.Region && HasSelection && Contains(_selection, ToPixel(e.GetPosition(Root))))
+        if (IsRegionLike && HasSelection && Contains(_selection, ToPixel(e.GetPosition(Root))))
             CompleteSelection();
     }
 
@@ -279,7 +288,7 @@ public sealed partial class OverlayWindow : Window
             case VirtualKey.Escape:
                 _session.Cancel();
                 break;
-            case VirtualKey.Enter when _mode == CaptureMode.Region && HasSelection:
+            case VirtualKey.Enter when IsRegionLike && HasSelection:
                 CompleteSelection();
                 break;
             case VirtualKey.Space:
@@ -325,7 +334,7 @@ public sealed partial class OverlayWindow : Window
     }
 
     private void CompleteSelection() =>
-        _session.Complete(new OverlayResult.RegionSelected(_monitor, _frame, _selection, CaptureMode.Region));
+        _session.Complete(new OverlayResult.RegionSelected(_monitor, _frame, _selection, _mode));
 
     /// <summary>Called by the session when the pointer moves to another monitor's overlay.</summary>
     internal void OnPointerLeftMonitor()
@@ -474,7 +483,7 @@ public sealed partial class OverlayWindow : Window
         Place(GuideH2, r.X, r.Y + r.Height * 2 / 3, r.Width, 1);
 
         // Handles only when the selection can be edited (Region mode).
-        var showHandles = _mode == CaptureMode.Region;
+        var showHandles = IsRegionLike;
         var centres = HandleCentres();
         for (var i = 0; i < _handles.Length; i++)
         {
@@ -548,7 +557,7 @@ public sealed partial class OverlayWindow : Window
 
         var s = _selection;
         if (!Contains(s, new PointInt32(x, y))) return Blend(pixel, StirlingColors.Scrim);
-        if (_mode == CaptureMode.Region || _hoverWindow is not null)
+        if (IsRegionLike || _hoverWindow is not null)
         {
             // One magnified pixel of frame, as in screenshots/03 (a full 2px band reads too heavy at 12×).
             if (x == s.X || y == s.Y || x == s.X + s.Width - 1 || y == s.Y + s.Height - 1)

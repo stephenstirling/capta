@@ -283,11 +283,8 @@
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <StackPanel VerticalAlignment="Center">
-                                                <TextBlock FontSize="13.5" Text="Grab text from screen" />
-                                                <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Coming soon" />
-                                            </StackPanel>
-                                            <Border Grid.Column="1" Opacity="0.5" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Ctrl + Shift + PrtSc" /></Border>
+                                            <TextBlock VerticalAlignment="Center" FontSize="13.5" Text="Grab text from screen" />
+                                            <Border Grid.Column="1" Style="{StaticResource KeyCombo}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Text="Ctrl + Shift + PrtSc" /></Border>
                                             <Button Grid.Column="2" Style="{StaticResource EditShortcut}"><c:LineIcon Size="16" Data="M4 20l4-1 11-11-3-3L5 16z" /></Button>
                                         </Grid>
                                     </StackPanel>

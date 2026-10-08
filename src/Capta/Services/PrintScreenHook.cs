@@ -65,7 +65,8 @@ public sealed class PrintScreenHook : IDisposable
         if (_swallowingKeyUp)
             return true;
 
-        var action = IsKeyDown(VK_CONTROL) ? HotkeyAction.ShowToolbar
+        var action = IsKeyDown(VK_CONTROL) && IsKeyDown(VK_SHIFT) ? HotkeyAction.GrabText
+            : IsKeyDown(VK_CONTROL) ? HotkeyAction.ShowToolbar
             : IsKeyDown(VK_MENU) ? HotkeyAction.ActiveWindow
             : IsKeyDown(VK_SHIFT) ? HotkeyAction.FullScreen
             : HotkeyAction.Region;

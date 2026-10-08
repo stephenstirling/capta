@@ -91,6 +91,7 @@ public partial class App : Application
             case HotkeyAction.FullScreen: StartCapture(CaptureMode.FullScreen); break;
             case HotkeyAction.ActiveWindow: StartCapture(CaptureMode.ActiveWindow); break;
             case HotkeyAction.ShowToolbar: ShowToolbar(); break;
+            case HotkeyAction.GrabText: StartCapture(CaptureMode.GrabText); break;
         }
     }
 
@@ -129,6 +130,12 @@ public partial class App : Application
 
     private async void OnCaptured(CaptureResult result)
     {
+        if (result.Mode == CaptureMode.GrabText)
+        {
+            await GrabTextAsync(result);
+            return;
+        }
+
         var copied = false;
         try
         {
@@ -149,15 +156,44 @@ public partial class App : Application
         ShowCard(result, copied);
     }
 
+    /// <summary>Grab text: copy the selection's text (on-device OCR) and say how it went on the card.</summary>
+    private async Task GrabTextAsync(CaptureResult result)
+    {
+        _history.Add(result);
+        string status;
+        var success = false;
+        try
+        {
+            var text = await CaptureActions.CopyTextInImageAsync(result.Image);
+            if (text is null)
+            {
+                status = "No text found";
+            }
+            else
+            {
+                var lines = text.Split(Environment.NewLine).Length;
+                status = lines == 1 ? "Copied 1 line of text" : $"Copied {lines} lines of text";
+                success = true;
+            }
+            Log.Info($"Grab text: {status}");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Grab text failed", ex);
+            status = ex.Message;
+        }
+        ShowCard(result, copied: false, status, success);
+    }
+
     /// <summary>Shows the after-capture card; from Recent in the tray flyout, nothing new was copied.</summary>
-    public void ShowCard(CaptureResult result, bool copied = false)
+    public void ShowCard(CaptureResult result, bool copied = false, string? status = null, bool success = true)
     {
         if (_card is null)
         {
             _card = new CaptureCardWindow();
             _card.PinRequested += Pin;
         }
-        _card.Show(result, copied);
+        _card.Show(result, copied, status, success);
     }
 
     public void ShowTrayFlyout()

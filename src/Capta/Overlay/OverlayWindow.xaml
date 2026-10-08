@@ -200,12 +200,12 @@
                                         <c:LineIcon Size="13" StrokeWidth="2" Data="M6 9l6 6 6-6" />
                                     </StackPanel>
                                 </Button>
-                                <Button Style="{StaticResource ModeBarButton}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                <ToggleButton x:Name="GrabTextMode" Style="{StaticResource ModeBarToggle}" Click="OnModeClick" Tag="GrabText" ToolTipService.ToolTip="Copy the text in a region (Ctrl+Shift+PrtSc)">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <c:LineIcon Data="M4 7V4h3M20 7V4h-3M4 17v3h3M20 17v3h-3M8 9h8M12 9v7" />
                                         <TextBlock Text="Grab text" />
                                     </StackPanel>
-                                </Button>
+                                </ToggleButton>
                                 <Rectangle Width="1" Height="26" Margin="4,0" Fill="{ThemeResource CaptaDividerBrush}" />
                                 <Button Style="{StaticResource ModeBarButton}" Padding="0" IsEnabled="False" ToolTipService.ToolTip="Capture settings (coming soon)">
                                     <c:LineIcon Data="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M18 6a2 2 0 1 1-4 0a2 2 0 1 1 4 0zM12 12a2 2 0 1 1-4 0a2 2 0 1 1 4 0zM20 18a2 2 0 1 1-4 0a2 2 0 1 1 4 0z" />
