@@ -64,13 +64,25 @@ public sealed class CaptureCoordinator
 
     private async Task<CaptureResult?> SelectAsync(CaptureMode mode)
     {
-        var monitors = Monitors.All();
-        // Freeze every monitor first; the overlay draws on top of these frames.
-        var frames = await Task.WhenAll(monitors.Select(_source.CaptureMonitorAsync));
+        IReadOnlyList<MonitorInfo> monitors;
+        CapturedImage[] frames;
+        OverlayResult selection;
+        while (true)
+        {
+            monitors = Monitors.All();
+            // Freeze every monitor first; the overlay draws on top of these frames.
+            frames = await Task.WhenAll(monitors.Select(_source.CaptureMonitorAsync));
 
-        Log.Info($"Froze {frames.Length} monitor(s); showing overlay");
-        var selection = await OverlaySession.RunAsync(mode, monitors, frames);
-        Log.Info($"Overlay result: {selection.GetType().Name}");
+            Log.Info($"Froze {frames.Length} monitor(s); showing overlay");
+            selection = await OverlaySession.RunAsync(mode, monitors, frames);
+            Log.Info($"Overlay result: {selection.GetType().Name}");
+            if (selection is not OverlayResult.Delayed delayed)
+                break;
+
+            // The overlay is gone; give the user time to set the screen up, then freeze again.
+            mode = delayed.Mode;
+            await Task.Delay(TimeSpan.FromSeconds(delayed.Seconds));
+        }
         switch (selection)
         {
             case OverlayResult.RegionSelected r:

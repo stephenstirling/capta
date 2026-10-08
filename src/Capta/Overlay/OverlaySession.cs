@@ -14,6 +14,9 @@ public abstract record OverlayResult
     public sealed record RegionSelected(MonitorInfo Monitor, CapturedImage Frame, RectInt32 Rect, CaptureMode Mode) : OverlayResult;
 
     public sealed record WindowSelected(WindowTarget Target) : OverlayResult;
+
+    /// <summary>Close, wait this long, then freeze the screen and show the overlay again.</summary>
+    public sealed record Delayed(int Seconds, CaptureMode Mode) : OverlayResult;
 }
 
 /// <summary>Shows one overlay per monitor and resolves when any of them produces a result.</summary>

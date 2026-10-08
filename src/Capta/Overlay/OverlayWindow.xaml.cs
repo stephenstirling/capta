@@ -96,6 +96,8 @@ public sealed partial class OverlayWindow : Window
         Root.SizeChanged += (_, _) => UpdateSelectionVisuals();
         Root.Cursor = InputSystemCursor.Create(InputSystemCursorShape.Cross);
         ApplyMode(mode);
+        var delay = Settings.CaptureDelaySeconds;
+        DelayText.Text = delay == 0 ? "No delay" : $"{delay}s delay";
     }
 
     public async Task PrepareAsync()
@@ -326,6 +328,19 @@ public sealed partial class OverlayWindow : Window
             new RectInt32(0, 0, _frame.Width, _frame.Height), CaptureMode.FullScreen));
 
     private void OnCancelClick(object sender, RoutedEventArgs e) => _session.Cancel();
+
+    private void OnDelay(object sender, RoutedEventArgs e)
+    {
+        var seconds = int.Parse((string)((FrameworkElement)sender).Tag);
+        Settings.CaptureDelaySeconds = seconds;
+        if (seconds == 0)
+        {
+            DelayText.Text = "No delay";
+            FocusHost.Focus(FocusState.Programmatic);
+            return;
+        }
+        _session.Complete(new OverlayResult.Delayed(seconds, _mode));
+    }
 
     private bool IsOverTopBar(Point dip)
     {

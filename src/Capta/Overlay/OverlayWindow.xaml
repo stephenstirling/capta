@@ -193,12 +193,21 @@
                                     </StackPanel>
                                 </ToggleButton>
                                 <Rectangle Width="1" Height="26" Margin="4,0" Fill="{ThemeResource CaptaDividerBrush}" />
-                                <Button Style="{StaticResource ModeBarButton}" Padding="12,0" IsEnabled="False" ToolTipService.ToolTip="Set a delay from the toolbar">
+                                <!-- Picking a delay closes the overlay, waits, then freezes the screen again. -->
+                                <Button Style="{StaticResource ModeBarButton}" Padding="12,0" ToolTipService.ToolTip="Wait before capturing, e.g. to open a menu">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <c:LineIcon Data="M20 13a8 8 0 1 1-16 0a8 8 0 1 1 16 0zM12 9v4l2 2M9 2h6" />
-                                        <TextBlock Text="No delay" />
+                                        <TextBlock x:Name="DelayText" Text="No delay" />
                                         <c:LineIcon Size="13" StrokeWidth="2" Data="M6 9l6 6 6-6" />
                                     </StackPanel>
+                                    <Button.Flyout>
+                                        <MenuFlyout Placement="Bottom">
+                                            <MenuFlyoutItem Text="No delay" Tag="0" Click="OnDelay" />
+                                            <MenuFlyoutItem Text="3 seconds" Tag="3" Click="OnDelay" />
+                                            <MenuFlyoutItem Text="5 seconds" Tag="5" Click="OnDelay" />
+                                            <MenuFlyoutItem Text="10 seconds" Tag="10" Click="OnDelay" />
+                                        </MenuFlyout>
+                                    </Button.Flyout>
                                 </Button>
                                 <ToggleButton x:Name="GrabTextMode" Style="{StaticResource ModeBarToggle}" Click="OnModeClick" Tag="GrabText" ToolTipService.ToolTip="Copy the text in a region (Ctrl+Shift+PrtSc)">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
