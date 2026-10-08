@@ -18,6 +18,8 @@ public partial class App : Application
     private PrintScreenHook? _hook;
     private PrintScreenOwnership? _ownership;
     private StartupSettingsWindow? _settings;
+    private TrayFlyoutWindow? _flyout;
+    private readonly CaptureHistory _history = new();
     private ToolbarWindow? _toolbar;
     private CaptureCoordinator? _capture;
     private readonly GraphicsCaptureSource _screenSource = new();
@@ -132,12 +134,25 @@ public partial class App : Application
             _tray?.ShowError("Couldn't copy to the clipboard", ex.Message);
         }
 
+        _history.Add(result);
+        ShowCard(result, copied);
+    }
+
+    /// <summary>Shows the after-capture card; from Recent in the tray flyout, nothing new was copied.</summary>
+    public void ShowCard(CaptureResult result, bool copied = false)
+    {
         if (_card is null)
         {
             _card = new CaptureCardWindow();
             _card.PinRequested += Pin;
         }
         _card.Show(result, copied);
+    }
+
+    public void ShowTrayFlyout()
+    {
+        _flyout ??= new TrayFlyoutWindow(this);
+        _flyout.ShowNearTray(_history.Items);
     }
 
     private async void Pin(CaptureResult result)
@@ -196,6 +211,7 @@ public partial class App : Application
         _hook?.Dispose();
         _ownership?.Dispose();
         _settings?.Close();
+        _flyout?.Close();
         _toolbar?.Close();
         _card?.Close();
         foreach (var pin in _pins.ToArray()) pin.Close();

@@ -56,6 +56,11 @@ Open `Capta.slnx` in Visual Studio and press F5 to deploy and run the packaged a
 `Package.appxmanifest` uses a placeholder identity (`StephenStirling.Capta`, `CN=StephenStirling`).
 Before submitting, run **Project → Publish → Associate App with the Store** in Visual Studio.
 
+## Support
+
+Capta is made by [Stephen Stirling](https://github.com/stephenstirling). If it's useful to you,
+you can [buy me a coffee](https://buymeacoffee.com/stephenstirling).
+
 ## Licence
 
 Apache-2.0. See [LICENSE](LICENSE).

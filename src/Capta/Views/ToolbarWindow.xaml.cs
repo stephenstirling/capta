@@ -82,6 +82,7 @@ public sealed partial class ToolbarWindow : Window
     {
         var cursor = WindowHelper.CursorPosition();
         UpdateHdrBadge(cursor);
+        ApplyDelay(Settings.CaptureDelaySeconds); // may have changed in the tray flyout
 
         var area = WindowHelper.CursorWorkArea();
         // Move onto the target monitor first so the window adopts its DPI before sizing.

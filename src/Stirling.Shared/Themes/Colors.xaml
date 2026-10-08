@@ -128,6 +128,12 @@
             <!-- Grouped list panels, e.g. the shortcut list -->
             <Color x:Key="CaptaListBorderColor">#2A2E35</Color>
             <SolidColorBrush x:Key="CaptaListBorderBrush" Color="{StaticResource CaptaListBorderColor}" />
+            <!-- Lower corners of the Aperture glyph (mockups/Tray.html); the upper corners use CaptaAccent -->
+            <Color x:Key="CaptaApertureLowerColor">#F0962E</Color>
+            <SolidColorBrush x:Key="CaptaApertureLowerBrush" Color="{StaticResource CaptaApertureLowerColor}" />
+            <!-- Selected item in a segmented picker, e.g. the tray's Delay -->
+            <Color x:Key="CaptaSegmentSelectedColor">#33383F</Color>
+            <SolidColorBrush x:Key="CaptaSegmentSelectedBrush" Color="{StaticResource CaptaSegmentSelectedColor}" />
             <!-- Fluent control overrides, mapped onto the tokens above. -->
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
@@ -238,6 +244,10 @@
             <SolidColorBrush x:Key="CaptaSuccessMutedBrush" Color="{StaticResource CaptaSuccessMutedColor}" />
             <Color x:Key="CaptaListBorderColor">#E3E5E9</Color>
             <SolidColorBrush x:Key="CaptaListBorderBrush" Color="{StaticResource CaptaListBorderColor}" />
+            <Color x:Key="CaptaApertureLowerColor">#F0962E</Color>
+            <SolidColorBrush x:Key="CaptaApertureLowerBrush" Color="{StaticResource CaptaApertureLowerColor}" />
+            <Color x:Key="CaptaSegmentSelectedColor">#FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaSegmentSelectedBrush" Color="{StaticResource CaptaSegmentSelectedColor}" />
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
             <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
@@ -299,6 +309,8 @@
             <SolidColorBrush x:Key="CaptaSuccessBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="CaptaSuccessMutedBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="CaptaListBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaApertureLowerBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaSegmentSelectedBrush" Color="{ThemeResource SystemColorHighlightColor}" />
 </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>

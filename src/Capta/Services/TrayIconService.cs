@@ -80,7 +80,7 @@ public sealed class TrayIconService : IDisposable
             ContextMenuMode = ContextMenuMode.SecondWindow,
             NoLeftClickDelay = true,
             ContextFlyout = menu,
-            LeftClickCommand = new RelayCommand(_app.ShowToolbar),
+            LeftClickCommand = new RelayCommand(_app.ShowTrayFlyout),
         };
         _icon.ForceCreate(enablesEfficiencyMode: false);
     }
