@@ -1,46 +1,80 @@
 # Capta design reference
 
-This folder is the source of truth for how Capta should look and behave. When building UI, match these mockups rather than default WinUI styling.
+This folder is the source of truth for how Capta looks and behaves. When building or changing UI, match these screens, not default WinUI styling. Updated 2026-10-07.
 
 ## What's here
 
-- `mockups/*.html` are the approved screens. Every size, colour, radius and gap is written as an inline `style=""` on the element, so read the HTML to get exact values. They need the canvas runtime to render, so don't expect them to open in a browser; read them as specs. The `{{accent}}` placeholders mean the accent colour `#FFB547`.
-- The theme tokens live in `src/Stirling.Shared/Themes/Colors.xaml`, the app's only theme dictionary, with Light, Dark and High Contrast versions. Use its brushes instead of hard-coded colours, and add any new token there.
-- `icons/` holds the chosen "Aperture" app icon as SVGs, PNGs at every size, `Capta.ico`, and single-colour tray icons (white for dark taskbars, black for light).
+- `screenshots/*.png`: rendered pictures of every approved screen at 1:1 size. **Look at these first.** They show the target exactly.
+- `mockups/*.html`: the same screens as source. Every size, colour, radius and gap is an inline `style=""`, so read them for exact numbers. They need a canvas runtime to render, so treat them as specs, not pages to open. `{{accent}}` means `#FFB547`; `{{accentSoft}}` is the accent at about 17% opacity (`CaptaAccentSoftBrush`).
+- `icons/`: the chosen "Aperture" icon as SVG, PNG at every size and `Capta.ico`, plus white and black 16 px tray icons (white for dark taskbars, black for light).
 
-## Screens and their mockup files
+Colours, shapes and fonts are **not** here. They live in one place only: `src/Stirling.Shared/Themes/Colors.xaml`. Use its `Capta*` brushes and tokens; never hard-code a colour.
 
-| Screen | File | Notes |
-|---|---|---|
-| Floating toolbar + after-capture card | `Toolbar.html` | The entry point. Small always-on-top bar; after a capture, a card appears bottom-right with Copy (split button with menu), Edit, Save, Pin, Send to Ocula |
-| Colour & HDR settings | `Hdr.html` | HDR handling choice, SDR white level, highlight roll-off, colour space |
-| Startup & shortcuts | `Startup.html` | Start with Windows, tray behaviour, Print Screen status card, shortcut list |
-| Capture overlay | `Main.html` | Dimmed screen, selection with handles and thirds guides, size badge above, magnifier loupe with coordinates and hex, mode bar at top |
-| Editor (dark) | `Editor.html` | Title bar, tool bar, canvas with dot grid, 340 px side panel |
-| Editor (light) | `EditorLight.html` | Same layout in the light theme |
-| Ocula smart folder | `Ocula.html` | How captures appear inside Ocula |
-| Tray flyout | `Tray.html` | 380 × 560 flyout from the tray icon |
-| Pin to screen | `Pinned.html` | Borderless always-on-top capture with opacity, click-through, copy, edit, unpin |
-| App icon | `Icon.html` | Concept A ("Aperture") is the chosen icon |
-| First-run setup | `FirstRun.html` | Five steps: welcome, Print Screen, startup + theme, Ocula, done |
+## Screen → screenshot → mockup → code
+
+| Screen | Screenshot | Mockup | Code | Status |
+|---|---|---|---|---|
+| Floating toolbar | `02-toolbar-and-card.png` (top) | `Toolbar.html` | `Views/ToolbarWindow.xaml` | Needs rework |
+| After-capture card | `02-toolbar-and-card.png` (bottom right) | `Toolbar.html` | `Views/CaptureCardWindow.xaml` | Needs rework |
+| Copy menu (open) | `01-toolbar-with-copy-menu.png` | `Toolbar.html` | `CaptureCardWindow` flyout | Needs building |
+| Capture overlay | `03-capture-overlay.png` | `Main.html` | `Overlay/OverlayWindow.xaml` | Needs rework |
+| Pin to screen | `04-pin-to-screen.png` | `Pinned.html` | `Views/PinWindow.xaml` | Needs rework |
+| Tray flyout | `05-tray-flyout.png` | `Tray.html` | `Services/TrayIconService.cs` | Not built (menu only) |
+| Startup & shortcuts | `06-startup-and-shortcuts.png` | `Startup.html` | none yet | Not built |
+| Colour & HDR settings | `07-colour-and-hdr.png` | `Hdr.html` | none yet | Not built |
+| First-run setup | `08-first-run.png` | `FirstRun.html` | none yet | Not built |
+| App icon | `09-app-icon.png` | `Icon.html` | `Stirling.Shared/Assets/Capta` | Done (concept A) |
+| Editor, dark / light | `10-…`, `11-…` | `Editor.html`, `EditorLight.html` | **not in Capta** | Future Ocula editing view |
+| Ocula captures folder | `12-ocula-captures-folder.png` | `Ocula.html` | **not in Capta** | For Ocula |
+
+Mockup details that are scenery, not UI to build: the grey placeholder windows and taskbar behind each screen, and the yellow "Display 1 is in HDR" tooltip (a hover tooltip on the HDR badge).
+
+## Decisions (2026-10-07)
+
+1. **Print Screen shortcuts.** These override `Startup.html` where they differ:
+
+   | Keys | Action |
+   |---|---|
+   | PrtSc | Region capture |
+   | Shift+PrtSc | Full screen, straight to the clipboard |
+   | Alt+PrtSc | Active window |
+   | Ctrl+PrtSc | Show the floating toolbar (becomes Record video once video exists; the mockup shows that future state) |
+   | Ctrl+Shift+PrtSc | Grab text from screen (later) |
+
+2. **Edit** opens `ocula:edit?file=…` if Ocula is registered, otherwise the default image app. Button label and tooltip say just "Edit". Capta does not get its own editor; `Editor.html` is reference for Ocula.
+3. **One theme file:** `src/Stirling.Shared/Themes/Colors.xaml`. There is no theme file in `design/`.
 
 ## Visual rules
 
-- **Font:** Segoe UI Variable Text for UI, Cascadia Mono for numbers like sizes, coordinates and hex values.
-- **Type sizes:** section labels are 11 px, bold, uppercase with 0.08em letter spacing, in the muted colour. Body text is 12.5–13.5 px. Window titles are 20–22 px bold. First-run headings are 26–30 px extra bold.
-- **Accent:** amber `#FFB547`, with near-black `#1A1206` text on top of it. Use it for the primary action, the active tool, toggles that are on, and selection outlines. In the light theme, accent-coloured text and icons use `CaptaAccentTextColor` instead.
-- **Surfaces:** solid colours, not Mica or Acrylic, so screenshots of the app look the same everywhere. The floating toolbar and the after-capture card are the exception and can use a slightly translucent surface.
-- **Shapes:** windows 14 px corners, cards 12, buttons 10, the floating toolbar 16, filter chips fully rounded.
-- **Hit targets:** icon buttons are 44 × 44 px. Regular buttons are 40 px tall.
-- **Icons:** 1.8 px stroke line icons, around 18 px, matching the inline SVGs in the mockups. Segoe Fluent Icons are an acceptable stand-in where an exact match exists.
-- **Title bar:** custom, using `ExtendsContentIntoTitleBar`. It's 40 px tall with the Aperture glyph, "Capta" and the file name on the left.
+- **Fonts:** Segoe UI Variable Text for UI; Cascadia Mono for sizes, coordinates, hex values and shortcut keys.
+- **Type:** section labels 11 px bold uppercase, letter spacing 0.08em, muted colour. Body 12.5–13.5 px. Dialog titles 20 px bold. First-run headings 26–30 px extra bold.
+- **Accent:** amber `#FFB547` with `#1A1206` on top. Used for the primary action, the active tool, toggles that are on, and selection outlines. In the light theme, accent-coloured text and icons use `CaptaAccentTextBrush`.
+- **Surfaces:** solid colours, not Mica. The floating toolbar and after-capture card use a near-opaque dark surface (`rgba(24,27,32,0.96)`) with a 1 px `#343A44` border and a soft shadow; Acrylic is acceptable if it looks the same.
+- **Corners:** windows 14 px, cards 12, buttons 10–11, floating toolbar and after-capture card 16, pills fully round.
+- **Hit targets:** icon buttons 40–44 px square. Regular buttons 40 px tall.
+- **Icons:** 1.8 px stroke line icons at about 18 px, matching the inline SVGs. Segoe Fluent Icons are fine where a close match exists.
 
-## Behaviour that the mockups assume
+## Per-screen checklist
 
-- **Startup:** Capta starts with Windows via the MSIX `windows.startupTask` and starts hidden in the tray. The floating toolbar only appears when asked for.
-- **Print Screen:** catch `VK_SNAPSHOT` (plus Shift, Alt, Ctrl variants) with a `WH_KEYBOARD_LL` hook. If `HKCU\Control Panel\Keyboard\PrintScreenKeyForSnippingEnabled` is 1, show the warning card and open `ms-settings:easeofaccess-keyboard`. Don't write that value directly from the packaged app.
-- **After capture:** copy to the clipboard automatically as an SDR PNG (setting on by default), then show the after-capture card. The editor only opens from Edit.
-- **HDR:** capture in FP16 via Windows.Graphics.Capture, scale by `AdvancedColorInfo.SdrWhiteLevelInNits`, tone-map highlights, and convert to sRGB.
-- **Auto-redact:** after on-device OCR, blur emails, phone numbers and long digit runs, and show the "Personal info found" card with Review and Undo.
-- **Pin:** each pin is its own borderless always-on-top window. Click-through uses `WS_EX_LAYERED | WS_EX_TRANSPARENT`.
-- **Ocula:** saved PNGs carry source app, window title, capture mode and OCR text in metadata so Ocula can build its "All captures" smart folder.
+**Floating toolbar** (one row, 6 px padding, 16 px corners)
+drag grip · amber **New** button (Aperture glyph + "New") · dark inset group of icon-only mode buttons (Region active: soft-amber fill, amber icon; Window, Full screen, Freeform, Scrolling, Record) · divider · Delay dropdown ("Off") · Auto-copy toggle · "HDR → SDR" badge (shown only when a display is in HDR) · divider · keep-on-top (amber when on) · settings · hide to tray · close. Freeform, Scrolling, Record and Delay can be disabled placeholders until built.
+
+**After-capture card** (bottom right, 400 px wide, 14 px padding, 16 px corners)
+Row 1: 96 × 60 thumbnail · green dot + "Copied to clipboard" (bold 14 px) with a muted line under it ("Region · 680 × 430 · tone-mapped from HDR") · dismiss ×.
+Row 2: **Copy** split button (Copy + chevron opening the menu) · **Edit**, wide amber primary · Save, Pin, Send to Ocula as 44 × 40 icon buttons.
+Copy menu: Copy image (Ctrl+C, checked default) · Copy image as HDR · Copy text in image (Ctrl+Shift+C) · Copy as file · Copy file path · separator · "Copy automatically after capture" toggle. Items not yet supported can be disabled.
+
+**Capture overlay**
+Dim `CaptaScrimBrush` outside the selection · 2 px amber frame · 8 white square handles with amber borders · thirds guides at 22% white · amber size badge with dark mono text above the top-left corner · circular 132 px loupe with white border, magnified pixels, amber crosshair and a centre-pixel box · readout pill below the loupe (coordinates · colour swatch · hex) · mode bar at the top matching the toolbar's modes · key hints under it (Space move, Shift square, Enter capture, Esc cancel).
+
+**Pin window**
+Amber 2 px outline with offset and a deep shadow · resize corner mark · on hover, a bar above the top-right with opacity slider and %, click-through, copy, edit, unpin · hint text "Scroll to zoom · drag corner to resize · double-click to unpin".
+
+## Behaviour the screens assume
+
+- Starts with Windows (`windows.startupTask`) and starts hidden in the tray; the toolbar appears only on request.
+- Print Screen via a `WH_KEYBOARD_LL` hook. If `HKCU\Control Panel\Keyboard\PrintScreenKeyForSnippingEnabled` is 1, show the warning card and open `ms-settings:easeofaccess-keyboard`; never write that value from the packaged app.
+- After capture, copy an SDR PNG to the clipboard automatically (on by default), then show the card.
+- HDR: capture FP16 via Windows.Graphics.Capture, scale by `AdvancedColorInfo.SdrWhiteLevelInNits`, tone-map highlights, convert to sRGB.
+- Pins are separate borderless always-on-top windows; click-through uses `WS_EX_LAYERED | WS_EX_TRANSPARENT`.
+- Saved PNGs carry source app, window title, capture mode and OCR text in metadata for Ocula.

@@ -5,10 +5,12 @@ See README.md for layout and build commands.
 
 ## Before any UI work
 
-1. Read `design/DESIGN.md`.
-2. Match the matching screen in `design/mockups/*.html`. The mockups are specs, not pages to open:
-   read the inline `style=""` values for exact sizes, radii, gaps and colours. `{{accent}}` means `#FFB547`.
-3. Use the theme brushes and tokens (`Capta*Brush`, `CaptaRadius*`, `CaptaFont`, …), never hard-coded colours.
+1. Read `design/DESIGN.md` first. Its "Decisions" section overrides the mockups where they differ.
+2. For each window, open its PNG in `design/screenshots` with the Read tool and look at it before writing
+   XAML. Use `design/mockups/*.html` for exact numbers: the inline `style=""` values give sizes, radii, gaps
+   and colours. `{{accent}}` means `#FFB547`.
+3. `src/Stirling.Shared/Themes/Colors.xaml` is the only theme file. Use its brushes and tokens
+   (`Capta*Brush`, `CaptaRadius*`, `CaptaFont`, …); never hard-code colours.
 
 ## Theme: one source of truth
 
