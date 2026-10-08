@@ -41,13 +41,12 @@ public sealed partial class LineIcon : UserControl
     public LineIcon()
     {
         IsTabStop = false;
-        // Follow the inherited Foreground (a {Binding} doesn't see inherited changes such as a
-        // ToggleButton switching to its checked colour).
-        RegisterPropertyChangedCallback(ForegroundProperty, (_, _) => _path.Stroke = Foreground);
+        RegisterPropertyChangedCallback(ForegroundProperty, (_, _) => UpdateStroke());
         Loaded += (_, _) =>
         {
-            _path.Stroke = Foreground;
+            TrackPresenterForeground();
             TrackOwnerEnabled();
+            UpdateStroke();
         };
         _box.Child = new Canvas { Width = 24, Height = 24, Children = { _path } };
         Content = _box;
@@ -79,6 +78,29 @@ public sealed partial class LineIcon : UserControl
     {
         get => (bool)GetValue(DashedProperty);
         set => SetValue(DashedProperty, value);
+    }
+
+    private ContentPresenter? _presenter;
+
+    /// <summary>
+    /// A button's visual states (hover, pressed, checked) set Foreground on its ContentPresenter,
+    /// and that change doesn't reliably reach a UserControl inside it. Follow the presenter
+    /// directly unless this icon has its own Foreground.
+    /// </summary>
+    private void TrackPresenterForeground()
+    {
+        if (_presenter is not null) return;
+        var parent = VisualTreeHelper.GetParent(this);
+        while (parent is not null and not ContentPresenter)
+            parent = VisualTreeHelper.GetParent(parent);
+        _presenter = parent as ContentPresenter;
+        _presenter?.RegisterPropertyChangedCallback(ContentPresenter.ForegroundProperty, (_, _) => UpdateStroke());
+    }
+
+    private void UpdateStroke()
+    {
+        var ownColour = ReadLocalValue(ForegroundProperty) != DependencyProperty.UnsetValue;
+        _path.Stroke = !ownColour && _presenter?.Foreground is { } inherited ? inherited : Foreground;
     }
 
     /// <summary>

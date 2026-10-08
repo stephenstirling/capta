@@ -44,7 +44,7 @@ public sealed partial class CaptureCardWindow : Window
         AppWindow.IsShownInSwitchers = false;
         AppWindow.SetIcon("Assets/Capta.ico");
         TransparentBackdrop.PrepareWindow(this);
-        SetWindowDisplayAffinity(this.GetHwnd(), WDA_EXCLUDEFROMCAPTURE);
+        CaptureExclusion.Apply(this);
 
         Panel.SizeChanged += (_, _) =>
         {

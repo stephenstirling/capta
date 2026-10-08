@@ -42,7 +42,7 @@ public sealed partial class ToolbarWindow : Window
         TransparentBackdrop.PrepareWindow(this);
 
         // Never appear in our own (or anyone else's) captures.
-        SetWindowDisplayAffinity(this.GetHwnd(), WDA_EXCLUDEFROMCAPTURE);
+        CaptureExclusion.Apply(this);
 
         // The shadow host tracks the panel exactly; the window padding leaves room for the blur.
         Panel.SizeChanged += (_, _) =>
