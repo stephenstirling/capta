@@ -63,6 +63,7 @@ public sealed partial class ToolbarWindow : Window
         ShadowHost.HorizontalAlignment = Panel.HorizontalAlignment = HorizontalAlignment.Left;
         ShadowHost.VerticalAlignment = Panel.VerticalAlignment = VerticalAlignment.Top;
         Shadow.Attach(ShadowHost, cornerRadius: 16, offsetY: 18, blur: 44, opacity: 0.5f);
+        Interop.ClickThroughMargins.Attach(this, Panel);
 
         LoadSettings();
 

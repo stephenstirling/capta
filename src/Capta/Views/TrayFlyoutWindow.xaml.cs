@@ -46,6 +46,7 @@ public sealed partial class TrayFlyoutWindow : Window
         ShadowHost.HorizontalAlignment = Panel.HorizontalAlignment = HorizontalAlignment.Left;
         ShadowHost.VerticalAlignment = Panel.VerticalAlignment = VerticalAlignment.Top;
         Interop.Shadow.Attach(ShadowHost, cornerRadius: 14, offsetY: 16, blur: 40, opacity: 0.45);
+        Interop.ClickThroughMargins.Attach(this, Panel);
 
         // Behave like a system flyout: clicking elsewhere dismisses it.
         Activated += (_, e) =>

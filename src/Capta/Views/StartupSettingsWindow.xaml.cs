@@ -54,6 +54,7 @@ public sealed partial class StartupSettingsWindow : Window
         ShadowHost.HorizontalAlignment = Panel.HorizontalAlignment = HorizontalAlignment.Left;
         ShadowHost.VerticalAlignment = Panel.VerticalAlignment = VerticalAlignment.Top;
         Interop.Shadow.Attach(ShadowHost, cornerRadius: 14, offsetY: 20, blur: 50, opacity: 0.5);
+        Interop.ClickThroughMargins.Attach(this, Panel);
 
         AppWindow.Closing += (_, e) =>
         {
