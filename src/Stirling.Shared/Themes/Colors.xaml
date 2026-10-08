@@ -157,6 +157,31 @@
             <SolidColorBrush x:Key="CaptaPreviewDarkInkBrush" Color="{StaticResource CaptaPreviewDarkInkColor}" />
             <Color x:Key="CaptaPreviewDarkInkSoftColor">#343A44</Color>
             <SolidColorBrush x:Key="CaptaPreviewDarkInkSoftBrush" Color="{StaticResource CaptaPreviewDarkInkSoftColor}" />
+            <!-- Selectable info cards, e.g. the display cards in Colour & HDR -->
+            <Color x:Key="CaptaCardSurfaceColor">#1D2025</Color>
+            <SolidColorBrush x:Key="CaptaCardSurfaceBrush" Color="{StaticResource CaptaCardSurfaceColor}" />
+            <!-- Unselected radio button ring -->
+            <Color x:Key="CaptaRadioRingColor">#5A616C</Color>
+            <SolidColorBrush x:Key="CaptaRadioRingBrush" Color="{StaticResource CaptaRadioRingColor}" />
+            <!-- Tone-mapping illustration in Colour & HDR (mockups/Hdr.html): fixed art, the same in every theme -->
+            <Color x:Key="CaptaHdrDemoNaiveSkyColor">#3B3F46</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoNaiveSkyBrush" Color="{StaticResource CaptaHdrDemoNaiveSkyColor}" />
+            <Color x:Key="CaptaHdrDemoNaiveSunColor">#F4F4F2</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoNaiveSunBrush" Color="{StaticResource CaptaHdrDemoNaiveSunColor}" />
+            <Color x:Key="CaptaHdrDemoNaiveGroundColor">#8A8F98</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoNaiveGroundBrush" Color="{StaticResource CaptaHdrDemoNaiveGroundColor}" />
+            <Color x:Key="CaptaHdrDemoMappedSkyColor">#1E2A3A</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoMappedSkyBrush" Color="{StaticResource CaptaHdrDemoMappedSkyColor}" />
+            <Color x:Key="CaptaHdrDemoMappedSunColor">#FFD27A</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoMappedSunBrush" Color="{StaticResource CaptaHdrDemoMappedSunColor}" />
+            <Color x:Key="CaptaHdrDemoMappedGroundColor">#2F5D50</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoMappedGroundBrush" Color="{StaticResource CaptaHdrDemoMappedGroundColor}" />
+            <Color x:Key="CaptaHdrDemoLabelColor">#BFFFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoLabelBrush" Color="{StaticResource CaptaHdrDemoLabelColor}" />
+            <Color x:Key="CaptaHdrDemoLabelInkColor">#1A1C20</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoLabelInkBrush" Color="{StaticResource CaptaHdrDemoLabelInkColor}" />
+            <Color x:Key="CaptaHdrDemoDividerColor">#ECEEF1</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoDividerBrush" Color="{StaticResource CaptaHdrDemoDividerColor}" />
             <!-- Fluent control overrides, mapped onto the tokens above. -->
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
@@ -291,6 +316,28 @@
             <SolidColorBrush x:Key="CaptaPreviewDarkInkBrush" Color="{StaticResource CaptaPreviewDarkInkColor}" />
             <Color x:Key="CaptaPreviewDarkInkSoftColor">#343A44</Color>
             <SolidColorBrush x:Key="CaptaPreviewDarkInkSoftBrush" Color="{StaticResource CaptaPreviewDarkInkSoftColor}" />
+            <Color x:Key="CaptaCardSurfaceColor">#FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaCardSurfaceBrush" Color="{StaticResource CaptaCardSurfaceColor}" />
+            <Color x:Key="CaptaRadioRingColor">#9AA1AC</Color>
+            <SolidColorBrush x:Key="CaptaRadioRingBrush" Color="{StaticResource CaptaRadioRingColor}" />
+            <Color x:Key="CaptaHdrDemoNaiveSkyColor">#3B3F46</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoNaiveSkyBrush" Color="{StaticResource CaptaHdrDemoNaiveSkyColor}" />
+            <Color x:Key="CaptaHdrDemoNaiveSunColor">#F4F4F2</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoNaiveSunBrush" Color="{StaticResource CaptaHdrDemoNaiveSunColor}" />
+            <Color x:Key="CaptaHdrDemoNaiveGroundColor">#8A8F98</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoNaiveGroundBrush" Color="{StaticResource CaptaHdrDemoNaiveGroundColor}" />
+            <Color x:Key="CaptaHdrDemoMappedSkyColor">#1E2A3A</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoMappedSkyBrush" Color="{StaticResource CaptaHdrDemoMappedSkyColor}" />
+            <Color x:Key="CaptaHdrDemoMappedSunColor">#FFD27A</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoMappedSunBrush" Color="{StaticResource CaptaHdrDemoMappedSunColor}" />
+            <Color x:Key="CaptaHdrDemoMappedGroundColor">#2F5D50</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoMappedGroundBrush" Color="{StaticResource CaptaHdrDemoMappedGroundColor}" />
+            <Color x:Key="CaptaHdrDemoLabelColor">#BFFFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoLabelBrush" Color="{StaticResource CaptaHdrDemoLabelColor}" />
+            <Color x:Key="CaptaHdrDemoLabelInkColor">#1A1C20</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoLabelInkBrush" Color="{StaticResource CaptaHdrDemoLabelInkColor}" />
+            <Color x:Key="CaptaHdrDemoDividerColor">#ECEEF1</Color>
+            <SolidColorBrush x:Key="CaptaHdrDemoDividerBrush" Color="{StaticResource CaptaHdrDemoDividerColor}" />
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
             <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
@@ -364,6 +411,17 @@
             <SolidColorBrush x:Key="CaptaPreviewDarkBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="CaptaPreviewDarkInkBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="CaptaPreviewDarkInkSoftBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaCardSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaRadioRingBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaHdrDemoNaiveSkyBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaHdrDemoNaiveSunBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaHdrDemoNaiveGroundBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaHdrDemoMappedSkyBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaHdrDemoMappedSunBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaHdrDemoMappedGroundBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaHdrDemoLabelBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaHdrDemoLabelInkBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaHdrDemoDividerBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
 </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>

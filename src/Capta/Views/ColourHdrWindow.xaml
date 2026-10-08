@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Colour & HDR: design/mockups/Hdr.html and screenshots/07-colour-and-hdr.png. -->
+<Window
+    x:Class="Capta.Views.ColourHdrWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:Capta.Controls"
+    Title="Capta: Colour &amp; HDR">
+
+    <!-- Transparent window; the padding leaves room for the dialog's shadow. -->
+    <Grid x:Name="Root" Padding="24,12,24,36">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Escape" Invoked="OnEscape" />
+        </Grid.KeyboardAccelerators>
+        <Grid.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <ResourceDictionary Source="ms-appx:///Styles/Floating.xaml" />
+                </ResourceDictionary.MergedDictionaries>
+                <Style x:Key="SectionLabel" TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="11" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="CharacterSpacing" Value="80" />
+                    <Setter Property="Foreground" Value="{ThemeResource CaptaTextMutedBrush}" />
+                </Style>
+                <Style x:Key="Switch" TargetType="ToggleSwitch" BasedOn="{StaticResource DefaultToggleSwitchStyle}">
+                    <Setter Property="MinWidth" Value="0" />
+                    <Setter Property="OnContent" Value="" />
+                    <Setter Property="OffContent" Value="" />
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0,0,-12,0" />
+                </Style>
+                <!-- "When capturing an HDR screen" options. -->
+                <Style x:Key="Option" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                    <Setter Property="Padding" Value="14" />
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="CornerRadius" Value="12" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="Background" Value="{ThemeResource CaptaSurfaceRaisedBrush}" />
+                    <Setter Property="BorderBrush" Value="{ThemeResource CaptaListBorderBrush}" />
+                </Style>
+                <Style x:Key="OptionSelected" TargetType="Button" BasedOn="{StaticResource Option}">
+                    <Setter Property="BorderThickness" Value="1.5" />
+                    <Setter Property="Background" Value="{ThemeResource CaptaAccentSoftBrush}" />
+                    <Setter Property="BorderBrush" Value="{ThemeResource CaptaAccentBrush}" />
+                </Style>
+                <Style x:Key="Segment" TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
+                    <Setter Property="Height" Value="32" />
+                    <Setter Property="Padding" Value="12,0" />
+                    <Setter Property="CornerRadius" Value="8" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="FontSize" Value="12" />
+                </Style>
+                <Style x:Key="DisplayCard" TargetType="Border">
+                    <Setter Property="Padding" Value="14,12" />
+                    <Setter Property="CornerRadius" Value="12" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="Background" Value="{ThemeResource CaptaCardSurfaceBrush}" />
+                    <Setter Property="BorderBrush" Value="{ThemeResource CaptaListBorderBrush}" />
+                </Style>
+                <Style x:Key="CardDetail" TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="{ThemeResource CaptaFloatingMutedBrush}" />
+                </Style>
+                <Style x:Key="DisplayCardCurrent" TargetType="Border" BasedOn="{StaticResource DisplayCard}">
+                    <Setter Property="BorderBrush" Value="{ThemeResource CaptaAccentBrush}" />
+                </Style>
+            </ResourceDictionary>
+        </Grid.Resources>
+
+        <Grid x:Name="ShadowHost" />
+
+        <Border
+            x:Name="Panel"
+            Width="680"
+            Background="{ThemeResource CaptaSurfaceBrush}"
+            BorderBrush="{ThemeResource CaptaBorderStrongBrush}"
+            BorderThickness="1"
+            CornerRadius="{StaticResource CaptaRadiusWindow}">
+            <ContentPresenter FontFamily="{StaticResource CaptaFont}" FontSize="13" Foreground="{ThemeResource CaptaTextBrush}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Title row; also the drag region. -->
+                    <Grid x:Name="TitleRow" Padding="24,22,24,14" Background="Transparent" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border VerticalAlignment="Center" Padding="6,3" BorderBrush="{ThemeResource CaptaAccentTextBrush}" BorderThickness="1.5" CornerRadius="5">
+                            <TextBlock Text="HDR" FontSize="10.5" FontWeight="ExtraBold" CharacterSpacing="60" Foreground="{ThemeResource CaptaAccentTextBrush}" />
+                        </Border>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Text="Colour &amp; HDR" />
+                        <Button Grid.Column="2" Width="44" Height="44" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnDone" ToolTipService.ToolTip="Close (Esc)">
+                            <c:LineIcon Size="16" Data="M6 6l12 12M18 6L6 18" />
+                        </Button>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" Padding="24,0,24,20" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="22">
+
+                            <!-- One card per display; the display under the pointer is outlined. -->
+                            <Grid x:Name="DisplayCards" ColumnSpacing="10" />
+
+                            <StackPanel Spacing="10">
+                                <!-- Options not built yet keep their card look while disabled. -->
+                                <StackPanel.Resources>
+                                    <ResourceDictionary>
+                                        <ResourceDictionary.ThemeDictionaries>
+                                            <ResourceDictionary x:Key="Default">
+                                                <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource CaptaSurfaceRaisedColor}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="{ThemeResource CaptaListBorderColor}" />
+                                            </ResourceDictionary>
+                                            <ResourceDictionary x:Key="Light">
+                                                <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource CaptaSurfaceRaisedColor}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="{ThemeResource CaptaListBorderColor}" />
+                                            </ResourceDictionary>
+                                            <ResourceDictionary x:Key="HighContrast">
+                                                <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="CaptaSurfaceRaisedBrush" />
+                                                <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="CaptaListBorderBrush" />
+                                            </ResourceDictionary>
+                                        </ResourceDictionary.ThemeDictionaries>
+                                    </ResourceDictionary>
+                                </StackPanel.Resources>
+                                <TextBlock Style="{StaticResource SectionLabel}" Text="WHEN CAPTURING AN HDR SCREEN" />
+                                <Button Style="{StaticResource OptionSelected}">
+                                    <Grid ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Width="18" Height="18" Margin="0,1,0,0" VerticalAlignment="Top">
+                                            <Ellipse Stroke="{ThemeResource CaptaAccentBrush}" StrokeThickness="2" />
+                                            <Ellipse Width="9" Height="9" Fill="{ThemeResource CaptaAccentBrush}" />
+                                        </Grid>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock FontSize="14" FontWeight="Bold">
+                                                <Run Text="Tone-map to SDR" /><Run FontWeight="Medium" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text=" · recommended" />
+                                            </TextBlock>
+                                            <TextBlock Margin="0,3,0,0" FontSize="12.5" Foreground="{ThemeResource CaptaTextSecondaryBrush}" Text="Looks the way it does on screen, and stays correct when pasted or shared anywhere." TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                                <Button Style="{StaticResource Option}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                    <Grid ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Width="18" Height="18" Margin="0,1,0,0" VerticalAlignment="Top" Stroke="{ThemeResource CaptaRadioRingBrush}" StrokeThickness="2" />
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock FontSize="14" FontWeight="Bold" Text="Keep HDR" />
+                                            <TextBlock Margin="0,3,0,0" FontSize="12.5" Foreground="{ThemeResource CaptaTextSecondaryBrush}" Text="Saves full brightness range as JPEG XR or AVIF. An SDR copy still goes to the clipboard." TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                                <Button Style="{StaticResource Option}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                    <Grid ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Width="18" Height="18" Margin="0,1,0,0" VerticalAlignment="Top" Stroke="{ThemeResource CaptaRadioRingBrush}" StrokeThickness="2" />
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock FontSize="14" FontWeight="Bold" Text="Save both" />
+                                            <TextBlock Margin="0,3,0,0" FontSize="12.5" Foreground="{ThemeResource CaptaTextSecondaryBrush}" Text="SDR PNG plus an HDR original alongside it in Ocula." TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </StackPanel>
+
+                            <StackPanel Spacing="12">
+                                <TextBlock Style="{StaticResource SectionLabel}" Text="TONE MAPPING" />
+                                <!-- Illustration: naive conversion vs Capta's. -->
+                                <Grid Height="120" CornerRadius="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="2" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Background="{ThemeResource CaptaHdrDemoNaiveSkyBrush}">
+                                        <Ellipse Width="70" Height="70" Margin="24,22,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="{ThemeResource CaptaHdrDemoNaiveSunBrush}" />
+                                        <Rectangle Height="40" VerticalAlignment="Bottom" Fill="{ThemeResource CaptaHdrDemoNaiveGroundBrush}" />
+                                        <Border Margin="10,0,0,8" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="{ThemeResource CaptaHdrDemoLabelBrush}" CornerRadius="4">
+                                            <TextBlock FontSize="11" FontWeight="Bold" Foreground="{ThemeResource CaptaHdrDemoLabelInkBrush}" Text="Naive · washed out" />
+                                        </Border>
+                                    </Grid>
+                                    <Rectangle Grid.Column="1" Fill="{ThemeResource CaptaHdrDemoDividerBrush}" />
+                                    <Grid Grid.Column="2" Background="{ThemeResource CaptaHdrDemoMappedSkyBrush}">
+                                        <Ellipse Width="70" Height="70" Margin="24,22,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="{ThemeResource CaptaHdrDemoMappedSunBrush}" />
+                                        <Rectangle Height="40" VerticalAlignment="Bottom" Fill="{ThemeResource CaptaHdrDemoMappedGroundBrush}" />
+                                        <Border Margin="10,0,0,8" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="{ThemeResource CaptaAccentBrush}" CornerRadius="4">
+                                            <TextBlock FontSize="11" FontWeight="Bold" Foreground="{ThemeResource CaptaOnAccentBrush}" Text="Capta · tone-mapped" />
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+
+                                <Grid>
+                                    <TextBlock Text="SDR white level" />
+                                    <TextBlock x:Name="SdrWhiteText" HorizontalAlignment="Right" FontFamily="{StaticResource CaptaMonoFont}" FontSize="12" Foreground="{ThemeResource CaptaFloatingTextBrush}" Text="240 nits" />
+                                </Grid>
+                                <Slider
+                                    x:Name="SdrWhiteSlider"
+                                    Maximum="480"
+                                    Minimum="80"
+                                    StepFrequency="10"
+                                    ValueChanged="OnSdrWhiteChanged"
+                                    AutomationProperties.Name="SDR white level" />
+                                <CheckBox
+                                    x:Name="MatchWindows"
+                                    MinHeight="32"
+                                    FontSize="13"
+                                    Foreground="{ThemeResource CaptaFloatingTextBrush}"
+                                    Content="Match the Windows HDR brightness slider automatically"
+                                    Click="OnMatchWindows" />
+
+                                <Grid>
+                                    <TextBlock VerticalAlignment="Center" Text="Highlight roll-off" />
+                                    <Border HorizontalAlignment="Right" Padding="3" Background="{ThemeResource CaptaInsetBrush}" CornerRadius="10">
+                                        <Border.Resources>
+                                            <ResourceDictionary>
+                                                <ResourceDictionary.ThemeDictionaries>
+                                                    <ResourceDictionary x:Key="Default">
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="{ThemeResource CaptaTextColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="{ThemeResource CaptaTextColor}" />
+                                                    </ResourceDictionary>
+                                                    <ResourceDictionary x:Key="Light">
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="{ThemeResource CaptaTextColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="{ThemeResource CaptaTextColor}" />
+                                                    </ResourceDictionary>
+                                                    <ResourceDictionary x:Key="HighContrast">
+                                                        <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="CaptaSegmentSelectedBrush" />
+                                                        <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="CaptaTextBrush" />
+                                                    </ResourceDictionary>
+                                                </ResourceDictionary.ThemeDictionaries>
+                                            </ResourceDictionary>
+                                        </Border.Resources>
+                                        <StackPanel Orientation="Horizontal" Spacing="2">
+                                            <ToggleButton x:Name="RollSoft" Style="{StaticResource Segment}" Tag="Soft" Click="OnRollOff" Content="Soft" ToolTipService.ToolTip="Compress highlights gently, keeping the most highlight detail" />
+                                            <ToggleButton x:Name="RollBalanced" Style="{StaticResource Segment}" Tag="Balanced" Click="OnRollOff" Content="Balanced" ToolTipService.ToolTip="Compress only the brightest part of the range" />
+                                            <ToggleButton x:Name="RollClip" Style="{StaticResource Segment}" Tag="Clip" Click="OnRollOff" Content="Clip" ToolTipService.ToolTip="Keep SDR colours exact; clip anything brighter than SDR white" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Margin="0,0,0,6" Style="{StaticResource SectionLabel}" Text="COLOUR OUTPUT" />
+                                <Grid MinHeight="44">
+                                    <TextBlock VerticalAlignment="Center" Text="Colour space" />
+                                    <Button HorizontalAlignment="Right" Height="36" Padding="12,0" CornerRadius="8" BorderThickness="0">
+                                        <Button.Resources>
+                                            <ResourceDictionary>
+                                                <ResourceDictionary.ThemeDictionaries>
+                                                    <ResourceDictionary x:Key="Default">
+                                                        <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlColor}" />
+                                                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaControlHoverColor}" />
+                                                        <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource CaptaTextColor}" />
+                                                    </ResourceDictionary>
+                                                    <ResourceDictionary x:Key="Light">
+                                                        <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlColor}" />
+                                                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaControlHoverColor}" />
+                                                        <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource CaptaTextColor}" />
+                                                    </ResourceDictionary>
+                                                    <ResourceDictionary x:Key="HighContrast">
+                                                        <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlBrush" />
+                                                    </ResourceDictionary>
+                                                </ResourceDictionary.ThemeDictionaries>
+                                            </ResourceDictionary>
+                                        </Button.Resources>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="sRGB" />
+                                            <c:LineIcon Size="13" StrokeWidth="2" Data="M6 9l6 6 6-6" />
+                                        </StackPanel>
+                                        <Button.Flyout>
+                                            <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                                <ToggleMenuFlyoutItem Text="sRGB" IsChecked="True" />
+                                                <MenuFlyoutItem Text="Display P3 (coming soon)" IsEnabled="False" />
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                </Grid>
+                                <Grid MinHeight="44">
+                                    <TextBlock VerticalAlignment="Center" Text="Embed colour profile in saved files" />
+                                    <ToggleSwitch x:Name="EmbedProfile" Style="{StaticResource Switch}" Toggled="OnEmbedProfile" />
+                                </Grid>
+                                <Grid MinHeight="44">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Correct for each monitor's colour profile" />
+                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Coming soon. Windows already colour-manages HDR and Auto Color Management displays." TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <ToggleSwitch Style="{StaticResource Switch}" IsEnabled="False" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Grid Grid.Row="2" Padding="24,14" BorderBrush="{ThemeResource CaptaBorderBrush}" BorderThickness="0,1,0,0">
+                        <Button Height="40" Padding="12,0" CornerRadius="10" BorderThickness="0" FontWeight="SemiBold" Click="OnReset" Content="Reset to defaults" />
+                        <Button HorizontalAlignment="Right" Height="40" Padding="22,0" CornerRadius="10" FontWeight="Bold" Style="{StaticResource AccentButtonStyle}" Click="OnDone" Content="Done" />
+                    </Grid>
+                </Grid>
+            </ContentPresenter>
+        </Border>
+    </Grid>
+</Window>

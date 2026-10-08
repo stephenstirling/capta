@@ -1,3 +1,4 @@
+using Capta.Capture;
 using Windows.Foundation.Collections;
 using Windows.Storage;
 
@@ -81,6 +82,43 @@ public static class Settings
         get => Get(nameof(SendToOculaAutomatically), true);
         set => Values[nameof(SendToOculaAutomatically)] = value;
     }
+
+    // ---- Colour & HDR ----
+
+    public static bool MatchWindowsSdrWhite
+    {
+        get => Get(nameof(MatchWindowsSdrWhite), true);
+        set => Values[nameof(MatchWindowsSdrWhite)] = value;
+    }
+
+    /// <summary>SDR white in nits (80 to 480) when not matching Windows.</summary>
+    public static double SdrWhiteNits
+    {
+        get => Get(nameof(SdrWhiteNits), 240.0);
+        set => Values[nameof(SdrWhiteNits)] = value;
+    }
+
+    /// <summary>Clip by default: SDR colours stay exact (the original v1 decision).</summary>
+    public static HighlightRollOff RollOff
+    {
+        get => (HighlightRollOff)Get(nameof(RollOff), (int)HighlightRollOff.Clip);
+        set => Values[nameof(RollOff)] = (int)value;
+    }
+
+    public static bool EmbedColourProfile
+    {
+        get => Get(nameof(EmbedColourProfile), true);
+        set => Values[nameof(EmbedColourProfile)] = value;
+    }
+
+    /// <summary>Pushes the colour settings to the capture engine.</summary>
+    public static void ApplyCaptureOptions() => CaptureOptions.Current = new CaptureOptions
+    {
+        MatchWindowsSdrWhite = MatchWindowsSdrWhite,
+        SdrWhiteNits = (float)SdrWhiteNits,
+        RollOff = RollOff,
+        EmbedColourProfile = EmbedColourProfile,
+    };
 
     private static T Get<T>(string key, T fallback) => Values.TryGetValue(key, out var v) && v is T t ? t : fallback;
 }

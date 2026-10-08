@@ -15,6 +15,21 @@ public static class ImageExport
         var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
         encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
             (uint)image.Width, (uint)image.Height, 96, 96, image.Pixels);
+        if (CaptureOptions.Current.EmbedColourProfile)
+        {
+            try
+            {
+                // PNG sRGB chunk (rendering intent 0, perceptual): the pixels are sRGB.
+                await encoder.BitmapProperties.SetPropertiesAsync(new Dictionary<string, BitmapTypedValue>
+                {
+                    ["/sRGB/RenderingIntent"] = new BitmapTypedValue((byte)0, Windows.Foundation.PropertyType.UInt8),
+                });
+            }
+            catch (Exception)
+            {
+                // The encoder doesn't support the tag here; the PNG is still sRGB.
+            }
+        }
         await encoder.FlushAsync();
         stream.Seek(0);
         return stream;

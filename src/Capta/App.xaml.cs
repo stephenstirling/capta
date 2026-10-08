@@ -20,6 +20,7 @@ public partial class App : Application
     private StartupSettingsWindow? _settings;
     private TrayFlyoutWindow? _flyout;
     private FirstRunWindow? _firstRun;
+    private ColourHdrWindow? _colour;
     private readonly CaptureHistory _history = new();
     private ToolbarWindow? _toolbar;
     private CaptureCoordinator? _capture;
@@ -36,12 +37,18 @@ public partial class App : Application
         InitializeComponent();
         // No main window: the process lives in the tray until the user chooses Exit.
         DispatcherShutdownMode = DispatcherShutdownMode.OnExplicitShutdown;
-        UnhandledException += (_, e) => Log.Error("Unhandled UI exception", e.Exception);
+        // A tray app should survive a failing window: log it and keep the hook and tray alive.
+        UnhandledException += (_, e) =>
+        {
+            Log.Error("Unhandled UI exception", e.Exception);
+            e.Handled = true;
+        };
     }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         // Starts in the tray; which windows appear is governed by Startup & shortcuts.
+        Settings.ApplyCaptureOptions();
         _capture = new CaptureCoordinator(_screenSource);
         _capture.Captured += OnCaptured;
 
@@ -94,6 +101,7 @@ public partial class App : Application
             _toolbar = new ToolbarWindow();
             _toolbar.CaptureRequested += StartCapture;
             _toolbar.SettingsRequested += ShowSettings;
+            _toolbar.ColourRequested += ShowColourAndHdr;
             _toolbar.CloseRequested += OnToolbarCloseRequested;
         }
         _toolbar.ShowOnCursorMonitor();
@@ -195,6 +203,12 @@ public partial class App : Application
         _firstRun?.SetPrintScreenOwnership(windowsOwnsKey);
     }
 
+    public void ShowColourAndHdr()
+    {
+        _colour ??= new ColourHdrWindow();
+        _colour.ShowCentered();
+    }
+
     public void ShowFirstRun()
     {
         if (_firstRun is null)
@@ -227,6 +241,7 @@ public partial class App : Application
         _settings?.Close();
         _flyout?.Close();
         _firstRun?.Close();
+        _colour?.Close();
         _toolbar?.Close();
         _card?.Close();
         foreach (var pin in _pins.ToArray()) pin.Close();

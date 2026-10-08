@@ -27,6 +27,9 @@ public sealed partial class ToolbarWindow : Window
 
     public event Action? SettingsRequested;
 
+    /// <summary>The HDR badge was clicked.</summary>
+    public event Action? ColourRequested;
+
     /// <summary>The × button (or Esc); App decides whether that hides or exits.</summary>
     public event Action? CloseRequested;
 
@@ -182,6 +185,12 @@ public sealed partial class ToolbarWindow : Window
     private void OnHide(object sender, RoutedEventArgs e) => Hide();
 
     private void OnClose(object sender, RoutedEventArgs e) => CloseRequested?.Invoke();
+
+    private void OnColour(object sender, RoutedEventArgs e)
+    {
+        Hide();
+        ColourRequested?.Invoke();
+    }
 
     private void OnSettings(object sender, RoutedEventArgs e)
     {

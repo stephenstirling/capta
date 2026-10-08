@@ -174,11 +174,11 @@
                 </ToggleButton>
 
                 <!-- Shown when the display under the toolbar is in HDR. -->
-                <Border x:Name="HdrBadge" Height="44" Padding="10,0" Background="Transparent" Visibility="Collapsed">
+                <Button x:Name="HdrBadge" Style="{StaticResource ToolButton}" Click="OnColour" Visibility="Collapsed">
                     <ToolTipService.ToolTip>
                         <StackPanel MaxWidth="250">
                             <TextBlock x:Name="HdrTitle" FontWeight="Bold" Text="Display 1 is in HDR" />
-                            <TextBlock TextWrapping="Wrap" FontWeight="Normal" Text="Captures are tone-mapped to match what you see, using the Windows SDR brightness." />
+                            <TextBlock TextWrapping="Wrap" FontWeight="Normal" Text="Captures are tone-mapped to match what you see, using the Windows SDR brightness. Click for Colour &amp; HDR settings." />
                         </StackPanel>
                     </ToolTipService.ToolTip>
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
@@ -190,7 +190,7 @@
                             <TextBlock Text="SDR" Foreground="{ThemeResource CaptaFloatingTextBrush}" />
                         </StackPanel>
                     </StackPanel>
-                </Border>
+                </Button>
 
                 <Rectangle Width="1" Height="26" Margin="6,0" Fill="{ThemeResource CaptaDividerBrush}" />
 

@@ -19,14 +19,29 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
     {
         var item = WinRTInterop.CreateItemForMonitor(monitor.Handle);
         var (pixels, w, h) = await GrabAsync(item);
-        return ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(monitor.Handle));
+        return ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(monitor.Handle), CaptureOptions.Current.RollOff);
     }
 
     public async Task<CapturedImage> CaptureWindowAsync(nint hwnd)
     {
         var item = WinRTInterop.CreateItemForWindow(hwnd);
         var (pixels, w, h) = await GrabAsync(item);
-        return ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)));
+        return ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)), CaptureOptions.Current.RollOff);
+    }
+
+    /// <summary>HDR state and the Windows SDR white level for a monitor (null if unavailable).</summary>
+    public static (bool Hdr, float SdrWhiteNits)? DisplayColour(nint hmonitor)
+    {
+        try
+        {
+            var info = WinRTInterop.GetDisplayInformation(hmonitor).GetAdvancedColorInfo();
+            return (info.CurrentAdvancedColorKind == Windows.Graphics.Display.AdvancedColorKind.HighDynamicRange,
+                (float)info.SdrWhiteLevelInNits);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     /// <summary>Whether the monitor is currently showing HDR (captures will be tone-mapped).</summary>
@@ -43,15 +58,19 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
         }
     }
 
-    /// <summary>SDR white in nits for the monitor; 80 (scRGB reference) when unknown or SDR.</summary>
+    /// <summary>
+    /// SDR white in nits for the monitor: the Windows value (or the user's override) on an HDR
+    /// display; 80 (the scRGB reference) when SDR or unknown.
+    /// </summary>
     private static float SdrWhiteLevel(nint hmonitor)
     {
         try
         {
             var info = WinRTInterop.GetDisplayInformation(hmonitor).GetAdvancedColorInfo();
-            return info.CurrentAdvancedColorKind == Windows.Graphics.Display.AdvancedColorKind.HighDynamicRange
-                ? (float)info.SdrWhiteLevelInNits
-                : 80f;
+            if (info.CurrentAdvancedColorKind != Windows.Graphics.Display.AdvancedColorKind.HighDynamicRange)
+                return 80f;
+            var options = CaptureOptions.Current;
+            return options.MatchWindowsSdrWhite ? (float)info.SdrWhiteLevelInNits : options.SdrWhiteNits;
         }
         catch (Exception ex)
         {

@@ -4,10 +4,15 @@ namespace Capta.Capture;
 /// Converts FP16 scRGB captures (linear, Rec.709 primaries, 1.0 = 80 nits) to 8-bit sRGB.
 /// </summary>
 /// <remarks>
-/// SDR white on an HDR display sits at SdrWhiteLevelInNits, not 80 nits, so pixels are
-/// first scaled by 80 / SdrWhiteLevelInNits. Everything at or below SDR white then maps
-/// exactly (UI white stays #FFFFFF). Highlights above it are clipped hue-preservingly by
-/// dividing the whole pixel by its largest channel rather than clamping channels apart.
+/// SDR white on an HDR display sits at the SDR white level, not 80 nits, so pixels are first
+/// scaled by 80 / SDR white. A capture with nothing brighter than SDR white then maps exactly
+/// (UI white stays #FFFFFF) whatever the roll-off. When there are highlights:
+/// <list type="bullet">
+/// <item>Clip divides the pixel by its largest channel, keeping hue.</item>
+/// <item>Balanced and Soft compress everything above a knee into the space below SDR white with
+/// an extended Reinhard curve whose white point is the frame's brightest pixel, applied to the
+/// largest channel so hue is kept.</item>
+/// </list>
 /// </remarks>
 public static class ToneMapper
 {
@@ -17,11 +22,23 @@ public static class ToneMapper
     private static readonly float[] s_halfToFloat = BuildHalfLut();
     private static readonly byte[] s_linearToSrgb = BuildSrgbLut();
 
-    public static CapturedImage ToSdr(ushort[] rgbaHalf, int width, int height, float sdrWhiteLevelNits)
+    public static CapturedImage ToSdr(ushort[] rgbaHalf, int width, int height, float sdrWhiteLevelNits,
+        HighlightRollOff rollOff = HighlightRollOff.Clip)
     {
         var scale = ScRgbReferenceNits / MathF.Max(sdrWhiteLevelNits, 1f);
-        var output = new byte[width * height * 4];
+        var knee = rollOff switch
+        {
+            HighlightRollOff.Soft => 0.6f,
+            HighlightRollOff.Balanced => 0.8f,
+            _ => 1f,
+        };
 
+        // Only compress when the frame actually has highlights; otherwise SDR stays exact.
+        var peak = knee < 1f ? FramePeak(rgbaHalf, scale) : 1f;
+        var compress = peak > 1.001f;
+        var whiteT = compress ? (peak - knee) / (1 - knee) : 1f;
+
+        var output = new byte[width * height * 4];
         Parallel.For(0, height, y =>
         {
             var src = rgbaHalf.AsSpan(y * width * 4, width * 4);
@@ -33,10 +50,17 @@ public static class ToneMapper
                 var g = MathF.Max(s_halfToFloat[src[i + 1]] * scale, 0f);
                 var b = MathF.Max(s_halfToFloat[src[i + 2]] * scale, 0f);
 
-                var peak = MathF.Max(r, MathF.Max(g, b));
-                if (peak > 1f)
+                var m = MathF.Max(r, MathF.Max(g, b));
+                if (compress && m > knee)
                 {
-                    var k = 1f / peak;
+                    var t = (m - knee) / (1 - knee);
+                    var curved = t * (1 + t / (whiteT * whiteT)) / (1 + t);
+                    var k = (knee + (1 - knee) * MathF.Min(curved, 1f)) / m;
+                    r *= k; g *= k; b *= k;
+                }
+                else if (m > 1f)
+                {
+                    var k = 1f / m;
                     r *= k; g *= k; b *= k;
                 }
 
@@ -48,6 +72,27 @@ public static class ToneMapper
         });
 
         return new CapturedImage(width, height, output);
+    }
+
+    /// <summary>Brightest channel value in the frame, relative to SDR white.</summary>
+    private static float FramePeak(ushort[] rgbaHalf, float scale)
+    {
+        var parts = Environment.ProcessorCount;
+        var peaks = new float[parts];
+        var pixels = rgbaHalf.Length / 4;
+        Parallel.For(0, parts, part =>
+        {
+            var start = (int)((long)pixels * part / parts);
+            var end = (int)((long)pixels * (part + 1) / parts);
+            var local = 0f;
+            for (var p = start; p < end; p++)
+            {
+                var i = p * 4;
+                local = MathF.Max(local, MathF.Max(s_halfToFloat[rgbaHalf[i]], MathF.Max(s_halfToFloat[rgbaHalf[i + 1]], s_halfToFloat[rgbaHalf[i + 2]])));
+            }
+            peaks[part] = local;
+        });
+        return peaks.Max() * scale;
     }
 
     private static byte Encode(float linear) =>
