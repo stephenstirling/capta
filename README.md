@@ -11,6 +11,7 @@ takes over the Print Screen key and copies captures to the clipboard as PNG.
 | Shift+PrtSc | Full screen, straight to the clipboard |
 | Alt+PrtSc | Active window |
 | Ctrl+PrtSc | Show the floating toolbar (will become Record video) |
+| Ctrl+Shift+PrtSc | Grab text from screen (planned; shows the toolbar for now) |
 
 Win+PrtSc and Win+Shift+S stay with Windows. If Windows is set to open Snipping Tool on Print Screen,
 Capta shows how to turn that off in Settings.

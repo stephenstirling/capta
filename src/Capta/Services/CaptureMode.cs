@@ -9,8 +9,9 @@ public enum CaptureMode
 }
 
 /// <summary>
-/// What a Print Screen chord asks Capta to do (see design/mockups/Startup.html).
-/// Win+PrtSc is left to Windows.
+/// What a Print Screen chord asks Capta to do (design/DESIGN.md, Decisions 1; these override
+/// Startup.html). Win+PrtSc is left to Windows. Ctrl+Shift+PrtSc will be Grab text; until then
+/// it counts as Ctrl+PrtSc.
 /// </summary>
 public enum HotkeyAction
 {
