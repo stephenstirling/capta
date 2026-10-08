@@ -23,6 +23,9 @@ public static class StirlingColors
     /// </summary>
     public static readonly Color Shadow = Color.FromArgb(0xFF, 0x1A, 0x1B, 0x1F);
 
+    /// <summary>CaptaScrimColor: capture-overlay dim, rgba(5,6,8,0.62).</summary>
+    public static readonly Color Scrim = Color.FromArgb(0x9E, 0x05, 0x06, 0x08);
+
     /// <summary>Pack URI for merging the theme into an app's resources.</summary>
     public const string ThemeUri = "ms-appx:///Stirling.Shared/Themes/Colors.xaml";
 }

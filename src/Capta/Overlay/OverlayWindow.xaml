@@ -141,7 +141,7 @@
             </Canvas>
 
             <!-- Mode bar and key hints, centred at the top. -->
-            <StackPanel x:Name="TopBar" Margin="0,24,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Spacing="20">
+            <StackPanel x:Name="TopBar" Margin="0,24,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Spacing="14">
                 <Grid>
                     <Grid x:Name="ModeBarShadow" HorizontalAlignment="Left" VerticalAlignment="Top" />
                     <Border

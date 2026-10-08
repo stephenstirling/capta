@@ -14,6 +14,7 @@ using Windows.Foundation;
 using Windows.Graphics;
 using Windows.System;
 using Windows.UI.Core;
+using Stirling.Shared;
 using static Capta.Interop.NativeMethods;
 
 namespace Capta.Overlay;
@@ -504,7 +505,7 @@ public sealed partial class OverlayWindow : Window
         for (var cy = 0; cy < LoupeCells; cy++)
         for (var cx = 0; cx < LoupeCells; cx++)
         {
-            var colour = _frame.GetPixel(px.X - half + cx, px.Y - half + cy) | 0xFF000000;
+            var colour = DisplayedPixel(px.X - half + cx, px.Y - half + cy);
             for (var zy = 0; zy < LoupeZoom; zy++)
             {
                 var row = ((cy * LoupeZoom + zy) * LoupeSize + cx * LoupeZoom) * 4;
@@ -534,6 +535,36 @@ public sealed partial class OverlayWindow : Window
         var y = dip.Y + offsetY + size.Height > Root.ActualHeight ? dip.Y - offsetY - size.Height : dip.Y + offsetY;
         Canvas.SetLeft(Loupe, x);
         Canvas.SetTop(Loupe, y);
+    }
+
+    /// <summary>
+    /// The pixel as the overlay shows it: dimmed by the scrim outside the selection, amber on
+    /// the selection frame. The loupe magnifies what's on screen, as in the mockup.
+    /// </summary>
+    private uint DisplayedPixel(int x, int y)
+    {
+        var pixel = _frame.GetPixel(x, y) | 0xFF000000;
+        if (!HasSelection) return Blend(pixel, StirlingColors.Scrim);
+
+        var s = _selection;
+        if (!Contains(s, new PointInt32(x, y))) return Blend(pixel, StirlingColors.Scrim);
+        if (_mode == CaptureMode.Region || _hoverWindow is not null)
+        {
+            // One magnified pixel of frame, as in screenshots/03 (a full 2px band reads too heavy at 12×).
+            if (x == s.X || y == s.Y || x == s.X + s.Width - 1 || y == s.Y + s.Height - 1)
+                return ToBgra(StirlingColors.Accent);
+        }
+        return pixel;
+    }
+
+    private static uint ToBgra(Windows.UI.Color c) => (uint)(0xFF << 24 | c.R << 16 | c.G << 8 | c.B);
+
+    /// <summary>Source-over blend of a translucent colour onto an opaque BGRA pixel.</summary>
+    private static uint Blend(uint bgra, Windows.UI.Color over)
+    {
+        var a = over.A / 255.0;
+        uint Channel(int shift, byte top) => (uint)Math.Round(((bgra >> shift) & 0xFF) * (1 - a) + top * a) << shift;
+        return 0xFF000000 | Channel(16, over.R) | Channel(8, over.G) | Channel(0, over.B);
     }
 
     private static uint Lighten(uint bgra, double amount)
