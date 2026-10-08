@@ -139,8 +139,22 @@ public partial class App : Application
     {
         var pin = new PinWindow(result);
         _pins.Add(pin);
-        pin.Closed += (_, _) => _pins.Remove(pin);
+        pin.ClickThroughChanged += _ => UpdateClickThroughItem();
+        pin.Closed += (_, _) =>
+        {
+            _pins.Remove(pin);
+            UpdateClickThroughItem();
+        };
         await pin.ShowAsync();
+    }
+
+    private void UpdateClickThroughItem() => _tray?.SetClickThroughPins(_pins.Any(p => p.IsClickThrough));
+
+    /// <summary>Click-through pins can't be hovered, so the tray offers the way back.</summary>
+    public void ReleaseClickThroughPins()
+    {
+        foreach (var pin in _pins.Where(p => p.IsClickThrough).ToArray())
+            pin.SetClickThrough(false);
     }
 
     private void OnPrintScreenOwnershipChanged(bool windowsOwnsKey)

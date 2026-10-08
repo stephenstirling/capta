@@ -82,6 +82,15 @@ internal static partial class NativeMethods
     public const int GWL_EXSTYLE = -20;
     public const int WS_EX_TOOLWINDOW = 0x80;
     public const int WS_EX_TRANSPARENT = 0x20;
+    public const int WS_EX_LAYERED = 0x80000;
+    public const uint LWA_ALPHA = 0x2;
+
+    [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
+    public static partial nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool SetLayeredWindowAttributes(nint hwnd, uint crKey, byte bAlpha, uint dwFlags);
     public const uint GA_ROOT = 2;
 
     public const int DWMWA_TRANSITIONS_FORCEDISABLED = 3;

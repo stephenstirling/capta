@@ -17,6 +17,7 @@ public sealed class TrayIconService : IDisposable
     private ToggleMenuFlyoutItem? _startupItem;
     private MenuFlyoutItem? _printScreenWarning;
     private MenuFlyoutSeparator? _printScreenWarningSeparator;
+    private MenuFlyoutItem? _clickThroughItem;
 
     public TrayIconService(App app) => _app = app;
 
@@ -45,6 +46,14 @@ public sealed class TrayIconService : IDisposable
         _printScreenWarning.Click += (_, _) => _app.ShowPrintScreenNotice();
         _printScreenWarningSeparator = new MenuFlyoutSeparator { Visibility = Visibility.Collapsed };
 
+        _clickThroughItem = new MenuFlyoutItem
+        {
+            Text = "Make pinned captures clickable",
+            Icon = new FontIcon { Glyph = "" },
+            Visibility = Visibility.Collapsed,
+        };
+        _clickThroughItem.Click += (_, _) => _app.ReleaseClickThroughPins();
+
         var menu = new MenuFlyout
         {
             Items =
@@ -54,6 +63,7 @@ public sealed class TrayIconService : IDisposable
                 CaptureItem("Window", "", "", CaptureMode.Window),
                 CaptureItem("Full screen", "", "Shift+PrtSc", CaptureMode.FullScreen),
                 toolbar,
+                _clickThroughItem,
                 new MenuFlyoutSeparator(),
                 _startupItem, new MenuFlyoutSeparator(), exit,
             },
@@ -117,6 +127,12 @@ public sealed class TrayIconService : IDisposable
         if (_printScreenWarningSeparator is not null) _printScreenWarningSeparator.Visibility = v;
         if (_icon is not null)
             _icon.ToolTipText = windowsOwnsKey ? "Capta: Print Screen is still used by Windows" : "Capta";
+    }
+
+    public void SetClickThroughPins(bool any)
+    {
+        if (_clickThroughItem is not null)
+            _clickThroughItem.Visibility = any ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public void ShowError(string title, string message) =>
