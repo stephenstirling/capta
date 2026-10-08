@@ -297,6 +297,19 @@ public sealed partial class OverlayWindow : Window
             case VirtualKey.Space:
                 _spaceDown = true;
                 break;
+            case VirtualKey.C when IsRegionLike:
+            {
+                // Pick the colour under the cursor (read directly, so it works before any
+                // pointer move): copied as hex and pinned as a chip.
+                var cursor = WindowHelper.CursorPosition();
+                var b = _monitor.Bounds;
+                if (cursor.X < b.X || cursor.Y < b.Y || cursor.X >= b.X + b.Width || cursor.Y >= b.Y + b.Height)
+                    return; // the cursor is on another monitor's overlay
+                var pixel = _frame.GetPixel(cursor.X - b.X, cursor.Y - b.Y);
+                var colour = Windows.UI.Color.FromArgb(0xFF, (byte)(pixel >> 16), (byte)(pixel >> 8), (byte)pixel);
+                _session.Complete(new OverlayResult.ColourPicked(colour, cursor));
+                break;
+            }
             default:
                 return;
         }

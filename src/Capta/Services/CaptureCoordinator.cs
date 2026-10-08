@@ -16,6 +16,9 @@ public sealed class CaptureCoordinator
     /// <summary>Raised on the UI thread with each finished capture.</summary>
     public event Action<CaptureResult>? Captured;
 
+    /// <summary>A colour was picked in the overlay (C) instead of a capture.</summary>
+    public event Action<Windows.UI.Color, PointInt32>? ColourPicked;
+
     public async Task RunAsync(CaptureMode mode)
     {
         if (_busy)
@@ -104,6 +107,9 @@ public sealed class CaptureCoordinator
                     WindowTitle = title,
                 };
             }
+            case OverlayResult.ColourPicked c:
+                ColourPicked?.Invoke(c.Colour, c.ScreenPoint);
+                return null;
             case OverlayResult.WindowSelected w:
             {
                 // Live capture: gets the whole window even where it was occluded or off-monitor.

@@ -249,6 +249,10 @@
                             <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="Enter" /></Border>
                             <TextBlock Text="capture" />
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="C" /></Border>
+                            <TextBlock Text="pick colour" />
+                        </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="Esc" /></Border>

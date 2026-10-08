@@ -13,6 +13,9 @@ takes over the Print Screen key and copies captures to the clipboard as PNG.
 | Ctrl+PrtSc | Show the floating toolbar (will become Record video) |
 | Ctrl+Shift+PrtSc | Grab text from screen: select a region and its text is copied |
 
+In the region overlay, press **C** to pick the colour under the cursor: its hex code is copied and
+pinned as a small chip (click the code to copy again, double-click or Esc to unpin).
+
 Win+PrtSc and Win+Shift+S stay with Windows. If Windows is set to open Snipping Tool on Print Screen,
 Capta shows how to turn that off in Settings.
 

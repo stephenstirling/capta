@@ -17,6 +17,9 @@ public abstract record OverlayResult
 
     /// <summary>Close, wait this long, then freeze the screen and show the overlay again.</summary>
     public sealed record Delayed(int Seconds, CaptureMode Mode) : OverlayResult;
+
+    /// <summary>C was pressed: the colour under the cursor, and where it is on the virtual desktop.</summary>
+    public sealed record ColourPicked(Windows.UI.Color Colour, PointInt32 ScreenPoint) : OverlayResult;
 }
 
 /// <summary>Shows one overlay per monitor and resolves when any of them produces a result.</summary>

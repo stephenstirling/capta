@@ -53,6 +53,7 @@ public partial class App : Application
         Settings.ApplyCaptureOptions();
         _capture = new CaptureCoordinator(_screenSource);
         _capture.Captured += OnCaptured;
+        _capture.ColourPicked += PinColour;
 
         _tray = new TrayIconService(this);
         _tray.Create();
@@ -217,6 +218,15 @@ public partial class App : Application
             UpdateClickThroughItem();
         };
         await pin.ShowAsync();
+    }
+
+    /// <summary>C in the overlay: copy the colour's hex code and pin it as a chip.</summary>
+    private void PinColour(Windows.UI.Color colour, Windows.Graphics.PointInt32 at)
+    {
+        var chip = new ColourChipWindow(colour);
+        CaptureActions.CopyText(chip.Hex);
+        Log.Info($"Picked colour {chip.Hex}");
+        chip.ShowAt(at);
     }
 
     private void UpdateClickThroughItem() => _tray?.SetClickThroughPins(_pins.Any(p => p.IsClickThrough));
