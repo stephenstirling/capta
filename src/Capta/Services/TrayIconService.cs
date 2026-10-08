@@ -47,6 +47,9 @@ public sealed class TrayIconService : IDisposable
 
         var settings = new MenuFlyoutItem { Text = "Startup & shortcuts…", Icon = new FontIcon { Glyph = "" } };
         settings.Click += (_, _) => _app.ShowSettings();
+
+        var setup = new MenuFlyoutItem { Text = "Set up Capta…" };
+        setup.Click += (_, _) => _app.ShowFirstRun();
         _printScreenWarningSeparator = new MenuFlyoutSeparator { Visibility = Visibility.Collapsed };
 
         _clickThroughItem = new MenuFlyoutItem
@@ -68,7 +71,7 @@ public sealed class TrayIconService : IDisposable
                 toolbar,
                 _clickThroughItem,
                 new MenuFlyoutSeparator(),
-                _startupItem, settings, new MenuFlyoutSeparator(), exit,
+                _startupItem, settings, setup, new MenuFlyoutSeparator(), exit,
             },
         };
         menu.Opening += async (_, _) => await RefreshStartupStateAsync();

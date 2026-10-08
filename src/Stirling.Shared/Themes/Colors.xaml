@@ -134,6 +134,29 @@
             <!-- Selected item in a segmented picker, e.g. the tray's Delay -->
             <Color x:Key="CaptaSegmentSelectedColor">#33383F</Color>
             <SolidColorBrush x:Key="CaptaSegmentSelectedBrush" Color="{StaticResource CaptaSegmentSelectedColor}" />
+            <!-- Lower edge of the amber PrtSc key cap (mockups/FirstRun.html, last step) -->
+            <Color x:Key="CaptaAccentShadeColor">#C98320</Color>
+            <SolidColorBrush x:Key="CaptaAccentShadeBrush" Color="{StaticResource CaptaAccentShadeColor}" />
+            <!-- Glint on the large Aperture glyph's lens -->
+            <Color x:Key="CaptaGlyphHighlightColor">#D9FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaGlyphHighlightBrush" Color="{StaticResource CaptaGlyphHighlightColor}" />
+            <!-- Theme picker previews: fixed light/dark swatches, the same in every theme -->
+            <Color x:Key="CaptaPreviewLightSurfaceColor">#FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaPreviewLightSurfaceBrush" Color="{StaticResource CaptaPreviewLightSurfaceColor}" />
+            <Color x:Key="CaptaPreviewLightBackgroundColor">#F3F4F6</Color>
+            <SolidColorBrush x:Key="CaptaPreviewLightBackgroundBrush" Color="{StaticResource CaptaPreviewLightBackgroundColor}" />
+            <Color x:Key="CaptaPreviewLightInkColor">#9AA2AE</Color>
+            <SolidColorBrush x:Key="CaptaPreviewLightInkBrush" Color="{StaticResource CaptaPreviewLightInkColor}" />
+            <Color x:Key="CaptaPreviewLightInkSoftColor">#C3C8D0</Color>
+            <SolidColorBrush x:Key="CaptaPreviewLightInkSoftBrush" Color="{StaticResource CaptaPreviewLightInkSoftColor}" />
+            <Color x:Key="CaptaPreviewDarkSurfaceColor">#1A1D21</Color>
+            <SolidColorBrush x:Key="CaptaPreviewDarkSurfaceBrush" Color="{StaticResource CaptaPreviewDarkSurfaceColor}" />
+            <Color x:Key="CaptaPreviewDarkBackgroundColor">#0F1114</Color>
+            <SolidColorBrush x:Key="CaptaPreviewDarkBackgroundBrush" Color="{StaticResource CaptaPreviewDarkBackgroundColor}" />
+            <Color x:Key="CaptaPreviewDarkInkColor">#4A5260</Color>
+            <SolidColorBrush x:Key="CaptaPreviewDarkInkBrush" Color="{StaticResource CaptaPreviewDarkInkColor}" />
+            <Color x:Key="CaptaPreviewDarkInkSoftColor">#343A44</Color>
+            <SolidColorBrush x:Key="CaptaPreviewDarkInkSoftBrush" Color="{StaticResource CaptaPreviewDarkInkSoftColor}" />
             <!-- Fluent control overrides, mapped onto the tokens above. -->
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
@@ -248,6 +271,26 @@
             <SolidColorBrush x:Key="CaptaApertureLowerBrush" Color="{StaticResource CaptaApertureLowerColor}" />
             <Color x:Key="CaptaSegmentSelectedColor">#FFFFFF</Color>
             <SolidColorBrush x:Key="CaptaSegmentSelectedBrush" Color="{StaticResource CaptaSegmentSelectedColor}" />
+            <Color x:Key="CaptaAccentShadeColor">#C98320</Color>
+            <SolidColorBrush x:Key="CaptaAccentShadeBrush" Color="{StaticResource CaptaAccentShadeColor}" />
+            <Color x:Key="CaptaGlyphHighlightColor">#D9FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaGlyphHighlightBrush" Color="{StaticResource CaptaGlyphHighlightColor}" />
+            <Color x:Key="CaptaPreviewLightSurfaceColor">#FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaPreviewLightSurfaceBrush" Color="{StaticResource CaptaPreviewLightSurfaceColor}" />
+            <Color x:Key="CaptaPreviewLightBackgroundColor">#F3F4F6</Color>
+            <SolidColorBrush x:Key="CaptaPreviewLightBackgroundBrush" Color="{StaticResource CaptaPreviewLightBackgroundColor}" />
+            <Color x:Key="CaptaPreviewLightInkColor">#9AA2AE</Color>
+            <SolidColorBrush x:Key="CaptaPreviewLightInkBrush" Color="{StaticResource CaptaPreviewLightInkColor}" />
+            <Color x:Key="CaptaPreviewLightInkSoftColor">#C3C8D0</Color>
+            <SolidColorBrush x:Key="CaptaPreviewLightInkSoftBrush" Color="{StaticResource CaptaPreviewLightInkSoftColor}" />
+            <Color x:Key="CaptaPreviewDarkSurfaceColor">#1A1D21</Color>
+            <SolidColorBrush x:Key="CaptaPreviewDarkSurfaceBrush" Color="{StaticResource CaptaPreviewDarkSurfaceColor}" />
+            <Color x:Key="CaptaPreviewDarkBackgroundColor">#0F1114</Color>
+            <SolidColorBrush x:Key="CaptaPreviewDarkBackgroundBrush" Color="{StaticResource CaptaPreviewDarkBackgroundColor}" />
+            <Color x:Key="CaptaPreviewDarkInkColor">#4A5260</Color>
+            <SolidColorBrush x:Key="CaptaPreviewDarkInkBrush" Color="{StaticResource CaptaPreviewDarkInkColor}" />
+            <Color x:Key="CaptaPreviewDarkInkSoftColor">#343A44</Color>
+            <SolidColorBrush x:Key="CaptaPreviewDarkInkSoftBrush" Color="{StaticResource CaptaPreviewDarkInkSoftColor}" />
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
             <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
@@ -311,6 +354,16 @@
             <SolidColorBrush x:Key="CaptaListBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="CaptaApertureLowerBrush" Color="{ThemeResource SystemColorHighlightColor}" />
             <SolidColorBrush x:Key="CaptaSegmentSelectedBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaAccentShadeBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaGlyphHighlightBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+            <SolidColorBrush x:Key="CaptaPreviewLightSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaPreviewLightBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaPreviewLightInkBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaPreviewLightInkSoftBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaPreviewDarkSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaPreviewDarkBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaPreviewDarkInkBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaPreviewDarkInkSoftBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
 </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>

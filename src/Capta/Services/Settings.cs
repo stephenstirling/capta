@@ -55,5 +55,32 @@ public static class Settings
         set => Values[nameof(KeepRunningWhenToolbarClosed)] = value;
     }
 
+    /// <summary>Set once first-run setup has been completed or closed.</summary>
+    public static bool FirstRunDone
+    {
+        get => Get(nameof(FirstRunDone), false);
+        set => Values[nameof(FirstRunDone)] = value;
+    }
+
+    public static AppTheme Theme
+    {
+        get => (AppTheme)Get(nameof(Theme), (int)AppTheme.System);
+        set => Values[nameof(Theme)] = (int)value;
+    }
+
+    /// <summary>Where captures are saved (Save As starts here). Default: Pictures\Captures.</summary>
+    public static string CaptureFolder
+    {
+        get => Get(nameof(CaptureFolder), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Captures"));
+        set => Values[nameof(CaptureFolder)] = value;
+    }
+
+    /// <summary>Send every capture to Ocula when it's installed.</summary>
+    public static bool SendToOculaAutomatically
+    {
+        get => Get(nameof(SendToOculaAutomatically), true);
+        set => Values[nameof(SendToOculaAutomatically)] = value;
+    }
+
     private static T Get<T>(string key, T fallback) => Values.TryGetValue(key, out var v) && v is T t ? t : fallback;
 }

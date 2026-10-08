@@ -19,6 +19,7 @@ public partial class App : Application
     private PrintScreenOwnership? _ownership;
     private StartupSettingsWindow? _settings;
     private TrayFlyoutWindow? _flyout;
+    private FirstRunWindow? _firstRun;
     private readonly CaptureHistory _history = new();
     private ToolbarWindow? _toolbar;
     private CaptureCoordinator? _capture;
@@ -63,7 +64,9 @@ public partial class App : Application
         var explainConflict = _ownership.WindowsOwnsKey && !settings.ContainsKey(NoticeShownKey);
         if (explainConflict)
             settings[NoticeShownKey] = true;
-        if (explainConflict || !Settings.StartQuietly)
+        if (!Settings.FirstRunDone)
+            ShowFirstRun(); // covers the Print Screen conflict as its second step
+        else if (explainConflict || !Settings.StartQuietly)
             ShowSettings();
         if (Settings.ShowToolbarAtStartup)
             ShowToolbar();
@@ -189,6 +192,17 @@ public partial class App : Application
     {
         _tray?.SetPrintScreenWarning(windowsOwnsKey);
         _settings?.SetPrintScreenOwnership(windowsOwnsKey);
+        _firstRun?.SetPrintScreenOwnership(windowsOwnsKey);
+    }
+
+    public void ShowFirstRun()
+    {
+        if (_firstRun is null)
+        {
+            _firstRun = new FirstRunWindow(this);
+            _firstRun.Closed += (_, _) => _firstRun = null;
+        }
+        _firstRun.ShowCentered(_ownership?.WindowsOwnsKey ?? false);
     }
 
     /// <summary>Startup &amp; shortcuts, which also explains the Print Screen conflict.</summary>
@@ -212,6 +226,7 @@ public partial class App : Application
         _ownership?.Dispose();
         _settings?.Close();
         _flyout?.Close();
+        _firstRun?.Close();
         _toolbar?.Close();
         _card?.Close();
         foreach (var pin in _pins.ToArray()) pin.Close();

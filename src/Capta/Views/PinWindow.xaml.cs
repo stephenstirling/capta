@@ -48,6 +48,7 @@ public sealed partial class PinWindow : Window
         _image = capture.Image;
         _imageOrigin = new PointInt32(capture.ScreenBounds.X, capture.ScreenBounds.Y);
         InitializeComponent();
+        ThemeService.Register(this);
         ExtendsContentIntoTitleBar = true;
 
         var presenter = OverlappedPresenter.Create();

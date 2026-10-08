@@ -17,6 +17,29 @@
                 <ResourceDictionary.MergedDictionaries>
                     <ResourceDictionary Source="ms-appx:///Styles/Floating.xaml" />
                 </ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary.ThemeDictionaries>
+                    <ResourceDictionary x:Key="Default">
+                        <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource CaptaTextMutedColor}" />
+                        <SolidColorBrush x:Key="HyperlinkButtonForegroundPointerOver" Color="{ThemeResource CaptaAccentTextColor}" />
+                        <SolidColorBrush x:Key="HyperlinkButtonForegroundPressed" Color="{ThemeResource CaptaAccentTextColor}" />
+                        <SolidColorBrush x:Key="HyperlinkButtonBackgroundPointerOver" Color="{ThemeResource CaptaHoverOverlayColor}" />
+                        <SolidColorBrush x:Key="HyperlinkButtonBackgroundPressed" Color="{ThemeResource CaptaPressedOverlayColor}" />
+                    </ResourceDictionary>
+                    <ResourceDictionary x:Key="Light">
+                        <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource CaptaTextMutedColor}" />
+                        <SolidColorBrush x:Key="HyperlinkButtonForegroundPointerOver" Color="{ThemeResource CaptaAccentTextColor}" />
+                        <SolidColorBrush x:Key="HyperlinkButtonForegroundPressed" Color="{ThemeResource CaptaAccentTextColor}" />
+                        <SolidColorBrush x:Key="HyperlinkButtonBackgroundPointerOver" Color="{ThemeResource CaptaHoverOverlayColor}" />
+                        <SolidColorBrush x:Key="HyperlinkButtonBackgroundPressed" Color="{ThemeResource CaptaPressedOverlayColor}" />
+                    </ResourceDictionary>
+                    <ResourceDictionary x:Key="HighContrast">
+                        <StaticResource x:Key="HyperlinkButtonForeground" ResourceKey="CaptaTextMutedBrush" />
+                        <StaticResource x:Key="HyperlinkButtonForegroundPointerOver" ResourceKey="CaptaAccentTextBrush" />
+                        <StaticResource x:Key="HyperlinkButtonForegroundPressed" ResourceKey="CaptaAccentTextBrush" />
+                        <StaticResource x:Key="HyperlinkButtonBackgroundPointerOver" ResourceKey="CaptaHoverOverlayBrush" />
+                        <StaticResource x:Key="HyperlinkButtonBackgroundPressed" ResourceKey="CaptaPressedOverlayBrush" />
+                    </ResourceDictionary>
+                </ResourceDictionary.ThemeDictionaries>
                 <Style x:Key="SectionLabel" TargetType="TextBlock">
                     <Setter Property="FontSize" Value="11" />
                     <Setter Property="FontWeight" Value="Bold" />
@@ -48,12 +71,7 @@
                     <Setter Property="IsEnabled" Value="False" />
                     <Setter Property="ToolTipService.ToolTip" Value="Changing shortcuts is coming soon" />
                 </Style>
-                <StaticResource x:Key="HyperlinkButtonForeground" ResourceKey="CaptaTextMutedBrush" />
-                <StaticResource x:Key="HyperlinkButtonForegroundPointerOver" ResourceKey="CaptaAccentTextBrush" />
-                <StaticResource x:Key="HyperlinkButtonForegroundPressed" ResourceKey="CaptaAccentTextBrush" />
                 <SolidColorBrush x:Key="HyperlinkButtonBackground" Color="Transparent" />
-                <StaticResource x:Key="HyperlinkButtonBackgroundPointerOver" ResourceKey="CaptaHoverOverlayBrush" />
-                <StaticResource x:Key="HyperlinkButtonBackgroundPressed" ResourceKey="CaptaPressedOverlayBrush" />
                 <Style x:Key="FooterLink" TargetType="HyperlinkButton">
                     <Setter Property="Padding" Value="8,6" />
                     <Setter Property="FontSize" Value="12.5" />

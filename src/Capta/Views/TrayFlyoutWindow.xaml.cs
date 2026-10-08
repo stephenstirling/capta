@@ -27,6 +27,7 @@ public sealed partial class TrayFlyoutWindow : Window
     {
         _app = app;
         InitializeComponent();
+        ThemeService.Register(this);
         ExtendsContentIntoTitleBar = true;
 
         var presenter = OverlappedPresenter.Create();

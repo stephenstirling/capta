@@ -83,7 +83,7 @@ public static partial class CaptureActions
         var picker = new FileSavePicker(owner)
         {
             SuggestedFileName = ImageExport.DefaultFileName(),
-            SuggestedFolder = ScreenshotsFolder(),
+            SuggestedFolder = CaptureFolderOrScreenshots(),
             DefaultFileExtension = ".png",
         };
         picker.FileTypeChoices.Add("PNG image", [".png"]);
@@ -106,6 +106,20 @@ public static partial class CaptureActions
 
     [LibraryImport("shell32.dll")]
     private static partial int SHGetKnownFolderPath(in Guid rfid, uint flags, nint token, out nint path);
+
+    /// <summary>The chosen capture folder (created if needed), falling back to Pictures\Screenshots.</summary>
+    private static string CaptureFolderOrScreenshots()
+    {
+        try
+        {
+            return Directory.CreateDirectory(Settings.CaptureFolder).FullName;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Capture folder unavailable", ex);
+            return ScreenshotsFolder();
+        }
+    }
 
     /// <summary>Pictures\Screenshots (honouring folder redirection), creating it if needed.</summary>
     public static string ScreenshotsFolder()

@@ -34,6 +34,7 @@ public sealed partial class CaptureCardWindow : Window
     public CaptureCardWindow()
     {
         InitializeComponent();
+        ThemeService.Register(this);
         ExtendsContentIntoTitleBar = true;
 
         var presenter = OverlappedPresenter.Create();

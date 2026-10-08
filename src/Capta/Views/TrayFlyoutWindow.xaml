@@ -104,23 +104,69 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.Resources>
-                            <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlBrush" />
-                            <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaControlHoverBrush" />
-                            <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaControlBrush" />
-                            <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="CaptaControlBrush" />
-                            <StaticResource x:Key="ButtonForeground" ResourceKey="CaptaTextBrush" />
-                            <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="CaptaTextBrush" />
-                            <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="CaptaTextBrush" />
+                            <ResourceDictionary>
+                                <ResourceDictionary.ThemeDictionaries>
+                                    <ResourceDictionary x:Key="Default">
+                                        <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource CaptaTextColor}" />
+                                        <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                        <SolidColorBrush x:Key="ButtonForegroundPressed" Color="{ThemeResource CaptaTextColor}" />
+                                    </ResourceDictionary>
+                                    <ResourceDictionary x:Key="Light">
+                                        <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource CaptaTextColor}" />
+                                        <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                        <SolidColorBrush x:Key="ButtonForegroundPressed" Color="{ThemeResource CaptaTextColor}" />
+                                    </ResourceDictionary>
+                                    <ResourceDictionary x:Key="HighContrast">
+                                        <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlBrush" />
+                                        <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaControlHoverBrush" />
+                                        <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaControlBrush" />
+                                        <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="CaptaControlBrush" />
+                                        <StaticResource x:Key="ButtonForeground" ResourceKey="CaptaTextBrush" />
+                                        <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="CaptaTextBrush" />
+                                        <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="CaptaTextBrush" />
+                                    </ResourceDictionary>
+                                </ResourceDictionary.ThemeDictionaries>
+                            </ResourceDictionary>
                         </Grid.Resources>
 
                         <Button Style="{StaticResource Tile}" Padding="14,12" FontWeight="Bold" CornerRadius="12" Click="OnRegion">
                             <Button.Resources>
-                                <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaAccentBrush" />
-                                <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaAccentBrush" />
-                                <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaAccentBrush" />
-                                <StaticResource x:Key="ButtonForeground" ResourceKey="CaptaOnAccentBrush" />
-                                <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="CaptaOnAccentBrush" />
-                                <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="CaptaOnAccentBrush" />
+                                <ResourceDictionary>
+                                    <ResourceDictionary.ThemeDictionaries>
+                                        <ResourceDictionary x:Key="Default">
+                                            <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource CaptaOnAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource CaptaOnAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonForegroundPressed" Color="{ThemeResource CaptaOnAccentColor}" />
+                                        </ResourceDictionary>
+                                        <ResourceDictionary x:Key="Light">
+                                            <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource CaptaOnAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource CaptaOnAccentColor}" />
+                                            <SolidColorBrush x:Key="ButtonForegroundPressed" Color="{ThemeResource CaptaOnAccentColor}" />
+                                        </ResourceDictionary>
+                                        <ResourceDictionary x:Key="HighContrast">
+                                            <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaAccentBrush" />
+                                            <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaAccentBrush" />
+                                            <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaAccentBrush" />
+                                            <StaticResource x:Key="ButtonForeground" ResourceKey="CaptaOnAccentBrush" />
+                                            <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="CaptaOnAccentBrush" />
+                                            <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="CaptaOnAccentBrush" />
+                                        </ResourceDictionary>
+                                    </ResourceDictionary.ThemeDictionaries>
+                                </ResourceDictionary>
                             </Button.Resources>
                             <Grid>
                                 <c:LineIcon HorizontalAlignment="Left" VerticalAlignment="Top" Data="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" Dashed="True" />
@@ -158,12 +204,34 @@
                         <TextBlock VerticalAlignment="Center" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Delay" />
                         <Border Grid.Column="1" Padding="3" Background="{ThemeResource CaptaInsetBrush}" CornerRadius="10">
                             <Border.Resources>
-                                <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="CaptaSegmentSelectedBrush" />
-                                <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="CaptaSegmentSelectedBrush" />
-                                <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="CaptaSegmentSelectedBrush" />
-                                <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="CaptaTextBrush" />
-                                <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="CaptaTextBrush" />
-                                <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="CaptaTextBrush" />
+                                <ResourceDictionary>
+                                    <ResourceDictionary.ThemeDictionaries>
+                                        <ResourceDictionary x:Key="Default">
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="{ThemeResource CaptaTextColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="{ThemeResource CaptaTextColor}" />
+                                        </ResourceDictionary>
+                                        <ResourceDictionary x:Key="Light">
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="{ThemeResource CaptaTextColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                            <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="{ThemeResource CaptaTextColor}" />
+                                        </ResourceDictionary>
+                                        <ResourceDictionary x:Key="HighContrast">
+                                            <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="CaptaSegmentSelectedBrush" />
+                                            <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="CaptaSegmentSelectedBrush" />
+                                            <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="CaptaSegmentSelectedBrush" />
+                                            <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="CaptaTextBrush" />
+                                            <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="CaptaTextBrush" />
+                                            <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="CaptaTextBrush" />
+                                        </ResourceDictionary>
+                                    </ResourceDictionary.ThemeDictionaries>
+                                </ResourceDictionary>
                             </Border.Resources>
                             <StackPanel Orientation="Horizontal" Spacing="2">
                                 <ToggleButton x:Name="DelayOff" Style="{StaticResource Segment}" Tag="0" Click="OnDelay" Content="Off" />
@@ -201,10 +269,28 @@
                         FontWeight="SemiBold"
                         Click="OnOpenInOcula">
                         <Button.Resources>
-                            <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlBrush" />
-                            <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaControlHoverBrush" />
-                            <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaControlBrush" />
-                            <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="CaptaControlBrush" />
+                            <ResourceDictionary>
+                                <ResourceDictionary.ThemeDictionaries>
+                                    <ResourceDictionary x:Key="Default">
+                                        <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource CaptaControlColor}" />
+                                    </ResourceDictionary>
+                                    <ResourceDictionary x:Key="Light">
+                                        <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaControlColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource CaptaControlColor}" />
+                                    </ResourceDictionary>
+                                    <ResourceDictionary x:Key="HighContrast">
+                                        <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlBrush" />
+                                        <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaControlHoverBrush" />
+                                        <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaControlBrush" />
+                                        <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="CaptaControlBrush" />
+                                    </ResourceDictionary>
+                                </ResourceDictionary.ThemeDictionaries>
+                            </ResourceDictionary>
                         </Button.Resources>
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <c:LineIcon Size="17" StrokeWidth="1.9" Data="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0z" />

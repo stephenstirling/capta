@@ -74,16 +74,32 @@
                 <!-- Mode group: icon-only, the selected mode is highlighted. -->
                 <Border Padding="3" Background="{ThemeResource CaptaInsetBrush}" CornerRadius="12">
                     <Border.Resources>
-                        <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="CaptaAccentSoftBrush" />
-                        <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="CaptaAccentSoftBrush" />
-                        <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="CaptaAccentSoftBrush" />
-                        <Style x:Key="ModeToggle" TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
-                            <Setter Property="Width" Value="40" />
-                            <Setter Property="Height" Value="40" />
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="CornerRadius" Value="9" />
-                            <Setter Property="BorderThickness" Value="0" />
-                        </Style>
+                        <ResourceDictionary>
+                            <ResourceDictionary.ThemeDictionaries>
+                                <ResourceDictionary x:Key="Default">
+                                    <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="{ThemeResource CaptaAccentSoftColor}" />
+                                    <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{ThemeResource CaptaAccentSoftColor}" />
+                                    <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="{ThemeResource CaptaAccentSoftColor}" />
+                                </ResourceDictionary>
+                                <ResourceDictionary x:Key="Light">
+                                    <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="{ThemeResource CaptaAccentSoftColor}" />
+                                    <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{ThemeResource CaptaAccentSoftColor}" />
+                                    <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="{ThemeResource CaptaAccentSoftColor}" />
+                                </ResourceDictionary>
+                                <ResourceDictionary x:Key="HighContrast">
+                                    <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="CaptaAccentSoftBrush" />
+                                    <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="CaptaAccentSoftBrush" />
+                                    <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="CaptaAccentSoftBrush" />
+                                </ResourceDictionary>
+                            </ResourceDictionary.ThemeDictionaries>
+                            <Style x:Key="ModeToggle" TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
+                                <Setter Property="Width" Value="40" />
+                                <Setter Property="Height" Value="40" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="CornerRadius" Value="9" />
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Style>
+                        </ResourceDictionary>
                     </Border.Resources>
                     <StackPanel Orientation="Horizontal" Spacing="2">
                         <ToggleButton x:Name="RegionMode" Style="{StaticResource ModeToggle}" Click="OnModeClick" Tag="Region" ToolTipService.ToolTip="Region (PrtSc)">
@@ -128,9 +144,25 @@
                 <!-- On/off shows as the icon's check mark, not colour. -->
                 <ToggleButton x:Name="AutoCopyToggle" Style="{StaticResource ToolToggle}" Click="OnAutoCopyClick" ToolTipService.ToolTip="Copy each capture to the clipboard automatically">
                     <ToggleButton.Resources>
-                        <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="CaptaFloatingTextBrush" />
-                        <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="CaptaTextBrush" />
-                        <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="CaptaFloatingTextBrush" />
+                        <ResourceDictionary>
+                            <ResourceDictionary.ThemeDictionaries>
+                                <ResourceDictionary x:Key="Default">
+                                    <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="{ThemeResource CaptaFloatingTextColor}" />
+                                    <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                    <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="{ThemeResource CaptaFloatingTextColor}" />
+                                </ResourceDictionary>
+                                <ResourceDictionary x:Key="Light">
+                                    <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="{ThemeResource CaptaFloatingTextColor}" />
+                                    <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                    <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="{ThemeResource CaptaFloatingTextColor}" />
+                                </ResourceDictionary>
+                                <ResourceDictionary x:Key="HighContrast">
+                                    <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="CaptaFloatingTextBrush" />
+                                    <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="CaptaTextBrush" />
+                                    <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="CaptaFloatingTextBrush" />
+                                </ResourceDictionary>
+                            </ResourceDictionary.ThemeDictionaries>
+                        </ResourceDictionary>
                     </ToggleButton.Resources>
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Grid Width="17" Height="17">

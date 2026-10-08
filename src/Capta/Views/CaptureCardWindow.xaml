@@ -87,13 +87,37 @@
                     <!-- Actions. Copy is a split button; Edit is the primary action. -->
                     <Grid ColumnSpacing="6">
                         <Grid.Resources>
-                            <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlHoverBrush" />
-                            <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaControlRaisedBrush" />
-                            <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaControlHoverBrush" />
-                            <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="CaptaControlHoverBrush" />
-                            <StaticResource x:Key="ButtonForeground" ResourceKey="CaptaTextBrush" />
-                            <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="CaptaTextBrush" />
-                            <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="CaptaTextBrush" />
+                            <ResourceDictionary>
+                                <ResourceDictionary.ThemeDictionaries>
+                                    <ResourceDictionary x:Key="Default">
+                                        <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaControlRaisedColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource CaptaTextColor}" />
+                                        <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                        <SolidColorBrush x:Key="ButtonForegroundPressed" Color="{ThemeResource CaptaTextColor}" />
+                                    </ResourceDictionary>
+                                    <ResourceDictionary x:Key="Light">
+                                        <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaControlRaisedColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource CaptaControlHoverColor}" />
+                                        <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource CaptaTextColor}" />
+                                        <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                        <SolidColorBrush x:Key="ButtonForegroundPressed" Color="{ThemeResource CaptaTextColor}" />
+                                    </ResourceDictionary>
+                                    <ResourceDictionary x:Key="HighContrast">
+                                        <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlHoverBrush" />
+                                        <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaControlRaisedBrush" />
+                                        <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaControlHoverBrush" />
+                                        <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="CaptaControlHoverBrush" />
+                                        <StaticResource x:Key="ButtonForeground" ResourceKey="CaptaTextBrush" />
+                                        <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="CaptaTextBrush" />
+                                        <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="CaptaTextBrush" />
+                                    </ResourceDictionary>
+                                </ResourceDictionary.ThemeDictionaries>
+                            </ResourceDictionary>
                         </Grid.Resources>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -106,81 +130,97 @@
                         <!-- The Copy menu opens above the whole split button, aligned to its left edge. -->
                         <StackPanel x:Name="CopySplit" Orientation="Horizontal">
                             <StackPanel.Resources>
-                                    <Flyout x:Key="CopyMenuFlyout" Placement="TopEdgeAlignedLeft" ShouldConstrainToRootBounds="False">
-                                        <Flyout.FlyoutPresenterStyle>
-                                            <Style TargetType="FlyoutPresenter">
-                                                <Setter Property="Background" Value="{ThemeResource CaptaMenuSurfaceBrush}" />
-                                                <Setter Property="BorderBrush" Value="{ThemeResource CaptaDividerBrush}" />
-                                                <Setter Property="BorderThickness" Value="1" />
-                                                <Setter Property="CornerRadius" Value="12" />
-                                                <Setter Property="Padding" Value="6" />
-                                                <Setter Property="MinWidth" Value="300" />
-                                                <Setter Property="MaxWidth" Value="300" />
-                                            </Style>
-                                        </Flyout.FlyoutPresenterStyle>
-                                        <StackPanel>
-                                            <StackPanel.Resources>
-                                                <SolidColorBrush x:Key="ButtonBackground" Color="Transparent" />
-                                                <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaHoverOverlayBrush" />
-                                                <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaPressedOverlayBrush" />
-                                                <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="Transparent" />
-                                                <SolidColorBrush x:Key="ButtonBorderBrush" Color="Transparent" />
-                                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="Transparent" />
-                                                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="Transparent" />
-                                                <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="Transparent" />
-                                                <StaticResource x:Key="ButtonForegroundDisabled" ResourceKey="CaptaTextFaintBrush" />
-                                            </StackPanel.Resources>
+                                <ResourceDictionary>
+                                    <ResourceDictionary.ThemeDictionaries>
+                                        <ResourceDictionary x:Key="Default">
+                                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaHoverOverlayColor}" />
+                                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaPressedOverlayColor}" />
+                                            <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="{ThemeResource CaptaTextFaintColor}" />
+                                        </ResourceDictionary>
+                                        <ResourceDictionary x:Key="Light">
+                                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CaptaHoverOverlayColor}" />
+                                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CaptaPressedOverlayColor}" />
+                                            <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="{ThemeResource CaptaTextFaintColor}" />
+                                        </ResourceDictionary>
+                                        <ResourceDictionary x:Key="HighContrast">
+                                            <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="CaptaHoverOverlayBrush" />
+                                            <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="CaptaPressedOverlayBrush" />
+                                            <StaticResource x:Key="ButtonForegroundDisabled" ResourceKey="CaptaTextFaintBrush" />
+                                        </ResourceDictionary>
+                                    </ResourceDictionary.ThemeDictionaries>
+                                        <Flyout x:Key="CopyMenuFlyout" Placement="TopEdgeAlignedLeft" ShouldConstrainToRootBounds="False">
+                                            <Flyout.FlyoutPresenterStyle>
+                                                <Style TargetType="FlyoutPresenter">
+                                                    <Setter Property="Background" Value="{ThemeResource CaptaMenuSurfaceBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{ThemeResource CaptaDividerBrush}" />
+                                                    <Setter Property="BorderThickness" Value="1" />
+                                                    <Setter Property="CornerRadius" Value="12" />
+                                                    <Setter Property="Padding" Value="6" />
+                                                    <Setter Property="MinWidth" Value="300" />
+                                                    <Setter Property="MaxWidth" Value="300" />
+                                                </Style>
+                                            </Flyout.FlyoutPresenterStyle>
+                                            <StackPanel>
+                                                <StackPanel.Resources>
+                                                    <SolidColorBrush x:Key="ButtonBackground" Color="Transparent" />
+                                                    <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="Transparent" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="Transparent" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="Transparent" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="Transparent" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="Transparent" />
+                                                </StackPanel.Resources>
 
-                                            <!-- Default action: highlighted, with a check. -->
-                                            <Button Style="{StaticResource MenuRow}" Padding="10,6" Background="{ThemeResource CaptaMenuItemSelectedBrush}" Click="OnCopyImage">
-                                                <Grid ColumnSpacing="10">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="16" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <c:LineIcon Size="16" StrokeWidth="2.4" Data="M5 12l5 5 9-10" Foreground="{ThemeResource CaptaAccentTextBrush}" />
-                                                    <StackPanel Grid.Column="1">
-                                                        <TextBlock FontWeight="SemiBold" Text="Copy image" />
-                                                        <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="PNG · SDR · works everywhere" />
+                                                <!-- Default action: highlighted, with a check. -->
+                                                <Button Style="{StaticResource MenuRow}" Padding="10,6" Background="{ThemeResource CaptaMenuItemSelectedBrush}" Click="OnCopyImage">
+                                                    <Grid ColumnSpacing="10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="16" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <c:LineIcon Size="16" StrokeWidth="2.4" Data="M5 12l5 5 9-10" Foreground="{ThemeResource CaptaAccentTextBrush}" />
+                                                        <StackPanel Grid.Column="1">
+                                                            <TextBlock FontWeight="SemiBold" Text="Copy image" />
+                                                            <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="PNG · SDR · works everywhere" />
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Ctrl+C" />
+                                                    </Grid>
+                                                </Button>
+                                                <Button Style="{StaticResource MenuRow}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                                    <StackPanel>
+                                                        <TextBlock FontWeight="SemiBold" Text="Copy image as HDR" />
+                                                        <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="JPEG XR · for HDR-aware apps" />
                                                     </StackPanel>
-                                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Ctrl+C" />
+                                                </Button>
+                                                <Button Style="{StaticResource MenuRow}" Click="OnCopyText">
+                                                    <Grid>
+                                                        <TextBlock FontWeight="SemiBold" Text="Copy text in image" />
+                                                        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Ctrl+Shift+C" />
+                                                    </Grid>
+                                                </Button>
+                                                <Button Style="{StaticResource MenuRow}" Click="OnCopyAsFile">
+                                                    <StackPanel>
+                                                        <TextBlock FontWeight="SemiBold" Text="Copy as file" />
+                                                        <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Paste into Explorer, email or chat" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button x:Name="CopyPathRow" Style="{StaticResource MenuRow}" Click="OnCopyPath" ToolTipService.ToolTip="Save the capture first">
+                                                    <TextBlock FontWeight="SemiBold" Text="Copy file path" />
+                                                </Button>
+                                                <Rectangle Height="1" Margin="6,4" Fill="{ThemeResource CaptaDividerBrush}" />
+                                                <Grid MinHeight="44" Padding="10,6">
+                                                    <TextBlock VerticalAlignment="Center" Text="Copy automatically after capture" />
+                                                    <ToggleSwitch
+                                                        x:Name="AutoCopySwitch"
+                                                        MinWidth="0"
+                                                        HorizontalAlignment="Right"
+                                                        OffContent=""
+                                                        OnContent=""
+                                                        Toggled="OnAutoCopyToggled" />
                                                 </Grid>
-                                            </Button>
-                                            <Button Style="{StaticResource MenuRow}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
-                                                <StackPanel>
-                                                    <TextBlock FontWeight="SemiBold" Text="Copy image as HDR" />
-                                                    <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="JPEG XR · for HDR-aware apps" />
-                                                </StackPanel>
-                                            </Button>
-                                            <Button Style="{StaticResource MenuRow}" Click="OnCopyText">
-                                                <Grid>
-                                                    <TextBlock FontWeight="SemiBold" Text="Copy text in image" />
-                                                    <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Ctrl+Shift+C" />
-                                                </Grid>
-                                            </Button>
-                                            <Button Style="{StaticResource MenuRow}" Click="OnCopyAsFile">
-                                                <StackPanel>
-                                                    <TextBlock FontWeight="SemiBold" Text="Copy as file" />
-                                                    <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Paste into Explorer, email or chat" />
-                                                </StackPanel>
-                                            </Button>
-                                            <Button x:Name="CopyPathRow" Style="{StaticResource MenuRow}" Click="OnCopyPath" ToolTipService.ToolTip="Save the capture first">
-                                                <TextBlock FontWeight="SemiBold" Text="Copy file path" />
-                                            </Button>
-                                            <Rectangle Height="1" Margin="6,4" Fill="{ThemeResource CaptaDividerBrush}" />
-                                            <Grid MinHeight="44" Padding="10,6">
-                                                <TextBlock VerticalAlignment="Center" Text="Copy automatically after capture" />
-                                                <ToggleSwitch
-                                                    x:Name="AutoCopySwitch"
-                                                    MinWidth="0"
-                                                    HorizontalAlignment="Right"
-                                                    OffContent=""
-                                                    OnContent=""
-                                                    Toggled="OnAutoCopyToggled" />
-                                            </Grid>
-                                        </StackPanel>
-                                    </Flyout>
+                                            </StackPanel>
+                                        </Flyout>
+                                </ResourceDictionary>
                             </StackPanel.Resources>
                             <Button Height="40" Padding="12,0" CornerRadius="10,0,0,10" BorderThickness="0" FontWeight="SemiBold" Click="OnCopy" ToolTipService.ToolTip="Copy image (Ctrl+C)">
                                 <StackPanel Orientation="Horizontal" Spacing="7">
@@ -198,10 +238,28 @@
                                 BorderThickness="1,0,0,0"
                                 ToolTipService.ToolTip="Copy options">
                                 <Button.Resources>
-                                    <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlRaisedBrush" />
-                                    <StaticResource x:Key="ButtonBorderBrush" ResourceKey="CaptaDividerBrush" />
-                                    <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="CaptaDividerBrush" />
-                                    <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="CaptaDividerBrush" />
+                                    <ResourceDictionary>
+                                        <ResourceDictionary.ThemeDictionaries>
+                                            <ResourceDictionary x:Key="Default">
+                                                <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlRaisedColor}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrush" Color="{ThemeResource CaptaDividerColor}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="{ThemeResource CaptaDividerColor}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="{ThemeResource CaptaDividerColor}" />
+                                            </ResourceDictionary>
+                                            <ResourceDictionary x:Key="Light">
+                                                <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CaptaControlRaisedColor}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrush" Color="{ThemeResource CaptaDividerColor}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="{ThemeResource CaptaDividerColor}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="{ThemeResource CaptaDividerColor}" />
+                                            </ResourceDictionary>
+                                            <ResourceDictionary x:Key="HighContrast">
+                                                <StaticResource x:Key="ButtonBackground" ResourceKey="CaptaControlRaisedBrush" />
+                                                <StaticResource x:Key="ButtonBorderBrush" ResourceKey="CaptaDividerBrush" />
+                                                <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="CaptaDividerBrush" />
+                                                <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="CaptaDividerBrush" />
+                                            </ResourceDictionary>
+                                        </ResourceDictionary.ThemeDictionaries>
+                                    </ResourceDictionary>
                                 </Button.Resources>
                                 <c:LineIcon Size="13" StrokeWidth="2.2" Data="M18 15l-6-6-6 6" />
                             </Button>

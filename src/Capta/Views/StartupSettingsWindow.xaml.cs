@@ -22,6 +22,7 @@ public sealed partial class StartupSettingsWindow : Window
     {
         _app = app;
         InitializeComponent();
+        ThemeService.Register(this);
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(TitleRow);
 

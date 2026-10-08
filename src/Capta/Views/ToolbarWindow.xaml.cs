@@ -33,6 +33,7 @@ public sealed partial class ToolbarWindow : Window
     public ToolbarWindow()
     {
         InitializeComponent();
+        ThemeService.Register(this);
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(Grip);
 
