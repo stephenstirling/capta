@@ -22,6 +22,8 @@ public partial class App : Application
     private FirstRunWindow? _firstRun;
     private ColourHdrWindow? _colour;
     private readonly CaptureHistory _history = new();
+
+    public CaptureHistory History => _history;
     private ToolbarWindow? _toolbar;
     private CaptureCoordinator? _capture;
     private readonly GraphicsCaptureSource _screenSource = new();
@@ -60,6 +62,7 @@ public partial class App : Application
         _hook.Pressed += OnHotkey;
         _hook.Install();
         Log.Info("Tray icon and Print Screen hook installed");
+        _ = _history.LoadAsync();
 
         _ownership = new PrintScreenOwnership();
         _ownership.Changed += owned => Dispatcher.TryEnqueue(() => OnPrintScreenOwnershipChanged(owned));

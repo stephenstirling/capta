@@ -36,7 +36,10 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <PublishTrimmed>false</PublishTrimmed>
+    <!-- Self-contained .NET is most of the package; partial trimming drops the unused framework
+         and Windows SDK projection. JSON is source-generated (Services/CaptaJson.cs) to stay trim-safe. -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
     <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 </Project>

@@ -23,12 +23,6 @@ public sealed record CaptureMetadata(
 {
     public const string PngKeyword = "Capta";
 
-    private static readonly JsonSerializerOptions s_json = new()
-    {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        // The default encoder escapes all non-ASCII, which PNG tEXt (Latin-1) needs.
-    };
-
     /// <summary>Builds the metadata for a capture, running on-device OCR for its text.</summary>
     public static async Task<CaptureMetadata> ForAsync(CaptureResult result)
     {
@@ -55,5 +49,5 @@ public sealed record CaptureMetadata(
             OcrText: text);
     }
 
-    public string ToJson() => JsonSerializer.Serialize(this, s_json);
+    public string ToJson() => JsonSerializer.Serialize(this, CaptaJson.Default.CaptureMetadata); // default encoder escapes non-ASCII, as tEXt (Latin-1) needs
 }

@@ -263,6 +263,7 @@ public sealed partial class CaptureCardWindow : Window
             var path = await CaptureActions.SaveAsAsync(_current, AppWindow.Id);
             if (path is null) return;
             _current.SavedPath = path;
+            ((App)Application.Current).History.Update();
             SetStatus($"Saved {Path.GetFileName(path)}");
         });
     }
