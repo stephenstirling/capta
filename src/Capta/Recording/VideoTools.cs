@@ -53,9 +53,14 @@ public static class VideoTools
             var at = TimeSpan.FromSeconds(i / (double)fps);
             using var stream = await composition.GetThumbnailAsync(at, width, height, VideoFramePrecision.NearestFrame);
             var decoder = await BitmapDecoder.CreateAsync(stream);
-            using var bitmap = await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore);
+            using var bitmap = await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
+            // Copy the pixels: SetSoftwareBitmap keeps a reference, and this bitmap is disposed
+            // before the frame is committed by the next GoToNextFrameAsync.
+            var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];
+            bitmap.CopyToBuffer(pixels.AsBuffer());
             if (i > 0) await encoder.GoToNextFrameAsync();
-            encoder.SetSoftwareBitmap(bitmap);
+            encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
+                (uint)bitmap.PixelWidth, (uint)bitmap.PixelHeight, 96, 96, pixels);
             await encoder.BitmapProperties.SetPropertiesAsync(new Dictionary<string, BitmapTypedValue>
             {
                 ["/grctlext/Delay"] = new BitmapTypedValue(delay, Windows.Foundation.PropertyType.UInt16),

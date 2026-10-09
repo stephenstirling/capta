@@ -42,7 +42,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
     private IDirect3DSurface? _latest;          // newest cropped frame, not yet sent
     private IDirect3DSurface? _lastSent;        // repeated when the screen doesn't change
     private TaskCompletionSource _frameArrived = new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private TimeSpan _lastFrameTime = TimeSpan.MinValue;
+    private TimeSpan _lastFrameTime = TimeSpan.FromSeconds(-1); // not MinValue: now - MinValue overflows
     private long _audioBlocks;
     private Task? _transcode;
 
@@ -111,15 +111,6 @@ public sealed class ScreenRecorder : IAsyncDisposable
 
     private async Task StartTranscodeAsync()
     {
-        var videoProps = VideoEncodingProperties.CreateUncompressed(MediaEncodingSubtypes.Bgra8, (uint)_crop.Width, (uint)_crop.Height);
-        _videoStream = new VideoStreamDescriptor(videoProps);
-        // Always an audio track, so sources can be switched on mid-recording.
-        var audioProps = AudioEncodingProperties.CreatePcm(WasapiSource.SampleRate, WasapiSource.Channels, 32);
-        audioProps.Subtype = MediaEncodingSubtypes.Float;
-        var source = new MediaStreamSource(_videoStream, new AudioStreamDescriptor(audioProps));
-        source.BufferTime = TimeSpan.Zero;
-        source.Starting += (_, e) => e.Request.SetActualStartPosition(TimeSpan.Zero);
-        source.SampleRequested += OnSampleRequested;
 
         var profile = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto);
         profile.Video.Width = (uint)_crop.Width;
@@ -134,14 +125,40 @@ public sealed class ScreenRecorder : IAsyncDisposable
 
         var file = await StorageFile.GetFileFromPathAsync(EnsureFile(_path));
         var output = await file.OpenAsync(FileAccessMode.ReadWrite);
-        var transcoder = new MediaTranscoder { HardwareAccelerationEnabled = true };
-        var prepared = await transcoder.PrepareMediaStreamSourceTranscodeAsync(source, output, profile);
+        PrepareTranscodeResult prepared;
+        try
+        {
+            prepared = await new MediaTranscoder { HardwareAccelerationEnabled = true }
+                .PrepareMediaStreamSourceTranscodeAsync(CreateSource(), output, profile);
+        }
+        catch (Exception ex)
+        {
+            // Some GPU encoders reject this pipeline (MF_E_TRANSFORM_TYPE_NOT_SET); the software
+            // H.264 encoder always takes it.
+            Log.Info($"Hardware video encoder unavailable ({ex.HResult:X8}); using the software encoder");
+            prepared = await new MediaTranscoder { HardwareAccelerationEnabled = false }
+                .PrepareMediaStreamSourceTranscodeAsync(CreateSource(), output, profile); // a failed attempt spoils its source
+        }
         if (!prepared.CanTranscode)
             throw new InvalidOperationException($"Can't record video: {prepared.FailureReason}.");
 
         _session.StartCapture();
         _clock.Start();
         _transcode = RunTranscodeAsync(prepared, output);
+    }
+
+    private MediaStreamSource CreateSource()
+    {
+        var videoProps = VideoEncodingProperties.CreateUncompressed(MediaEncodingSubtypes.Bgra8, (uint)_crop.Width, (uint)_crop.Height);
+        _videoStream = new VideoStreamDescriptor(videoProps);
+        // Always an audio track, so sources can be switched on mid-recording. 16-bit PCM: the AAC
+        // encoder doesn't take float input.
+        var audioProps = AudioEncodingProperties.CreatePcm(WasapiSource.SampleRate, WasapiSource.Channels, 16);
+        var source = new MediaStreamSource(_videoStream, new AudioStreamDescriptor(audioProps));
+        source.BufferTime = TimeSpan.Zero;
+        source.Starting += (_, e) => e.Request.SetActualStartPosition(TimeSpan.Zero);
+        source.SampleRequested += OnSampleRequested;
+        return source;
     }
 
     private static async Task RunTranscodeAsync(PrepareTranscodeResult prepared, Windows.Storage.Streams.IRandomAccessStream output)
@@ -250,10 +267,11 @@ public sealed class ScreenRecorder : IAsyncDisposable
             _system?.MixInto(mix, AudioBlockFrames);
             _mic?.MixInto(mix, AudioBlockFrames);
         }
-        for (var i = 0; i < mix.Length; i++) mix[i] = Math.Clamp(mix[i], -1f, 1f);
+        var pcm = new short[mix.Length];
+        for (var i = 0; i < mix.Length; i++) pcm[i] = (short)(Math.Clamp(mix[i], -1f, 1f) * short.MaxValue);
 
-        var bytes = new byte[mix.Length * 4];
-        Buffer.BlockCopy(mix, 0, bytes, 0, bytes.Length);
+        var bytes = new byte[pcm.Length * 2];
+        Buffer.BlockCopy(pcm, 0, bytes, 0, bytes.Length);
         var sample = MediaStreamSample.CreateFromBuffer(bytes.AsBuffer(), timestamp);
         sample.Duration = AudioBlock;
         _audioBlocks++;

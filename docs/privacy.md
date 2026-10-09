@@ -15,8 +15,8 @@ Capta keeps this data on your device only, in its own app folder
 (`%LOCALAPPDATA%\Packages\StephenStirling.Capta_*`):
 
 - **Settings**: shortcuts, theme, capture and colour options.
-- **Recent captures**: your six most recent captures, as PNG files, so the tray menu can show them
-  after a restart. Older ones are deleted automatically.
+- **Recent captures**: your six most recent captures, as PNG files (for recordings, a still frame),
+  so the tray menu can show them after a restart. Older ones are deleted automatically.
 - **Temporary files**: PNGs written when you use Edit, Copy as file or Send to Ocula. Windows clears
   these from time to time.
 - **A diagnostic log** (`capta.log`): timings, image sizes and errors. It doesn't contain the content
@@ -33,6 +33,14 @@ Uninstalling Capta removes all of this.
   title of the app window that was captured, the image size, and any text recognised in the image.
   This lets image apps such as Ocula search your captures. If you share a saved PNG, this metadata
   goes with it. Images copied to the clipboard as pictures have no metadata.
+
+## Video recordings and the microphone
+
+Recordings are saved as MP4 files in your capture folder (Pictures\Captures by default). They
+include what your PC plays (system audio) unless you turn that off on the recording bar.
+The microphone is used only while you have it switched on during a recording. Windows asks for
+microphone permission the first time, and shows its microphone indicator while it's in use.
+Nothing is uploaded.
 
 ## Screen capture permission
 
