@@ -67,7 +67,7 @@ Images Capta puts on the clipboard as bitmaps carry no metadata.
 | --- | --- | --- |
 | `version` | int | `1`. Bumped only for breaking changes; new optional fields don't bump it. |
 | `software` | string | Always `"Capta"`. |
-| `mode` | string | `Region`, `Window`, `FullScreen`, `ActiveWindow` or `GrabText`. |
+| `mode` | string | `Region`, `Window`, `FullScreen`, `ActiveWindow`, `GrabText` or `Freeform` (transparent outside the drawn shape). |
 | `capturedAt` | string | ISO 8601 with offset (local time). |
 | `sourceApp` | string? | Process name of the captured window. For regions, it's the window under the selection's centre. Absent when unknown (e.g. full screen). |
 | `windowTitle` | string? | That window's title. Absent when unknown. |

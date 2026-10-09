@@ -132,7 +132,7 @@ public sealed partial class ToolbarWindow : Window
 
     // ---- Mode group and New ----
 
-    private ToggleButton[] ModeButtons => [RegionMode, WindowMode, FullScreenMode];
+    private ToggleButton[] ModeButtons => [RegionMode, WindowMode, FullScreenMode, FreeformMode];
 
     private void SelectMode(CaptureMode mode)
     {

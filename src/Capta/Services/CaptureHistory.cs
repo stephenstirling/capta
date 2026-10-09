@@ -49,7 +49,7 @@ public sealed class CaptureHistory
                 if (_items.Count >= Capacity) break; // captures taken while loading come first
                 try
                 {
-                    var image = await DecodeAsync(Path.Combine(_folder, e.File));
+                    var image = await DecodeAsync(Path.Combine(_folder, e.File), transparent: e.Mode == CaptureMode.Freeform);
                     var bounds = new RectInt32(e.X, e.Y, e.Width, e.Height);
                     var monitor = Monitors.AtPoint(new PointInt32(e.X + e.Width / 2, e.Y + e.Height / 2));
                     var result = new CaptureResult(image, monitor, bounds, e.Mode, e.WasHdr)
@@ -122,7 +122,7 @@ public sealed class CaptureHistory
 
     private bool IsListed(CaptureResult r) => _items.Any(i => ReferenceEquals(i, r));
 
-    private static async Task<CapturedImage> DecodeAsync(string path)
+    private static async Task<CapturedImage> DecodeAsync(string path, bool transparent)
     {
         var file = await StorageFile.GetFileFromPathAsync(path);
         using var stream = await file.OpenReadAsync();
@@ -130,6 +130,6 @@ public sealed class CaptureHistory
         using var bitmap = await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
         var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];
         bitmap.CopyToBuffer(pixels.AsBuffer());
-        return new CapturedImage(bitmap.PixelWidth, bitmap.PixelHeight, pixels);
+        return new CapturedImage(bitmap.PixelWidth, bitmap.PixelHeight, pixels) { HasTransparency = transparent };
     }
 }

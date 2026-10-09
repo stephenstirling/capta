@@ -15,6 +15,9 @@ public abstract record OverlayResult
 
     public sealed record WindowSelected(WindowTarget Target) : OverlayResult;
 
+    /// <param name="Points">The drawn outline in physical pixels, relative to <paramref name="Monitor"/>.</param>
+    public sealed record FreeformSelected(MonitorInfo Monitor, CapturedImage Frame, PointInt32[] Points) : OverlayResult;
+
     /// <summary>Close, wait this long, then freeze the screen and show the overlay again.</summary>
     public sealed record Delayed(int Seconds, CaptureMode Mode) : OverlayResult;
 

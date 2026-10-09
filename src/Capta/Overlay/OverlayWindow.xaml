@@ -77,6 +77,9 @@
             <!-- Even-odd scrim, rebuilt in code: WinUI doesn't re-render a Path when child geometries change. -->
             <Path x:Name="Shade" Fill="{ThemeResource CaptaScrimBrush}" IsHitTestVisible="False" />
 
+            <!-- Freeform outline while drawing (rebuilt in code, like Shade). -->
+            <Path x:Name="Lasso" Stroke="{ThemeResource CaptaAccentBrush}" StrokeThickness="2" StrokeLineJoin="Round" IsHitTestVisible="False" />
+
             <Canvas x:Name="SelectionLayer" IsHitTestVisible="False" Visibility="Collapsed">
                 <Border x:Name="SelectionFrame" BorderBrush="{ThemeResource CaptaAccentBrush}" BorderThickness="2" />
                 <Rectangle x:Name="GuideV1" Width="1" Fill="{ThemeResource CaptaOverlayGuideBrush}" />
@@ -173,7 +176,7 @@
                                         <TextBlock Text="Full screen" />
                                     </StackPanel>
                                 </ToggleButton>
-                                <ToggleButton Style="{StaticResource ModeBarToggle}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                <ToggleButton x:Name="FreeformMode" Style="{StaticResource ModeBarToggle}" Click="OnModeClick" Tag="Freeform">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <c:LineIcon Data="M6 16c-2-3 0-9 5-10s9 2 8 6-6 3-7 6 2 4 4 3" />
                                         <TextBlock Text="Freeform" />

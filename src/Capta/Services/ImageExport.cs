@@ -14,7 +14,7 @@ public static class ImageExport
     {
         var stream = new InMemoryRandomAccessStream();
         var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-        encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
+        encoder.SetPixelData(BitmapPixelFormat.Bgra8, image.HasTransparency ? BitmapAlphaMode.Premultiplied : BitmapAlphaMode.Ignore,
             (uint)image.Width, (uint)image.Height, 96, 96, image.Pixels);
         if (CaptureOptions.Current.EmbedColourProfile)
         {

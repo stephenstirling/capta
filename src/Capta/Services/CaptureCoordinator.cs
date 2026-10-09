@@ -107,6 +107,23 @@ public sealed class CaptureCoordinator
                     WindowTitle = title,
                 };
             }
+            case OverlayResult.FreeformSelected f:
+            {
+                int x0 = f.Points.Min(p => p.X), y0 = f.Points.Min(p => p.Y);
+                int x1 = f.Points.Max(p => p.X), y1 = f.Points.Max(p => p.Y);
+                var rect = new RectInt32(x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+                var local = f.Points.Select(p => new PointInt32(p.X - x0, p.Y - y0)).ToArray();
+                var image = f.Frame.Crop(rect).MaskOutside(local);
+                var b = f.Monitor.Bounds;
+                var screen = new RectInt32(b.X + rect.X, b.Y + rect.Y, rect.Width, rect.Height);
+                var under = WindowFinder.At(new PointInt32(screen.X + screen.Width / 2, screen.Y + screen.Height / 2));
+                var (app, title) = under is null ? (null, null) : WindowFinder.Describe(under.Handle);
+                return new CaptureResult(image, f.Monitor, screen, CaptureMode.Freeform, GraphicsCaptureSource.IsHdr(f.Monitor.Handle))
+                {
+                    SourceApp = app,
+                    WindowTitle = title,
+                };
+            }
             case OverlayResult.ColourPicked c:
                 ColourPicked?.Invoke(c.Colour, c.ScreenPoint);
                 return null;

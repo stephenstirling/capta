@@ -111,7 +111,7 @@
                         <ToggleButton x:Name="FullScreenMode" Style="{StaticResource ModeToggle}" Click="OnModeClick" Tag="FullScreen" ToolTipService.ToolTip="Full screen (Shift+PrtSc)">
                             <c:LineIcon Data="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
                         </ToggleButton>
-                        <ToggleButton Style="{StaticResource ModeToggle}" IsEnabled="False" ToolTipService.ToolTip="Freeform (coming soon)">
+                        <ToggleButton x:Name="FreeformMode" Style="{StaticResource ModeToggle}" Click="OnModeClick" Tag="Freeform" ToolTipService.ToolTip="Freeform">
                             <c:LineIcon Data="M6 16c-2-3 0-9 5-10s9 2 8 6-6 3-7 6 2 4 4 3" />
                         </ToggleButton>
                         <ToggleButton Style="{StaticResource ModeToggle}" IsEnabled="False" ToolTipService.ToolTip="Scrolling (coming soon)">

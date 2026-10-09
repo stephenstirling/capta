@@ -59,6 +59,7 @@ public sealed partial class OverlayWindow : Window
     private PointInt32 _lastPoint;
     private RectInt32 _dragStartSelection;
     private bool _spaceDown;
+    private readonly List<PointInt32> _lasso = [];
 
     public OverlayWindow(OverlaySession session, MonitorInfo monitor, CapturedImage frame, CaptureMode mode, IReadOnlyList<WindowTarget> windows)
     {
@@ -129,14 +130,17 @@ public sealed partial class OverlayWindow : Window
         RegionMode.IsChecked = mode == CaptureMode.Region;
         WindowMode.IsChecked = mode == CaptureMode.Window;
         GrabTextMode.IsChecked = mode == CaptureMode.GrabText;
+        FreeformMode.IsChecked = mode == CaptureMode.Freeform;
         HintLead.Text = mode switch
         {
             CaptureMode.Window => "Click a window",
+            CaptureMode.Freeform => "Draw around what to capture",
             CaptureMode.GrabText => "Select the text to copy",
             _ => "Drag to select",
         };
-        RegionHints.Visibility = mode == CaptureMode.Window ? Visibility.Collapsed : Visibility.Visible;
+        RegionHints.Visibility = IsRegionLike ? Visibility.Visible : Visibility.Collapsed;
         _selection = default;
+        _lasso.Clear();
         _hoverWindow = null;
         _drag = Drag.None;
         UpdateSelectionVisuals();
@@ -182,6 +186,14 @@ public sealed partial class OverlayWindow : Window
 
         var px = ToPixel(point.Position);
         Root.CapturePointer(e.Pointer);
+        if (_mode == CaptureMode.Freeform)
+        {
+            _drag = Drag.New;
+            _lasso.Clear();
+            _lasso.Add(px);
+            UpdateSelectionVisuals();
+            return;
+        }
         _dragStart = _lastPoint = px;
         _dragStartSelection = _selection;
 
@@ -231,6 +243,27 @@ public sealed partial class OverlayWindow : Window
             return;
         }
 
+        if (_mode == CaptureMode.Freeform)
+        {
+            if (_drag == Drag.New)
+            {
+                // Thin the outline: a point every few pixels is plenty.
+                var last = _lasso[^1];
+                if (Math.Abs(px.X - last.X) + Math.Abs(px.Y - last.Y) >= 3)
+                {
+                    _lasso.Add(px);
+                    UpdateSelectionVisuals();
+                }
+            }
+            else
+            {
+                SetCursor(InputSystemCursorShape.Cross);
+            }
+            _lastPoint = px;
+            UpdateLoupe(px, dip);
+            return;
+        }
+
         switch (_drag)
         {
             case Drag.New:
@@ -264,6 +297,19 @@ public sealed partial class OverlayWindow : Window
         Root.ReleasePointerCapture(e.Pointer);
         var wasNew = _drag == Drag.New;
         _drag = Drag.None;
+
+        if (_mode == CaptureMode.Freeform)
+        {
+            // Releasing closes the shape and captures it; a tiny scribble is ignored.
+            var points = _lasso.ToArray();
+            _lasso.Clear();
+            int w = points.Max(p => p.X) - points.Min(p => p.X), h = points.Max(p => p.Y) - points.Min(p => p.Y);
+            if (points.Length >= 3 && w >= 3 && h >= 3)
+                _session.Complete(new OverlayResult.FreeformSelected(_monitor, _frame, points));
+            else
+                UpdateSelectionVisuals();
+            return;
+        }
 
         // A click without a drag clears the selection rather than leaving a 1px one.
         if (wasNew && (_selection.Width < 3 || _selection.Height < 3))
@@ -493,7 +539,10 @@ public sealed partial class OverlayWindow : Window
         group.Children.Add(new RectangleGeometry { Rect = new Rect(0, 0, Root.ActualWidth, Root.ActualHeight) });
         if (HasSelection)
             group.Children.Add(new RectangleGeometry { Rect = ToDip(_selection) });
+        if (_lasso.Count >= 2)
+            group.Children.Add(LassoGeometry(closed: true));
         Shade.Data = group;
+        Lasso.Data = _lasso.Count >= 2 ? LassoGeometry(closed: false) : null;
 
         if (!HasSelection)
         {
@@ -527,6 +576,19 @@ public sealed partial class OverlayWindow : Window
         SizeText.Text = $"{_selection.Width} × {_selection.Height} px";
         Canvas.SetLeft(SizeBadge, Math.Max(4, r.X - 2));
         Canvas.SetTop(SizeBadge, r.Y >= 40 ? r.Y - 40 : r.Y + 10);
+    }
+
+    private PathGeometry LassoGeometry(bool closed)
+    {
+        var s = Scale;
+        var figure = new PathFigure { StartPoint = new Point(_lasso[0].X / s, _lasso[0].Y / s), IsClosed = closed, IsFilled = closed };
+        var line = new PolyLineSegment();
+        for (var i = 1; i < _lasso.Count; i++)
+            line.Points.Add(new Point(_lasso[i].X / s, _lasso[i].Y / s));
+        figure.Segments.Add(line);
+        var geometry = new PathGeometry();
+        geometry.Figures.Add(figure);
+        return geometry;
     }
 
     private static void Place(FrameworkElement e, double x, double y, double w, double h)

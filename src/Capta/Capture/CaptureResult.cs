@@ -27,6 +27,7 @@ public sealed record CaptureResult(CapturedImage Image, MonitorInfo Monitor, Rec
         CaptureMode.FullScreen => "Full screen",
         CaptureMode.ActiveWindow => "Active window",
         CaptureMode.GrabText => "Grab text",
+        CaptureMode.Freeform => "Freeform",
         _ => Mode.ToString(),
     };
 }
