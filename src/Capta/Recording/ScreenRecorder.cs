@@ -191,7 +191,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
         var deferral = request.GetDeferral();
         try
         {
-            request.Sample = request.StreamDescriptor == _videoStream ? await NextVideoSampleAsync() : await NextAudioSampleAsync();
+            request.Sample = request.StreamDescriptor is VideoStreamDescriptor ? await NextVideoSampleAsync() : await NextAudioSampleAsync();
         }
         catch (Exception ex)
         {

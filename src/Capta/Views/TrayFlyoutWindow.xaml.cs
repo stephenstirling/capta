@@ -110,7 +110,31 @@ public sealed partial class TrayFlyoutWindow : Window
                     BorderThickness = new Thickness(0),
                     CornerRadius = new CornerRadius(8),
                 };
-                ToolTipService.SetToolTip(button, $"{result.ModeName} · {result.Image.Width} × {result.Image.Height}");
+                ToolTipService.SetToolTip(button, result.IsVideo
+                    ? $"Recording · {result.VideoLength:m\\:ss}"
+                    : $"{result.ModeName} · {result.Image.Width} × {result.Image.Height}");
+                if (result.IsVideo)
+                {
+                    button.Content = new Border
+                    {
+                        Margin = new Thickness(0, 0, 0, 0),
+                        Padding = new Thickness(6, 2, 6, 2),
+                        CornerRadius = new CornerRadius(5),
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        Background = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["CaptaVideoBadgeBrush"],
+                        Child = new TextBlock
+                        {
+                            Text = result.VideoLength.TotalHours >= 1 ? result.VideoLength.ToString(@"h\:mm\:ss") : result.VideoLength.ToString(@"m\:ss"),
+                            FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["CaptaMonoFont"],
+                            FontSize = 11,
+                            Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["CaptaVideoBadgeTextBrush"],
+                        },
+                    };
+                    button.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+                    button.VerticalContentAlignment = VerticalAlignment.Stretch;
+                    button.Padding = new Thickness(8);
+                }
                 button.Click += (_, _) =>
                 {
                     Hide();

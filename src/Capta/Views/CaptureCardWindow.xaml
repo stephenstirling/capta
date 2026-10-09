@@ -171,7 +171,7 @@
                                                 </StackPanel.Resources>
 
                                                 <!-- Default action: highlighted, with a check. -->
-                                                <Button Style="{StaticResource MenuRow}" Padding="10,6" Background="{ThemeResource CaptaMenuItemSelectedBrush}" Click="OnCopyImage">
+                                                <Button x:Name="CopyImageRow" Style="{StaticResource MenuRow}" Padding="10,6" Background="{ThemeResource CaptaMenuItemSelectedBrush}" Click="OnCopyImage">
                                                     <Grid ColumnSpacing="10">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="16" />
@@ -192,7 +192,7 @@
                                                         <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="JPEG XR · for HDR-aware apps" />
                                                     </StackPanel>
                                                 </Button>
-                                                <Button Style="{StaticResource MenuRow}" Click="OnCopyText">
+                                                <Button x:Name="CopyTextRow" Style="{StaticResource MenuRow}" Click="OnCopyText">
                                                     <Grid>
                                                         <TextBlock FontWeight="SemiBold" Text="Copy text in image" />
                                                         <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Ctrl+Shift+C" />
@@ -200,8 +200,14 @@
                                                 </Button>
                                                 <Button Style="{StaticResource MenuRow}" Click="OnCopyAsFile">
                                                     <StackPanel>
-                                                        <TextBlock FontWeight="SemiBold" Text="Copy as file" />
+                                                        <TextBlock x:Name="CopyAsFileText" FontWeight="SemiBold" Text="Copy as file" />
                                                         <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Paste into Explorer, email or chat" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button x:Name="GifRow" Style="{StaticResource MenuRow}" Click="OnSaveGif" Visibility="Collapsed">
+                                                    <StackPanel>
+                                                        <TextBlock FontWeight="SemiBold" Text="Save as GIF" />
+                                                        <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="First 30 s · 10 fps · copied as a file too" />
                                                     </StackPanel>
                                                 </Button>
                                                 <Button x:Name="CopyPathRow" Style="{StaticResource MenuRow}" Click="OnCopyPath" ToolTipService.ToolTip="Save the capture first">
@@ -273,17 +279,18 @@
                             CornerRadius="10"
                             FontWeight="Bold"
                             Style="{StaticResource AccentButtonStyle}"
+                            x:Name="EditButton"
                             Click="OnEdit"
                             ToolTipService.ToolTip="Edit">
                             <StackPanel Orientation="Horizontal" Spacing="7">
-                                <c:LineIcon Size="16" StrokeWidth="2" Data="M4 20l4-1 11-11-3-3L5 16z" />
-                                <TextBlock Text="Edit" />
+                                <c:LineIcon x:Name="EditIcon" Size="16" StrokeWidth="2" Data="M4 20l4-1 11-11-3-3L5 16z" />
+                                <TextBlock x:Name="EditText" Text="Edit" />
                             </StackPanel>
                         </Button>
                         <Button Grid.Column="2" Width="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnSave" ToolTipService.ToolTip="Save as">
                             <c:LineIcon Size="16" Data="M12 4v12M7 11l5 5 5-5M5 20h14" />
                         </Button>
-                        <Button Grid.Column="3" Width="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnPin" ToolTipService.ToolTip="Pin to screen">
+                        <Button x:Name="PinButton" Grid.Column="3" Width="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnPin" ToolTipService.ToolTip="Pin to screen">
                             <c:LineIcon Size="17" Data="M14 4l6 6M16 6l-5 5-4-1-2 2 7 7 2-2-1-4 5-5M8 16l-4 4" />
                         </Button>
                         <Button x:Name="OculaButton" Grid.Column="4" Width="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnSendToOcula" ToolTipService.ToolTip="Send to Ocula">

@@ -1,3 +1,4 @@
+using Capta.Capture;
 using Capta.Interop;
 using Capta.Services;
 using Microsoft.UI.Dispatching;
