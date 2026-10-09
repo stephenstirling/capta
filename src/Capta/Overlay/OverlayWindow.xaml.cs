@@ -166,6 +166,12 @@ public sealed partial class OverlayWindow : Window
 
     private bool HasSelection => _selection.Width > 0 && _selection.Height > 0;
 
+    /// <summary>
+    /// Esc finishes rather than cancels once a Region or Grab text selection is drawn. Scrolling and
+    /// Record keep Esc as cancel: for them, finishing starts something long-running.
+    /// </summary>
+    private bool EscCaptures => _mode is CaptureMode.Region or CaptureMode.GrabText && HasSelection && _drag == Drag.None;
+
     // ---- Pointer ----
 
     private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
@@ -336,6 +342,9 @@ public sealed partial class OverlayWindow : Window
     {
         switch (e.Key)
         {
+            case VirtualKey.Escape when EscCaptures:
+                CompleteSelection(); // a finished selection: Esc takes it (copied with Auto-copy)
+                break;
             case VirtualKey.Escape:
                 _session.Cancel();
                 break;
@@ -544,6 +553,7 @@ public sealed partial class OverlayWindow : Window
         if (_lasso.Count >= 2)
             group.Children.Add(LassoGeometry(closed: true));
         Shade.Data = group;
+        EscHint.Text = EscCaptures ? "capture" : "cancel";
         Lasso.Data = _lasso.Count >= 2 ? LassoGeometry(closed: false) : null;
 
         if (!HasSelection)
