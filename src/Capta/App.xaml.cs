@@ -159,6 +159,21 @@ public partial class App : Application
 
         _history.Add(result);
         ShowCard(result, copied);
+        await SendToOculaIfEnabledAsync(result);
+    }
+
+    /// <summary>"Send every capture to Ocula automatically" (first-run setup), once Ocula is installed.</summary>
+    private static async Task SendToOculaIfEnabledAsync(CaptureResult result)
+    {
+        try
+        {
+            if (Settings.SendToOculaAutomatically && await CaptureActions.IsOculaInstalledAsync())
+                await CaptureActions.SendToOculaAsync(result);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Automatic send to Ocula failed", ex);
+        }
     }
 
     /// <summary>Grab text: copy the selection's text (on-device OCR) and say how it went on the card.</summary>

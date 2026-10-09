@@ -54,6 +54,12 @@ Open `Capta.slnx` in Visual Studio and press F5 to deploy and run the packaged a
    <Import Project="..\Stirling.Shared\build\Stirling.Shared.AppIcons.targets" />
    ```
 
+## Docs
+
+- [Privacy policy](docs/privacy.md)
+- [Ocula integration](docs/ocula-integration.md): the `ocula:` URIs and the PNG metadata
+- [Store submission](docs/store-submission.md): checklist, certification notes and the draft listing
+
 ## Store identity
 
 `Package.appxmanifest` uses a placeholder identity (`StephenStirling.Capta`, `CN=StephenStirling`).
