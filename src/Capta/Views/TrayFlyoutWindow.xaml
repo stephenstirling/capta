@@ -187,7 +187,7 @@
                                 <TextBlock VerticalAlignment="Bottom" Text="Full screen" />
                             </Grid>
                         </Button>
-                        <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource Tile}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                        <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource Tile}" Click="OnRecord">
                             <Grid>
                                 <c:LineIcon HorizontalAlignment="Left" VerticalAlignment="Top" Data="M5 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM16 10l5-3v10l-5-3" />
                                 <TextBlock VerticalAlignment="Bottom" Text="Record video" />

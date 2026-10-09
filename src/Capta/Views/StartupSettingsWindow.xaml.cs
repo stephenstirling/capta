@@ -26,7 +26,7 @@ public sealed partial class StartupSettingsWindow : Window
         (HotkeyAction.Region, "Region capture", null),
         (HotkeyAction.FullScreen, "Full screen, straight to clipboard", null),
         (HotkeyAction.ActiveWindow, "Active window", null),
-        (HotkeyAction.ShowToolbar, "Show the floating toolbar", "Becomes Record video once video capture is available"),
+        (HotkeyAction.Record, "Record video", "Press again to stop. The toolbar is in the tray menu"),
         (HotkeyAction.GrabText, "Grab text from screen", null),
     ];
 

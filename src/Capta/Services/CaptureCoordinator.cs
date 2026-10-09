@@ -16,6 +16,9 @@ public sealed class CaptureCoordinator
     /// <summary>Raised on the UI thread with each finished capture.</summary>
     public event Action<CaptureResult>? Captured;
 
+    /// <summary>An area was chosen to record (Record mode): the monitor and the area on the desktop.</summary>
+    public event Action<MonitorInfo, RectInt32>? RecordRequested;
+
     /// <summary>A colour was picked in the overlay (C) instead of a capture.</summary>
     public event Action<Windows.UI.Color, PointInt32>? ColourPicked;
 
@@ -93,6 +96,12 @@ public sealed class CaptureCoordinator
         }
         switch (selection)
         {
+            case OverlayResult.RegionSelected r when r.Mode == CaptureMode.Recording:
+            {
+                var b = r.Monitor.Bounds;
+                RecordRequested?.Invoke(r.Monitor, new RectInt32(b.X + r.Rect.X, b.Y + r.Rect.Y, r.Rect.Width, r.Rect.Height));
+                return null;
+            }
             case OverlayResult.RegionSelected r when r.Mode == CaptureMode.Scrolling:
             {
                 var b = r.Monitor.Bounds;

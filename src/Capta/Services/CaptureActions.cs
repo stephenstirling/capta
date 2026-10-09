@@ -28,9 +28,41 @@ public static partial class CaptureActions
     /// <summary>Adds the capture to Ocula's library via <c>ocula:import?file=&lt;path&gt;</c>.</summary>
     public static async Task SendToOculaAsync(CaptureResult capture)
     {
-        var file = await SaveTempAsync(capture, "Ocula");
-        await Launcher.LaunchUriAsync(OculaUri("import", file.Path));
+        var path = capture.VideoPath ?? (await SaveTempAsync(capture, "Ocula")).Path;
+        await Launcher.LaunchUriAsync(OculaUri("import", path));
     }
+
+    /// <summary>Copies a recording as a file (pastes into Explorer, email and chat).</summary>
+    public static async Task CopyFileAsync(string path)
+    {
+        var file = await StorageFile.GetFileFromPathAsync(path);
+        var package = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
+        package.SetStorageItems([file]);
+        Clipboard.SetContent(package);
+        Clipboard.Flush();
+    }
+
+    /// <summary>Save As for a recording: copies the MP4. Returns the new path, or null if cancelled.</summary>
+    public static async Task<string?> SaveVideoAsAsync(CaptureResult capture, WindowId owner)
+    {
+        var source = capture.VideoPath ?? throw new InvalidOperationException("Not a recording.");
+        var picker = new FileSavePicker(owner)
+        {
+            SuggestedFileName = Path.GetFileNameWithoutExtension(source),
+            SuggestedFolder = CaptureFolderOrScreenshots(),
+            DefaultFileExtension = ".mp4",
+        };
+        picker.FileTypeChoices.Add("MP4 video", [".mp4"]);
+        var result = await picker.PickSaveFileAsync();
+        if (result is null) return null;
+        if (!string.Equals(Path.GetFullPath(result.Path), Path.GetFullPath(source), StringComparison.OrdinalIgnoreCase))
+            await Task.Run(() => File.Copy(source, result.Path, overwrite: true));
+        return result.Path;
+    }
+
+    /// <summary>Where new recordings go: the capture folder.</summary>
+    public static string NewRecordingPath() =>
+        Path.Combine(CaptureFolderOrScreenshots(), $"Recording {DateTime.Now:yyyy-MM-dd HHmmss}.mp4");
 
     public static async Task<bool> IsOculaInstalledAsync() =>
         await Launcher.QueryUriSupportAsync(new Uri("ocula:"), LaunchQuerySupportType.Uri) == LaunchQuerySupportStatus.Available;

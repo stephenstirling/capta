@@ -117,7 +117,7 @@
                         <ToggleButton x:Name="ScrollingMode" Style="{StaticResource ModeToggle}" Click="OnModeClick" Tag="Scrolling" ToolTipService.ToolTip="Scrolling">
                             <c:LineIcon Data="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM12 8v8M9 13l3 3 3-3" />
                         </ToggleButton>
-                        <ToggleButton Style="{StaticResource ModeToggle}" IsEnabled="False" ToolTipService.ToolTip="Record video (coming soon)">
+                        <ToggleButton x:Name="RecordMode" Style="{StaticResource ModeToggle}" Click="OnModeClick" Tag="Recording" ToolTipService.ToolTip="Record video">
                             <c:LineIcon Data="M5 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM16 10l5-3v10l-5-3" />
                         </ToggleButton>
                     </StackPanel>

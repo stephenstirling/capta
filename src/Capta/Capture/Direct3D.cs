@@ -19,11 +19,16 @@ internal sealed unsafe partial class Direct3D : IDisposable
     private const uint D3D11_CPU_ACCESS_READ = 0x20000;
     private const uint D3D11_MAP_READ = 1;
     private const uint DXGI_FORMAT_R16G16B16A16_FLOAT = 10;
+    private const uint DXGI_FORMAT_B8G8R8A8_UNORM = 87;
+    private const uint D3D11_USAGE_DEFAULT = 0;
+    private const uint D3D11_BIND_SHADER_RESOURCE = 0x8;
+    private const uint D3D11_BIND_RENDER_TARGET = 0x20;
 
     // vtable slots (see d3d11.h *Vtbl structs)
     private const int Device_CreateTexture2D = 5;
     private const int Context_Map = 14;
     private const int Context_Unmap = 15;
+    private const int Context_CopySubresourceRegion = 46;
     private const int Context_CopyResource = 47;
     private const int Texture2D_GetDesc = 10;
     private const int DxgiAccess_GetInterface = 3;
@@ -31,6 +36,7 @@ internal sealed unsafe partial class Direct3D : IDisposable
     private static readonly Guid IID_IDXGIDevice = new("54ec77fa-1377-44e6-8c32-88fd5f44c84c");
     private static readonly Guid IID_ID3D11Texture2D = new("6f15aaf2-d208-4e89-9ab4-489535d34f9c");
     private static readonly Guid IID_IDirect3DDxgiInterfaceAccess = new("a9b3d012-3df2-4ee3-b8d1-8695f457d3c1");
+    private static readonly Guid IID_IDXGISurface = new("cafcb56c-6ac3-4889-bf47-9e23bbd260ec");
 
     [StructLayout(LayoutKind.Sequential)]
     private struct D3D11_TEXTURE2D_DESC
@@ -51,6 +57,15 @@ internal sealed unsafe partial class Direct3D : IDisposable
 
     [LibraryImport("d3d11.dll")]
     private static partial int CreateDirect3D11DeviceFromDXGIDevice(nint dxgiDevice, nint* graphicsDevice);
+
+    [LibraryImport("d3d11.dll")]
+    private static partial int CreateDirect3D11SurfaceFromDXGISurface(nint dxgiSurface, nint* graphicsSurface);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct D3D11_BOX
+    {
+        public uint Left, Top, Front, Right, Bottom, Back;
+    }
 
     private readonly object _contextLock = new();
     private nint _device;
@@ -144,6 +159,64 @@ internal sealed unsafe partial class Direct3D : IDisposable
         finally
         {
             if (staging != 0) Marshal.Release(staging);
+            Marshal.Release(texture);
+        }
+    }
+
+    /// <summary>
+    /// Copies part of a BGRA surface into a new <paramref name="width"/> x <paramref name="height"/>
+    /// texture (for video frames: the pool recycles its surfaces). The source rectangle is clipped
+    /// to the surface; anything it doesn't cover stays black.
+    /// </summary>
+    public IDirect3DSurface CopyRegion(IDirect3DSurface source, int x, int y, int width, int height)
+    {
+        var texture = GetTexture(source);
+        nint copy = 0, dxgi = 0;
+        try
+        {
+            D3D11_TEXTURE2D_DESC srcDesc;
+            ((delegate* unmanaged[Stdcall]<nint, D3D11_TEXTURE2D_DESC*, void>)VTable(texture, Texture2D_GetDesc))(texture, &srcDesc);
+
+            var desc = new D3D11_TEXTURE2D_DESC
+            {
+                Width = (uint)width,
+                Height = (uint)height,
+                MipLevels = 1,
+                ArraySize = 1,
+                Format = DXGI_FORMAT_B8G8R8A8_UNORM,
+                SampleCount = 1,
+                Usage = D3D11_USAGE_DEFAULT,
+                BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE,
+            };
+            Marshal.ThrowExceptionForHR(((delegate* unmanaged[Stdcall]<nint, D3D11_TEXTURE2D_DESC*, void*, nint*, int>)VTable(_device, Device_CreateTexture2D))(_device, &desc, null, &copy));
+
+            var box = new D3D11_BOX
+            {
+                Left = (uint)Math.Clamp(x, 0, (int)srcDesc.Width),
+                Top = (uint)Math.Clamp(y, 0, (int)srcDesc.Height),
+                Front = 0,
+                Back = 1,
+            };
+            box.Right = (uint)Math.Clamp(x + width, (int)box.Left, (int)srcDesc.Width);
+            box.Bottom = (uint)Math.Clamp(y + height, (int)box.Top, (int)srcDesc.Height);
+            if (box.Right > box.Left && box.Bottom > box.Top)
+            {
+                lock (_contextLock)
+                    ((delegate* unmanaged[Stdcall]<nint, nint, uint, uint, uint, uint, nint, uint, D3D11_BOX*, void>)VTable(_context, Context_CopySubresourceRegion))(
+                        _context, copy, 0, 0, 0, 0, texture, 0, &box);
+            }
+
+            Marshal.ThrowExceptionForHR(Marshal.QueryInterface(copy, in IID_IDXGISurface, out dxgi));
+            nint inspectable;
+            Marshal.ThrowExceptionForHR(CreateDirect3D11SurfaceFromDXGISurface(dxgi, &inspectable));
+            var surface = MarshalInterface<IDirect3DSurface>.FromAbi(inspectable);
+            Marshal.Release(inspectable);
+            return surface;
+        }
+        finally
+        {
+            if (dxgi != 0) Marshal.Release(dxgi);
+            if (copy != 0) Marshal.Release(copy);
             Marshal.Release(texture);
         }
     }

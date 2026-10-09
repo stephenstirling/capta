@@ -95,7 +95,11 @@ public sealed partial class CaptureCardWindow : Window
     {
         _current = result;
         var image = result.Image;
-        DetailText.Text = $"{result.ModeName} · {image.Width} × {image.Height}" + (result.WasHdr ? " · tone-mapped from HDR" : "");
+        var video = result.IsVideo;
+        DetailText.Text = video
+            ? $"Recording · {FormatLength(result.VideoLength)} · {result.ScreenBounds.Width} × {result.ScreenBounds.Height}"
+            : $"{result.ModeName} · {image.Width} × {image.Height}" + (result.WasHdr ? " · tone-mapped from HDR" : "");
+        ApplyKind(video);
         if (status is not null)
             SetStatus(status, success);
         else
@@ -114,6 +118,23 @@ public sealed partial class CaptureCardWindow : Window
         this.BringToFront();
         RestartTimer();
     }
+
+    /// <summary>Recordings: Play instead of Edit, file copies instead of image copies, GIF export, no pin.</summary>
+    private void ApplyKind(bool video)
+    {
+        var image = video ? Visibility.Collapsed : Visibility.Visible;
+        CopyImageRow.Visibility = CopyHdrRow.Visibility = CopyTextRow.Visibility = image;
+        GifRow.Visibility = video ? Visibility.Visible : Visibility.Collapsed;
+        CopyAsFileText.Text = video ? "Copy video file" : "Copy as file";
+        EditText.Text = video ? "Play" : "Edit";
+        EditIcon.Data = (Microsoft.UI.Xaml.Media.Geometry)Microsoft.UI.Xaml.Markup.XamlBindingHelper.ConvertValue(
+            typeof(Microsoft.UI.Xaml.Media.Geometry), video ? "M8 5v14l11-7z" : "M4 20l4-1 11-11-3-3L5 16z");
+        ToolTipService.SetToolTip(EditButton, video ? "Play" : "Edit");
+        PinButton.IsEnabled = !video;
+        ToolTipService.SetToolTip(PinButton, video ? "Recordings can't be pinned" : "Pin to screen");
+    }
+
+    private static string FormatLength(TimeSpan t) => t.TotalHours >= 1 ? t.ToString(@"h\:mm\:ss") : t.ToString(@"m\:ss");
 
     /// <summary>Bottom-right of the monitor's work area; the window's padding holds the shadow.</summary>
     private void PlaceOn(MonitorInfo monitor)
@@ -184,6 +205,15 @@ public sealed partial class CaptureCardWindow : Window
     private async Task CopyImageAsync()
     {
         if (_current is null) return;
+        if (_current.VideoPath is { } video)
+        {
+            await RunAsync(async () =>
+            {
+                await CaptureActions.CopyFileAsync(video);
+                SetStatus("Copied video file");
+            });
+            return;
+        }
         await RunAsync(async () =>
         {
             await ImageExport.CopyToClipboardAsync(_current.Image);
@@ -217,10 +247,30 @@ public sealed partial class CaptureCardWindow : Window
     {
         CopyMenu.Hide();
         if (_current is null) return;
+        if (_current.IsVideo)
+        {
+            await CopyImageAsync(); // copies the MP4
+            return;
+        }
         await RunAsync(async () =>
         {
             await CaptureActions.CopyAsFileAsync(_current);
             SetStatus("Copied as file");
+        });
+    }
+
+    private async void OnSaveGif(object sender, RoutedEventArgs e)
+    {
+        CopyMenu.Hide();
+        if (_current?.VideoPath is not { } video) return;
+        await RunAsync(async () =>
+        {
+            var gif = Path.ChangeExtension(video, ".gif");
+            SetStatus("Making GIF…");
+            await Recording.VideoTools.SaveGifAsync(video, gif,
+                progress: new Progress<double>(f => SetStatus($"Making GIF… {f:P0}")));
+            await CaptureActions.CopyFileAsync(gif);
+            SetStatus($"Saved {Path.GetFileName(gif)} · copied as file");
         });
     }
 
@@ -265,7 +315,10 @@ public sealed partial class CaptureCardWindow : Window
         if (_current is null) return;
         await RunAsync(async () =>
         {
-            await CaptureActions.EditAsync(_current);
+            if (_current.VideoPath is { } video)
+                await Windows.System.Launcher.LaunchFileAsync(await Windows.Storage.StorageFile.GetFileFromPathAsync(video));
+            else
+                await CaptureActions.EditAsync(_current);
             Hide();
         });
     }
@@ -275,7 +328,9 @@ public sealed partial class CaptureCardWindow : Window
         if (_current is null) return;
         await RunAsync(async () =>
         {
-            var path = await CaptureActions.SaveAsAsync(_current, AppWindow.Id);
+            var path = _current.IsVideo
+                ? await CaptureActions.SaveVideoAsAsync(_current, AppWindow.Id)
+                : await CaptureActions.SaveAsAsync(_current, AppWindow.Id);
             if (path is null) return;
             _current.SavedPath = path;
             ((App)Application.Current).History.Update();

@@ -9,6 +9,7 @@ public enum CaptureMode
     GrabText,     // select a region on the overlay; its text is copied
     Freeform,     // draw around any shape on the overlay; outside it is transparent
     Scrolling,    // select a region; Capta scrolls it and stitches one tall image
+    Recording,    // select a region; Capta records it to MP4
 }
 
 /// <summary>
@@ -20,6 +21,6 @@ public enum HotkeyAction
     Region,       // PrtSc
     FullScreen,   // Shift+PrtSc: full screen, straight to the clipboard
     ActiveWindow, // Alt+PrtSc
-    ShowToolbar,  // Ctrl+PrtSc: for now; becomes Record video
+    Record,       // Ctrl+PrtSc: start recording video; again to stop
     GrabText,     // Ctrl+Shift+PrtSc
 }

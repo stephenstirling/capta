@@ -111,6 +111,18 @@ public static class Settings
         set => Values[nameof(EmbedColourProfile)] = value;
     }
 
+    public static bool RecordSystemAudio
+    {
+        get => Get(nameof(RecordSystemAudio), true);
+        set => Values[nameof(RecordSystemAudio)] = value;
+    }
+
+    public static bool RecordMicrophone
+    {
+        get => Get(nameof(RecordMicrophone), false);
+        set => Values[nameof(RecordMicrophone)] = value;
+    }
+
     public static HdrHandling HdrHandling
     {
         get => (HdrHandling)Get(nameof(HdrHandling), (int)HdrHandling.ToneMap);

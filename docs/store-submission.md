@@ -1,8 +1,6 @@
 # Microsoft Store submission
 
-A checklist and draft listing for submitting Capta in Partner Center. The listing below describes only
-features that ship today. Freeform, Scrolling, Record and Copy as HDR show as disabled in the
-toolbar and aren't advertised.
+A checklist and draft listing for submitting Capta in Partner Center.
 
 ## 1. Reserve the name and associate the app (you)
 
@@ -53,13 +51,16 @@ why each restricted capability is needed:
 
 > Capta is a notification-area screen-capture app. After install, it starts in the tray (a startup
 > task the user can turn off). Press Print Screen for a region capture, Shift+Print Screen for full
-> screen, or Alt+Print Screen for the active window; Ctrl+Print Screen shows the floating toolbar.
+> screen, or Alt+Print Screen for the active window; Ctrl+Print Screen records video (again to stop).
 > If Windows' "Use the Print Screen key to open screen capture" setting is on, Capta explains how to
 > turn it off; it never changes that setting itself. Windows asks for screen-capture permission on
 > the first capture.
 >
 > **runFullTrust**: a WinUI 3 desktop app. It needs a low-level keyboard hook to respond to the Print
 > Screen key, and it needs topmost overlay and tray windows.
+>
+> **microphone**: used only when the user switches the microphone on while recording a video, to
+> narrate it. It's off by default.
 >
 > **graphicsCaptureProgrammatic / graphicsCaptureWithoutBorder**: captures happen when the user presses
 > the capture shortcut or clicks a capture button. Showing the system picker or a yellow border would
@@ -92,11 +93,13 @@ Fast, HDR-correct screenshots from the Print Screen key, right in your tray.
 > in the image. Pinned captures float above your windows. You can zoom them, make them
 > translucent, or click through them.
 >
-> - Region, window, full-screen and active-window capture
+> - Region, window, full-screen, active-window, freeform and scrolling capture
+> - Screen recording to MP4 with system audio and microphone, plus GIF export
 > - Frozen-screen overlay with a pixel loupe and colour picker (press C to pin a colour)
 > - HDR-aware capture with tone-mapping you can adjust
 > - Grab text: on-device text recognition, nothing uploaded
 > - Pin captures above other windows
+> - Copy as HDR (JPEG XR) for HDR-aware apps
 > - Capture delay of 3, 5 or 10 seconds
 > - Rebindable shortcuts; light, dark and high-contrast themes
 > - Recent captures one click away from the tray
@@ -106,12 +109,13 @@ Fast, HDR-correct screenshots from the Print Screen key, right in your tray.
 **What's new in this version:** First release.
 
 **Features (up to 20, one line each):**
-Region capture with frozen screen · Window and full-screen capture · Active-window capture ·
+Region capture with frozen screen · Window and full-screen capture · Freeform and scrolling capture ·
+Screen recording with audio · GIF export · Active-window capture ·
 HDR-correct tone-mapping · Pixel loupe and colour picker · Grab text (on-device OCR) · Pin to screen ·
 Capture delay · Rebindable Print Screen shortcuts · Recent captures in the tray
 
-**Search terms (up to 7):** screenshot, screen capture, snipping, print screen, HDR screenshot,
-OCR, pin screenshot
+**Search terms (up to 7):** screenshot, screen recorder, screen capture, print screen, HDR screenshot,
+OCR, scrolling screenshot
 
 **Screenshots (1920×1080 or 2560×1440 PNG, at least one, up to ten):** take them with Capta's own
 full-screen capture over a tidy desktop. Suggested set:

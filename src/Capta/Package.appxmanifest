@@ -56,5 +56,7 @@
     <!-- Capture monitors/windows without the system picker, and without the yellow border. -->
     <uap11:Capability Name="graphicsCaptureProgrammatic" />
     <uap11:Capability Name="graphicsCaptureWithoutBorder" />
+    <!-- Only used when the user turns the microphone on while recording video. -->
+    <DeviceCapability Name="microphone" />
   </Capabilities>
 </Package>

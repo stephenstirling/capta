@@ -10,12 +10,16 @@ takes over the Print Screen key and copies captures to the clipboard as PNG.
 | PrtSc | Region capture |
 | Shift+PrtSc | Full screen, straight to the clipboard |
 | Alt+PrtSc | Active window |
-| Ctrl+PrtSc | Show the floating toolbar (will become Record video) |
+| Ctrl+PrtSc | Record video: choose an area, then Ctrl+PrtSc or Stop to finish |
 | Ctrl+Shift+PrtSc | Grab text from screen: select a region and its text is copied |
 
 In the region overlay, **Esc** captures the selection once you've drawn one (and copies it, with Auto-copy on);
 with nothing selected it cancels. Press **C** to pick the colour under the cursor: its hex code is copied and
 pinned as a small chip (click the code to copy again, double-click or Esc to unpin).
+
+Recordings are MP4 (H.264 + AAC) in your capture folder, with system audio and, if you switch it on,
+the microphone. The card after a recording can play it, copy the file or save a GIF of the first
+30 seconds. The floating toolbar is in the tray menu.
 
 Win+PrtSc and Win+Shift+S stay with Windows. If Windows is set to open Snipping Tool on Print Screen,
 Capta shows how to turn that off in Settings.

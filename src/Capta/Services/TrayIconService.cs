@@ -35,7 +35,6 @@ public sealed class TrayIconService : IDisposable
             Text = "Show toolbar",
             Icon = new FontIcon { Glyph = "" },
         };
-        _shortcutItems.Add((toolbar, HotkeyAction.ShowToolbar));
         toolbar.Click += (_, _) => _app.ShowToolbar();
 
         _printScreenWarning = new MenuFlyoutItem
@@ -72,6 +71,7 @@ public sealed class TrayIconService : IDisposable
                 CaptureItem("Region", "", HotkeyAction.Region, CaptureMode.Region),
                 CaptureItem("Window", "", null, CaptureMode.Window),
                 CaptureItem("Full screen", "", HotkeyAction.FullScreen, CaptureMode.FullScreen),
+                CaptureItem("Record video", "", HotkeyAction.Record, CaptureMode.Recording),
                 toolbar,
                 _clickThroughItem,
                 new MenuFlyoutSeparator(),
