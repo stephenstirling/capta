@@ -182,7 +182,7 @@
                                         <TextBlock Text="Freeform" />
                                     </StackPanel>
                                 </ToggleButton>
-                                <ToggleButton Style="{StaticResource ModeBarToggle}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                <ToggleButton x:Name="ScrollingMode" Style="{StaticResource ModeBarToggle}" Click="OnModeClick" Tag="Scrolling">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <c:LineIcon Data="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM12 8v8M9 13l3 3 3-3" />
                                         <TextBlock Text="Scrolling" />

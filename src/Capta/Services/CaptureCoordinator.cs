@@ -93,6 +93,20 @@ public sealed class CaptureCoordinator
         }
         switch (selection)
         {
+            case OverlayResult.RegionSelected r when r.Mode == CaptureMode.Scrolling:
+            {
+                var b = r.Monitor.Bounds;
+                var screen = new RectInt32(b.X + r.Rect.X, b.Y + r.Rect.Y, r.Rect.Width, r.Rect.Height);
+                var under = WindowFinder.At(new PointInt32(screen.X + screen.Width / 2, screen.Y + screen.Height / 2));
+                var (app, title) = under is null ? (null, null) : WindowFinder.Describe(under.Handle);
+                var image = await ScrollingCapture.RunAsync(_source, r.Monitor, screen);
+                return new CaptureResult(image, r.Monitor, new RectInt32(screen.X, screen.Y, image.Width, image.Height),
+                    CaptureMode.Scrolling, GraphicsCaptureSource.IsHdr(r.Monitor.Handle))
+                {
+                    SourceApp = app,
+                    WindowTitle = title,
+                };
+            }
             case OverlayResult.RegionSelected r:
             {
                 var b = r.Monitor.Bounds;

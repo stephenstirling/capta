@@ -48,8 +48,8 @@ public sealed partial class OverlayWindow : Window
 
     private CaptureMode _mode;
 
-    /// <summary>Region and Grab text both draw an editable selection.</summary>
-    private bool IsRegionLike => _mode is CaptureMode.Region or CaptureMode.GrabText;
+    /// <summary>Region, Grab text and Scrolling all draw an editable selection.</summary>
+    private bool IsRegionLike => _mode is CaptureMode.Region or CaptureMode.GrabText or CaptureMode.Scrolling;
     private RectInt32 _selection;
     private WindowTarget? _hoverWindow;
 
@@ -131,10 +131,12 @@ public sealed partial class OverlayWindow : Window
         WindowMode.IsChecked = mode == CaptureMode.Window;
         GrabTextMode.IsChecked = mode == CaptureMode.GrabText;
         FreeformMode.IsChecked = mode == CaptureMode.Freeform;
+        ScrollingMode.IsChecked = mode == CaptureMode.Scrolling;
         HintLead.Text = mode switch
         {
             CaptureMode.Window => "Click a window",
             CaptureMode.Freeform => "Draw around what to capture",
+            CaptureMode.Scrolling => "Select the area that scrolls, then press Enter (Esc stops scrolling)",
             CaptureMode.GrabText => "Select the text to copy",
             _ => "Drag to select",
         };

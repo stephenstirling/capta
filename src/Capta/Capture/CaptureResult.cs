@@ -28,6 +28,7 @@ public sealed record CaptureResult(CapturedImage Image, MonitorInfo Monitor, Rec
         CaptureMode.ActiveWindow => "Active window",
         CaptureMode.GrabText => "Grab text",
         CaptureMode.Freeform => "Freeform",
+        CaptureMode.Scrolling => "Scrolling",
         _ => Mode.ToString(),
     };
 }

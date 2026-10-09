@@ -8,6 +8,7 @@ public enum CaptureMode
     ActiveWindow, // the foreground window, no overlay
     GrabText,     // select a region on the overlay; its text is copied
     Freeform,     // draw around any shape on the overlay; outside it is transparent
+    Scrolling,    // select a region; Capta scrolls it and stitches one tall image
 }
 
 /// <summary>

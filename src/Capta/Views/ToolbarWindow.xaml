@@ -114,7 +114,7 @@
                         <ToggleButton x:Name="FreeformMode" Style="{StaticResource ModeToggle}" Click="OnModeClick" Tag="Freeform" ToolTipService.ToolTip="Freeform">
                             <c:LineIcon Data="M6 16c-2-3 0-9 5-10s9 2 8 6-6 3-7 6 2 4 4 3" />
                         </ToggleButton>
-                        <ToggleButton Style="{StaticResource ModeToggle}" IsEnabled="False" ToolTipService.ToolTip="Scrolling (coming soon)">
+                        <ToggleButton x:Name="ScrollingMode" Style="{StaticResource ModeToggle}" Click="OnModeClick" Tag="Scrolling" ToolTipService.ToolTip="Scrolling">
                             <c:LineIcon Data="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM12 8v8M9 13l3 3 3-3" />
                         </ToggleButton>
                         <ToggleButton Style="{StaticResource ModeToggle}" IsEnabled="False" ToolTipService.ToolTip="Record video (coming soon)">
