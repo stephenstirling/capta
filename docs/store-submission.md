@@ -21,8 +21,9 @@ msbuild src\Capta\Capta.csproj -restore -p:Configuration=Release -p:Platform=x64
   -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:AppxPackageSigningEnabled=false
 ```
 
-The `.msixupload` lands under `bin\x64\Release\…\AppPackages\` (or under `StirlingLocalBuildRoot` when
-that's set). Release builds are self-contained and partially trimmed, about 34 MB per architecture.
+The bundle (`Capta_<version>_x64_arm64.msixbundle`, plus the `.msixupload` to submit) lands under
+`bin\x64\Release\net10.0-windows10.0.26100.0\win-x64\Upload\` (inside `StirlingLocalBuildRoot` when
+that's set). The x64 + ARM64 bundle is about 66 MB. Release builds are self-contained and partially trimmed, about 34 MB per architecture.
 The Store signs the package, so leave local signing off. Bump the `Version` in
 `Package.appxmanifest` for every resubmission.
 

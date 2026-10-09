@@ -72,6 +72,9 @@ public sealed partial class CaptureCardWindow : Window
         {
             AutoCopySwitch.IsOn = Settings.AutoCopy;
             CopyPathRow.IsEnabled = _current?.SavedPath is not null;
+            var hdr = _current?.Image.HdrPixels is not null;
+            CopyHdrRow.IsEnabled = hdr;
+            ToolTipService.SetToolTip(CopyHdrRow, hdr ? null : "Only for captures of an HDR screen");
             _busy = true;
             _timer!.Stop();
         };
@@ -218,6 +221,17 @@ public sealed partial class CaptureCardWindow : Window
         {
             await CaptureActions.CopyAsFileAsync(_current);
             SetStatus("Copied as file");
+        });
+    }
+
+    private async void OnCopyHdr(object sender, RoutedEventArgs e)
+    {
+        CopyMenu.Hide();
+        if (_current is null) return;
+        await RunAsync(async () =>
+        {
+            await CaptureActions.CopyAsHdrAsync(_current);
+            SetStatus("Copied as HDR (JPEG XR)");
         });
     }
 

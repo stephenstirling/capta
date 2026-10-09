@@ -19,15 +19,22 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
     {
         var item = WinRTInterop.CreateItemForMonitor(monitor.Handle);
         var (pixels, w, h) = await GrabAsync(item);
-        return ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(monitor.Handle), CaptureOptions.Current.RollOff);
+        return WithHdr(ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(monitor.Handle), CaptureOptions.Current.RollOff),
+            pixels, monitor.Handle);
     }
 
     public async Task<CapturedImage> CaptureWindowAsync(nint hwnd)
     {
         var item = WinRTInterop.CreateItemForWindow(hwnd);
         var (pixels, w, h) = await GrabAsync(item);
-        return ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)), CaptureOptions.Current.RollOff);
+        var monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+        return WithHdr(ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(monitor), CaptureOptions.Current.RollOff),
+            pixels, monitor);
     }
+
+    /// <summary>Keeps the FP16 original alongside the SDR image, but only from an HDR display.</summary>
+    private static CapturedImage WithHdr(CapturedImage sdr, ushort[] fp16, nint hmonitor) =>
+        IsHdr(hmonitor) ? new CapturedImage(sdr.Width, sdr.Height, sdr.Pixels) { HdrPixels = fp16 } : sdr;
 
     /// <summary>HDR state and the Windows SDR white level for a monitor (null if unavailable).</summary>
     public static (bool Hdr, float SdrWhiteNits)? DisplayColour(nint hmonitor)

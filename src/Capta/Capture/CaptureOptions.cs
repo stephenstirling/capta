@@ -10,6 +10,17 @@ public enum HighlightRollOff
     Soft,
 }
 
+/// <summary>What to keep when the screen being captured is in HDR (Colour &amp; HDR window).</summary>
+public enum HdrHandling
+{
+    /// <summary>Tone-map to SDR; JPEG XR is still offered by Save As and the Copy menu.</summary>
+    ToneMap,
+    /// <summary>Save As defaults to JPEG XR (full range); the clipboard still gets SDR.</summary>
+    KeepHdr,
+    /// <summary>Save As writes the SDR PNG plus a .jxr HDR original beside it.</summary>
+    SaveBoth,
+}
+
 /// <summary>Colour settings the capture engine reads. The app keeps these in sync with Settings.</summary>
 public sealed class CaptureOptions
 {

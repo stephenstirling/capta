@@ -111,6 +111,12 @@ public static class Settings
         set => Values[nameof(EmbedColourProfile)] = value;
     }
 
+    public static HdrHandling HdrHandling
+    {
+        get => (HdrHandling)Get(nameof(HdrHandling), (int)HdrHandling.ToneMap);
+        set => Values[nameof(HdrHandling)] = (int)value;
+    }
+
     /// <summary>Pushes the colour settings to the capture engine.</summary>
     public static void ApplyCaptureOptions() => CaptureOptions.Current = new CaptureOptions
     {

@@ -20,6 +20,21 @@ public sealed class CapturedImage
     public int Height { get; }
     public byte[] Pixels { get; }
 
+    /// <summary>
+    /// The original HDR pixels (RGBA half floats, scRGB, same size) when the source display was in
+    /// HDR, for "Copy image as HDR" and Keep HDR saves. Null for SDR captures.
+    /// </summary>
+    public ushort[]? HdrPixels
+    {
+        get;
+        init
+        {
+            if (value is not null && value.Length != Width * Height * 4)
+                throw new ArgumentException("HDR buffer does not match dimensions.", nameof(value));
+            field = value;
+        }
+    }
+
     public uint GetPixel(int x, int y)
     {
         if ((uint)x >= (uint)Width || (uint)y >= (uint)Height) return 0;
@@ -37,7 +52,15 @@ public sealed class CapturedImage
         var dst = new byte[w * h * 4];
         for (var row = 0; row < h; row++)
             Buffer.BlockCopy(Pixels, ((y0 + row) * Width + x0) * 4, dst, row * w * 4, w * 4);
-        return new CapturedImage(w, h, dst);
+
+        ushort[]? hdr = null;
+        if (HdrPixels is not null)
+        {
+            hdr = new ushort[w * h * 4];
+            for (var row = 0; row < h; row++)
+                Array.Copy(HdrPixels, ((y0 + row) * Width + x0) * 4, hdr, row * w * 4, w * 4);
+        }
+        return new CapturedImage(w, h, dst) { HdrPixels = hdr };
     }
 
     public SoftwareBitmap ToSoftwareBitmap()

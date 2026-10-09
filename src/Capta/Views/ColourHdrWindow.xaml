@@ -129,15 +129,16 @@
                                     </ResourceDictionary>
                                 </StackPanel.Resources>
                                 <TextBlock Style="{StaticResource SectionLabel}" Text="WHEN CAPTURING AN HDR SCREEN" />
-                                <Button Style="{StaticResource OptionSelected}">
+                                <Button x:Name="HdrToneMap" Style="{StaticResource OptionSelected}" Tag="ToneMap" Click="OnHdrHandling">
                                     <Grid ColumnSpacing="12">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <Grid Width="18" Height="18" Margin="0,1,0,0" VerticalAlignment="Top">
-                                            <Ellipse Stroke="{ThemeResource CaptaAccentBrush}" StrokeThickness="2" />
-                                            <Ellipse Width="9" Height="9" Fill="{ThemeResource CaptaAccentBrush}" />
+                                            <Ellipse x:Name="HdrToneMapOff" Stroke="{ThemeResource CaptaRadioRingBrush}" StrokeThickness="2" />
+                                            <Ellipse x:Name="HdrToneMapOn" Stroke="{ThemeResource CaptaAccentBrush}" StrokeThickness="2" />
+                                            <Ellipse x:Name="HdrToneMapDot" Width="9" Height="9" Fill="{ThemeResource CaptaAccentBrush}" />
                                         </Grid>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock FontSize="14" FontWeight="Bold">
@@ -147,29 +148,37 @@
                                         </StackPanel>
                                     </Grid>
                                 </Button>
-                                <Button Style="{StaticResource Option}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                <Button x:Name="HdrKeep" Style="{StaticResource Option}" Tag="KeepHdr" Click="OnHdrHandling">
                                     <Grid ColumnSpacing="12">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <Ellipse Width="18" Height="18" Margin="0,1,0,0" VerticalAlignment="Top" Stroke="{ThemeResource CaptaRadioRingBrush}" StrokeThickness="2" />
+                                        <Grid Width="18" Height="18" Margin="0,1,0,0" VerticalAlignment="Top">
+                                            <Ellipse x:Name="HdrKeepOff" Stroke="{ThemeResource CaptaRadioRingBrush}" StrokeThickness="2" />
+                                            <Ellipse x:Name="HdrKeepOn" Stroke="{ThemeResource CaptaAccentBrush}" StrokeThickness="2" />
+                                            <Ellipse x:Name="HdrKeepDot" Width="9" Height="9" Fill="{ThemeResource CaptaAccentBrush}" />
+                                        </Grid>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock FontSize="14" FontWeight="Bold" Text="Keep HDR" />
-                                            <TextBlock Margin="0,3,0,0" FontSize="12.5" Foreground="{ThemeResource CaptaTextSecondaryBrush}" Text="Saves full brightness range as JPEG XR or AVIF. An SDR copy still goes to the clipboard." TextWrapping="Wrap" />
+                                            <TextBlock Margin="0,3,0,0" FontSize="12.5" Foreground="{ThemeResource CaptaTextSecondaryBrush}" Text="Save As keeps the full brightness range as JPEG XR. An SDR copy still goes to the clipboard." TextWrapping="Wrap" />
                                         </StackPanel>
                                     </Grid>
                                 </Button>
-                                <Button Style="{StaticResource Option}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                <Button x:Name="HdrBoth" Style="{StaticResource Option}" Tag="SaveBoth" Click="OnHdrHandling">
                                     <Grid ColumnSpacing="12">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <Ellipse Width="18" Height="18" Margin="0,1,0,0" VerticalAlignment="Top" Stroke="{ThemeResource CaptaRadioRingBrush}" StrokeThickness="2" />
+                                        <Grid Width="18" Height="18" Margin="0,1,0,0" VerticalAlignment="Top">
+                                            <Ellipse x:Name="HdrBothOff" Stroke="{ThemeResource CaptaRadioRingBrush}" StrokeThickness="2" />
+                                            <Ellipse x:Name="HdrBothOn" Stroke="{ThemeResource CaptaAccentBrush}" StrokeThickness="2" />
+                                            <Ellipse x:Name="HdrBothDot" Width="9" Height="9" Fill="{ThemeResource CaptaAccentBrush}" />
+                                        </Grid>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock FontSize="14" FontWeight="Bold" Text="Save both" />
-                                            <TextBlock Margin="0,3,0,0" FontSize="12.5" Foreground="{ThemeResource CaptaTextSecondaryBrush}" Text="SDR PNG plus an HDR original alongside it in Ocula." TextWrapping="Wrap" />
+                                            <TextBlock Margin="0,3,0,0" FontSize="12.5" Foreground="{ThemeResource CaptaTextSecondaryBrush}" Text="Save As writes the SDR PNG plus an HDR original (.jxr) beside it." TextWrapping="Wrap" />
                                         </StackPanel>
                                     </Grid>
                                 </Button>

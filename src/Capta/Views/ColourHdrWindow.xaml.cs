@@ -121,6 +121,7 @@ public sealed partial class ColourHdrWindow : Window
             SdrWhiteSlider.Value = Settings.SdrWhiteNits;
             ApplySdrWhiteState();
             ApplyRollOff(Settings.RollOff);
+            ApplyHdrHandling(Settings.HdrHandling);
             EmbedProfile.IsOn = Settings.EmbedColourProfile;
         }
         finally
@@ -197,9 +198,34 @@ public sealed partial class ColourHdrWindow : Window
         Settings.MatchWindowsSdrWhite = true;
         Settings.SdrWhiteNits = 240;
         Settings.RollOff = HighlightRollOff.Clip;
+        Settings.HdrHandling = HdrHandling.ToneMap;
         Settings.EmbedColourProfile = true;
         Settings.ApplyCaptureOptions();
         Load();
+    }
+
+    private void ApplyHdrHandling(HdrHandling handling)
+    {
+        var selected = (Style)Root.Resources["OptionSelected"];
+        var normal = (Style)Root.Resources["Option"];
+        foreach (var (button, on, dot, value) in new[]
+        {
+            (HdrToneMap, HdrToneMapOn, HdrToneMapDot, HdrHandling.ToneMap),
+            (HdrKeep, HdrKeepOn, HdrKeepDot, HdrHandling.KeepHdr),
+            (HdrBoth, HdrBothOn, HdrBothDot, HdrHandling.SaveBoth),
+        })
+        {
+            var isSelected = value == handling;
+            button.Style = isSelected ? selected : normal;
+            on.Visibility = dot.Visibility = isSelected ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
+
+    private void OnHdrHandling(object sender, RoutedEventArgs e)
+    {
+        var handling = Enum.Parse<HdrHandling>((string)((Button)sender).Tag);
+        Settings.HdrHandling = handling;
+        ApplyHdrHandling(handling);
     }
 
     private void OnDone(object sender, RoutedEventArgs e) => AppWindow.Hide();

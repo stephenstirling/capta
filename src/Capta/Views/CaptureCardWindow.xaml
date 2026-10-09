@@ -186,7 +186,7 @@
                                                         <TextBlock Grid.Column="2" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Ctrl+C" />
                                                     </Grid>
                                                 </Button>
-                                                <Button Style="{StaticResource MenuRow}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                                <Button x:Name="CopyHdrRow" Style="{StaticResource MenuRow}" Click="OnCopyHdr">
                                                     <StackPanel>
                                                         <TextBlock FontWeight="SemiBold" Text="Copy image as HDR" />
                                                         <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="JPEG XR · for HDR-aware apps" />

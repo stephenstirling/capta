@@ -78,23 +78,60 @@ public static partial class CaptureActions
         await ImageExport.SaveAsync(capture.Image, file, metadata.ToJson());
     }
 
-    /// <summary>Save As dialog defaulting to Pictures\Screenshots. Returns the saved path, or null if cancelled.</summary>
+    /// <summary>
+    /// Save As dialog in the capture folder. Captures of an HDR screen can also be saved as JPEG XR;
+    /// Colour &amp; HDR decides the default and whether a .jxr goes beside the PNG. Returns the saved
+    /// path, or null if cancelled.
+    /// </summary>
     public static async Task<string?> SaveAsAsync(CaptureResult capture, WindowId owner)
     {
+        var hdr = capture.Image.HdrPixels is not null;
+        var handling = Settings.HdrHandling;
+        var hdrFirst = hdr && handling == HdrHandling.KeepHdr;
         var picker = new FileSavePicker(owner)
         {
             SuggestedFileName = ImageExport.DefaultFileName(),
             SuggestedFolder = CaptureFolderOrScreenshots(),
-            DefaultFileExtension = ".png",
+            DefaultFileExtension = hdrFirst ? ".jxr" : ".png",
         };
+        if (hdrFirst) picker.FileTypeChoices.Add(JpegXrChoice, [".jxr"]);
         picker.FileTypeChoices.Add("PNG image", [".png"]);
+        if (hdr && !hdrFirst) picker.FileTypeChoices.Add(JpegXrChoice, [".jxr"]);
 
         var result = await picker.PickSaveFileAsync();
         if (result is null) return null;
 
+        if (hdr && Path.GetExtension(result.Path).Equals(".jxr", StringComparison.OrdinalIgnoreCase))
+        {
+            await SaveHdrAsync(capture.Image, result.Path);
+            return result.Path;
+        }
+
         var file = await StorageFile.GetFileFromPathAsync(EnsureFileExists(result.Path));
         await SaveWithMetadataAsync(capture, file);
+        if (hdr && handling == HdrHandling.SaveBoth)
+            await SaveHdrAsync(capture.Image, Path.ChangeExtension(result.Path, ".jxr"));
         return result.Path;
+    }
+
+    private const string JpegXrChoice = "JPEG XR image (HDR)";
+
+    /// <summary>Copies the HDR original as a .jxr file (pastes into HDR-aware apps, Explorer and chat).</summary>
+    public static async Task CopyAsHdrAsync(CaptureResult capture)
+    {
+        var folder = await ApplicationData.Current.TemporaryFolder.CreateFolderAsync("Clipboard", CreationCollisionOption.OpenIfExists);
+        var file = await folder.CreateFileAsync(ImageExport.DefaultFileName() + ".jxr", CreationCollisionOption.GenerateUniqueName);
+        await SaveHdrAsync(capture.Image, file.Path);
+        var package = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
+        package.SetStorageItems([file]);
+        Clipboard.SetContent(package);
+        Clipboard.Flush();
+    }
+
+    private static Task SaveHdrAsync(CapturedImage image, string path)
+    {
+        var pixels = image.HdrPixels ?? throw new InvalidOperationException("This capture has no HDR original.");
+        return Task.Run(() => JpegXr.Save(pixels, image.Width, image.Height, path));
     }
 
     private static string EnsureFileExists(string path)
