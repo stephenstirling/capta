@@ -189,7 +189,7 @@
                                     </StackPanel>
                                 </ToggleButton>
                                 <Rectangle Width="1" Height="26" Margin="4,0" Fill="{ThemeResource CaptaDividerBrush}" />
-                                <ToggleButton Style="{StaticResource ModeBarToggle}" IsEnabled="False" ToolTipService.ToolTip="Coming soon">
+                                <ToggleButton x:Name="RecordMode" Style="{StaticResource ModeBarToggle}" Click="OnModeClick" Tag="Recording">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <c:LineIcon Data="M5 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM16 10l5-3v10l-5-3" />
                                         <TextBlock Text="Record" />

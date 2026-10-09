@@ -49,7 +49,7 @@ public sealed partial class OverlayWindow : Window
     private CaptureMode _mode;
 
     /// <summary>Region, Grab text and Scrolling all draw an editable selection.</summary>
-    private bool IsRegionLike => _mode is CaptureMode.Region or CaptureMode.GrabText or CaptureMode.Scrolling;
+    private bool IsRegionLike => _mode is CaptureMode.Region or CaptureMode.GrabText or CaptureMode.Scrolling or CaptureMode.Recording;
     private RectInt32 _selection;
     private WindowTarget? _hoverWindow;
 
@@ -132,11 +132,13 @@ public sealed partial class OverlayWindow : Window
         GrabTextMode.IsChecked = mode == CaptureMode.GrabText;
         FreeformMode.IsChecked = mode == CaptureMode.Freeform;
         ScrollingMode.IsChecked = mode == CaptureMode.Scrolling;
+        RecordMode.IsChecked = mode == CaptureMode.Recording;
         HintLead.Text = mode switch
         {
             CaptureMode.Window => "Click a window",
             CaptureMode.Freeform => "Draw around what to capture",
             CaptureMode.Scrolling => "Select the area that scrolls, then press Enter (Esc stops scrolling)",
+            CaptureMode.Recording => "Select the area to record, then press Enter",
             CaptureMode.GrabText => "Select the text to copy",
             _ => "Drag to select",
         };
@@ -387,7 +389,8 @@ public sealed partial class OverlayWindow : Window
 
     private void OnFullScreenClick(object sender, RoutedEventArgs e) =>
         _session.Complete(new OverlayResult.RegionSelected(_monitor, _frame,
-            new RectInt32(0, 0, _frame.Width, _frame.Height), CaptureMode.FullScreen));
+            new RectInt32(0, 0, _frame.Width, _frame.Height),
+            _mode == CaptureMode.Recording ? CaptureMode.Recording : CaptureMode.FullScreen)); // in Record mode: record the screen
 
     private void OnCancelClick(object sender, RoutedEventArgs e) => _session.Cancel();
 

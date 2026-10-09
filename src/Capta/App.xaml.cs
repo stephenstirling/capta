@@ -2,10 +2,13 @@ using Capta.Capture;
 using Capta.Interop;
 using Capta.Services;
 using Capta.Views;
+using Capta.Overlay;
+using Capta.Recording;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using Windows.Storage;
+using Windows.Graphics;
 
 namespace Capta;
 
@@ -29,6 +32,10 @@ public partial class App : Application
     private readonly GraphicsCaptureSource _screenSource = new();
     private CaptureCardWindow? _card;
     private readonly List<PinWindow> _pins = [];
+    private ScreenRecorder? _recorder;
+    private RecordingBarWindow? _recordBar;
+    private (MonitorInfo Monitor, RectInt32 Area) _recorded;
+    private bool _recordingBusy;
 
     public static new App? Current => (App?)Application.Current;
 
@@ -54,6 +61,7 @@ public partial class App : Application
         _capture = new CaptureCoordinator(_screenSource);
         _capture.Captured += OnCaptured;
         _capture.ColourPicked += PinColour;
+        _capture.RecordRequested += StartRecording;
 
         _tray = new TrayIconService(this);
         _tray.Create();
@@ -95,7 +103,7 @@ public partial class App : Application
             case HotkeyAction.Region: StartCapture(CaptureMode.Region); break;
             case HotkeyAction.FullScreen: StartCapture(CaptureMode.FullScreen); break;
             case HotkeyAction.ActiveWindow: StartCapture(CaptureMode.ActiveWindow); break;
-            case HotkeyAction.ShowToolbar: ShowToolbar(); break;
+            case HotkeyAction.Record: ToggleRecording(); break;
             case HotkeyAction.GrabText: StartCapture(CaptureMode.GrabText); break;
         }
     }
@@ -117,6 +125,11 @@ public partial class App : Application
 
     public async void StartCapture(CaptureMode mode, int delaySeconds)
     {
+        if (mode == CaptureMode.Recording && _recorder is not null)
+        {
+            await StopRecordingAsync(); // Record again while recording stops it
+            return;
+        }
         Log.Info($"Capture requested: {mode}, delay {delaySeconds}s");
         _toolbar?.Hide();
         _card?.Hide();
@@ -206,6 +219,107 @@ public partial class App : Application
     }
 
     /// <summary>Shows the after-capture card; from Recent in the tray flyout, nothing new was copied.</summary>
+    // ---- Recording ----
+
+    /// <summary>Ctrl+PrtSc: choose an area and start recording, or stop the current recording.</summary>
+    public async void ToggleRecording()
+    {
+        if (_recorder is not null) await StopRecordingAsync();
+        else StartCapture(CaptureMode.Recording);
+    }
+
+    private async void StartRecording(MonitorInfo monitor, RectInt32 area)
+    {
+        if (_recorder is not null || _recordingBusy) return;
+        _recordingBusy = true;
+        try
+        {
+            var path = CaptureActions.NewRecordingPath();
+            var item = WinRTInterop.CreateItemForMonitor(monitor.Handle);
+            var crop = new RectInt32(area.X - monitor.Bounds.X, area.Y - monitor.Bounds.Y, area.Width, area.Height);
+            var microphone = Settings.RecordMicrophone && await MicrophoneAccess.RequestAsync();
+            _recorder = await ScreenRecorder.StartAsync(item, crop, path, Settings.RecordSystemAudio, microphone);
+            _recorded = (monitor, new RectInt32(area.X, area.Y, _recorder.Width, _recorder.Height));
+            Log.Info($"Recording {_recorder.Width}x{_recorder.Height} to {path}");
+
+            if (_recordBar is null)
+            {
+                _recordBar = new RecordingBarWindow();
+                _recordBar.StopRequested += async () => await StopRecordingAsync();
+                _recordBar.SystemAudioChanged = on =>
+                {
+                    Settings.RecordSystemAudio = on;
+                    return Task.FromResult(_recorder?.SetSystemAudio(on) ?? false);
+                };
+                _recordBar.MicrophoneChanged = async on =>
+                {
+                    if (on && !await MicrophoneAccess.RequestAsync())
+                    {
+                        _tray?.ShowError("Microphone not available",
+                            "Allow Capta to use the microphone in Settings > Privacy & security > Microphone.");
+                        return false;
+                    }
+                    Settings.RecordMicrophone = on;
+                    return _recorder?.SetMicrophone(on) ?? false;
+                };
+            }
+            var recorder = _recorder;
+            _recordBar.Show(_recorded.Area, monitor, () => recorder.Elapsed, recorder.SystemAudio, recorder.Microphone);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Recording failed to start", ex);
+            _tray?.ShowError("Couldn't start recording", ex.Message);
+            if (_recorder is not null) await _recorder.DisposeAsync();
+            _recorder = null;
+        }
+        finally
+        {
+            _recordingBusy = false;
+        }
+    }
+
+    private async Task StopRecordingAsync()
+    {
+        if (_recorder is not { } recorder || _recordingBusy) return;
+        _recordingBusy = true;
+        _recordBar?.Hide();
+        try
+        {
+            var length = await recorder.StopAsync();
+            await recorder.DisposeAsync();
+            _recorder = null;
+
+            // Card and Recent show a frame from the recording.
+            var (monitor, area) = _recorded;
+            double scale = Math.Min(1, 640.0 / Math.Max(area.Width, area.Height));
+            var thumbnail = await VideoTools.ThumbnailAsync(recorder.Path, Math.Max(2, (int)(area.Width * scale)), Math.Max(2, (int)(area.Height * scale)));
+            var under = WindowFinder.At(new PointInt32(area.X + area.Width / 2, area.Y + area.Height / 2));
+            var (app, title) = under is null ? (null, null) : WindowFinder.Describe(under.Handle);
+            var result = new CaptureResult(thumbnail, monitor, area, CaptureMode.Recording, false)
+            {
+                VideoPath = recorder.Path,
+                VideoLength = length,
+                SavedPath = recorder.Path,
+                SourceApp = app,
+                WindowTitle = title,
+            };
+            _history.Add(result);
+            ShowCard(result, status: $"Saved to {Path.GetFileName(Path.GetDirectoryName(recorder.Path))}");
+            await SendToOculaIfEnabledAsync(result);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Recording failed", ex);
+            _tray?.ShowError("Recording failed", ex.Message);
+            _recorder = null;
+        }
+        finally
+        {
+            _recordingBusy = false;
+        }
+    }
+
     public void ShowCard(CaptureResult result, bool copied = false, string? status = null, bool success = true)
     {
         if (_card is null)
@@ -306,6 +420,13 @@ public partial class App : Application
 
     public void Quit()
     {
+        if (_recorder is not null)
+        {
+            // Finish the file so it stays playable.
+            try { _recorder.StopAsync().GetAwaiter().GetResult(); }
+            catch (Exception ex) { Log.Error("Stopping the recording on exit failed", ex); }
+        }
+        _recordBar?.Close();
         _hook?.Dispose();
         _ownership?.Dispose();
         _settings?.Close();

@@ -135,6 +135,7 @@ public sealed partial class TrayFlyoutWindow : Window
     private void OnRegion(object sender, RoutedEventArgs e) => Capture(CaptureMode.Region);
     private void OnWindow(object sender, RoutedEventArgs e) => Capture(CaptureMode.Window);
     private void OnFullScreen(object sender, RoutedEventArgs e) => Capture(CaptureMode.FullScreen);
+    private void OnRecord(object sender, RoutedEventArgs e) => Capture(CaptureMode.Recording);
 
     private void ApplyDelay(int seconds)
     {

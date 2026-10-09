@@ -17,7 +17,8 @@ public sealed class CaptureHistory
 
     internal sealed record Entry(
         string File, CaptureMode Mode, bool WasHdr, int X, int Y, int Width, int Height,
-        DateTimeOffset CapturedAt, string? SourceApp, string? WindowTitle, string? SavedPath);
+        DateTimeOffset CapturedAt, string? SourceApp, string? WindowTitle, string? SavedPath,
+        string? VideoPath = null, long VideoLengthMs = 0);
 
     private readonly List<CaptureResult> _items = [];
     private readonly Dictionary<CaptureResult, string> _files = new(ReferenceEqualityComparer.Instance);
@@ -49,6 +50,7 @@ public sealed class CaptureHistory
                 if (_items.Count >= Capacity) break; // captures taken while loading come first
                 try
                 {
+                    if (e.VideoPath is not null && !File.Exists(e.VideoPath)) continue; // recording deleted
                     var image = await DecodeAsync(Path.Combine(_folder, e.File), transparent: e.Mode == CaptureMode.Freeform);
                     var bounds = new RectInt32(e.X, e.Y, e.Width, e.Height);
                     var monitor = Monitors.AtPoint(new PointInt32(e.X + e.Width / 2, e.Y + e.Height / 2));
@@ -58,6 +60,8 @@ public sealed class CaptureHistory
                         SourceApp = e.SourceApp,
                         WindowTitle = e.WindowTitle,
                         SavedPath = e.SavedPath,
+                        VideoPath = e.VideoPath,
+                        VideoLength = TimeSpan.FromMilliseconds(e.VideoLengthMs),
                     };
                     _items.Add(result);
                     _files[result] = e.File;
@@ -99,7 +103,7 @@ public sealed class CaptureHistory
 
             var entries = _items.Where(_files.ContainsKey).Select(r => new Entry(
                 _files[r], r.Mode, r.WasHdr, r.ScreenBounds.X, r.ScreenBounds.Y, r.ScreenBounds.Width, r.ScreenBounds.Height,
-                r.CapturedAt, r.SourceApp, r.WindowTitle, r.SavedPath)).ToList();
+                r.CapturedAt, r.SourceApp, r.WindowTitle, r.SavedPath, r.VideoPath, (long)r.VideoLength.TotalMilliseconds)).ToList();
             await File.WriteAllTextAsync(IndexPath, JsonSerializer.Serialize(entries, CaptaJson.Default.ListEntry));
 
             // Drop images that fell off the list.

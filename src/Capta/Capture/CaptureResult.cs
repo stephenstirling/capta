@@ -17,6 +17,13 @@ public sealed record CaptureResult(CapturedImage Image, MonitorInfo Monitor, Rec
 
     public DateTimeOffset CapturedAt { get; init; } = DateTimeOffset.Now;
 
+    /// <summary>For recordings: the MP4 (Image is a frame from it, for thumbnails).</summary>
+    public string? VideoPath { get; init; }
+
+    public TimeSpan VideoLength { get; init; }
+
+    public bool IsVideo => VideoPath is not null;
+
     /// <summary>Set once the capture has been saved; enables "Copy file path".</summary>
     public string? SavedPath { get; set; }
 
@@ -29,6 +36,7 @@ public sealed record CaptureResult(CapturedImage Image, MonitorInfo Monitor, Rec
         CaptureMode.GrabText => "Grab text",
         CaptureMode.Freeform => "Freeform",
         CaptureMode.Scrolling => "Scrolling",
+        CaptureMode.Recording => "Recording",
         _ => Mode.ToString(),
     };
 }

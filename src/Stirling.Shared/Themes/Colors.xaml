@@ -182,6 +182,17 @@
             <SolidColorBrush x:Key="CaptaHdrDemoLabelInkBrush" Color="{StaticResource CaptaHdrDemoLabelInkColor}" />
             <Color x:Key="CaptaHdrDemoDividerColor">#ECEEF1</Color>
             <SolidColorBrush x:Key="CaptaHdrDemoDividerBrush" Color="{StaticResource CaptaHdrDemoDividerColor}" />
+            <!-- Recording indicator and Stop button -->
+            <Color x:Key="CaptaRecordColor">#FF5A5F</Color>
+            <SolidColorBrush x:Key="CaptaRecordBrush" Color="{StaticResource CaptaRecordColor}" />
+            <!-- Text and icons on CaptaRecord -->
+            <Color x:Key="CaptaOnRecordColor">#FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaOnRecordBrush" Color="{StaticResource CaptaOnRecordColor}" />
+            <!-- Video length badge on thumbnails (Ocula.html) -->
+            <Color x:Key="CaptaVideoBadgeColor">#CC0A0B0D</Color>
+            <SolidColorBrush x:Key="CaptaVideoBadgeBrush" Color="{StaticResource CaptaVideoBadgeColor}" />
+            <Color x:Key="CaptaVideoBadgeTextColor">#ECEEF1</Color>
+            <SolidColorBrush x:Key="CaptaVideoBadgeTextBrush" Color="{StaticResource CaptaVideoBadgeTextColor}" />
             <!-- Fluent control overrides, mapped onto the tokens above. -->
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
@@ -338,6 +349,14 @@
             <SolidColorBrush x:Key="CaptaHdrDemoLabelInkBrush" Color="{StaticResource CaptaHdrDemoLabelInkColor}" />
             <Color x:Key="CaptaHdrDemoDividerColor">#ECEEF1</Color>
             <SolidColorBrush x:Key="CaptaHdrDemoDividerBrush" Color="{StaticResource CaptaHdrDemoDividerColor}" />
+            <Color x:Key="CaptaRecordColor">#E5383E</Color>
+            <SolidColorBrush x:Key="CaptaRecordBrush" Color="{StaticResource CaptaRecordColor}" />
+            <Color x:Key="CaptaOnRecordColor">#FFFFFF</Color>
+            <SolidColorBrush x:Key="CaptaOnRecordBrush" Color="{StaticResource CaptaOnRecordColor}" />
+            <Color x:Key="CaptaVideoBadgeColor">#CC0A0B0D</Color>
+            <SolidColorBrush x:Key="CaptaVideoBadgeBrush" Color="{StaticResource CaptaVideoBadgeColor}" />
+            <Color x:Key="CaptaVideoBadgeTextColor">#ECEEF1</Color>
+            <SolidColorBrush x:Key="CaptaVideoBadgeTextBrush" Color="{StaticResource CaptaVideoBadgeTextColor}" />
             <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource CaptaAccentColor}" />
             <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.9" />
             <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource CaptaAccentColor}" Opacity="0.8" />
@@ -422,6 +441,10 @@
             <SolidColorBrush x:Key="CaptaHdrDemoLabelBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="CaptaHdrDemoLabelInkBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="CaptaHdrDemoDividerBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaRecordBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="CaptaOnRecordBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+            <SolidColorBrush x:Key="CaptaVideoBadgeBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaVideoBadgeTextBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
 </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>

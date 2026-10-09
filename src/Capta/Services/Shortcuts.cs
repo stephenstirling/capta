@@ -63,7 +63,7 @@ public static class Shortcuts
         [HotkeyAction.Region] = new(false, false, false, Chord.PrintScreen),
         [HotkeyAction.FullScreen] = new(false, true, false, Chord.PrintScreen),
         [HotkeyAction.ActiveWindow] = new(false, false, true, Chord.PrintScreen),
-        [HotkeyAction.ShowToolbar] = new(true, false, false, Chord.PrintScreen),
+        [HotkeyAction.Record] = new(true, false, false, Chord.PrintScreen),
         [HotkeyAction.GrabText] = new(true, true, false, Chord.PrintScreen),
     };
 

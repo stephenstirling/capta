@@ -92,6 +92,7 @@ public sealed partial class ToolbarWindow : Window
         ToolTipService.SetToolTip(RegionMode, $"Region ({Shortcuts.For(HotkeyAction.Region).Compact})");
         ToolTipService.SetToolTip(WindowMode, $"Window ({Shortcuts.For(HotkeyAction.ActiveWindow).Compact} captures the active window)");
         ToolTipService.SetToolTip(FullScreenMode, $"Full screen ({Shortcuts.For(HotkeyAction.FullScreen).Compact})");
+        ToolTipService.SetToolTip(RecordMode, $"Record video ({Shortcuts.For(HotkeyAction.Record).Compact})");
 
         var area = WindowHelper.CursorWorkArea();
         // Move onto the target monitor first so the window adopts its DPI before sizing.
@@ -132,7 +133,7 @@ public sealed partial class ToolbarWindow : Window
 
     // ---- Mode group and New ----
 
-    private ToggleButton[] ModeButtons => [RegionMode, WindowMode, FullScreenMode, FreeformMode, ScrollingMode];
+    private ToggleButton[] ModeButtons => [RegionMode, WindowMode, FullScreenMode, FreeformMode, ScrollingMode, RecordMode];
 
     private void SelectMode(CaptureMode mode)
     {
