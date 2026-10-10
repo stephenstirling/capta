@@ -1,3 +1,4 @@
+using Capta.Views;
 using H.NotifyIcon;
 using H.NotifyIcon.Core;
 using Microsoft.UI.Dispatching;
@@ -14,6 +15,8 @@ public sealed class TrayIconService : IDisposable
 {
     private readonly App _app;
     private TaskbarIcon? _icon;
+    private MenuFlyout? _menu;
+    private TrayMenuWindow? _menuWindow;
     private ToggleMenuFlyoutItem? _startupItem;
     private MenuFlyoutItem? _printScreenWarning;
     private MenuFlyoutSeparator? _printScreenWarningSeparator;
@@ -63,7 +66,7 @@ public sealed class TrayIconService : IDisposable
         };
         _clickThroughItem.Click += (_, _) => _app.ReleaseClickThroughPins();
 
-        var menu = new MenuFlyout
+        var menu = _menu = new MenuFlyout
         {
             Items =
             {
@@ -86,12 +89,21 @@ public sealed class TrayIconService : IDisposable
         {
             ToolTipText = "Capta",
             IconSource = new BitmapImage(new Uri("ms-appx:///Assets/Tray.ico")),
-            ContextMenuMode = ContextMenuMode.SecondWindow,
             NoLeftClickDelay = true,
-            ContextFlyout = menu,
             LeftClickCommand = new RelayCommand(_app.ShowTrayFlyout),
+            RightClickCommand = new RelayCommand(ShowMenu),
         };
         _icon.ForceCreate(enablesEfficiencyMode: false);
+    }
+
+    /// <summary>
+    /// Capta shows the menu itself (TrayMenuWindow) rather than through H.NotifyIcon, whose
+    /// SecondWindow mode sized it too small to show the labels.
+    /// </summary>
+    private void ShowMenu()
+    {
+        if (_menu is null) return;
+        (_menuWindow ??= new TrayMenuWindow(_menu)).ShowAtCursor();
     }
 
     private MenuFlyoutItem CaptureItem(string text, string glyph, HotkeyAction? shortcut, CaptureMode mode)

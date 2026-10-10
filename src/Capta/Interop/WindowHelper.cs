@@ -22,7 +22,17 @@ internal static partial class WindowHelper
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SetForegroundWindow(nint hwnd);
 
+    [LibraryImport("user32.dll")]
+    private static partial nint GetForegroundWindow();
+
+    [LibraryImport("user32.dll")]
+    private static partial uint GetWindowThreadProcessId(nint hwnd, out uint processId);
+
     public static nint GetHwnd(this Window window) => WinRT.Interop.WindowNative.GetWindowHandle(window);
+
+    /// <summary>Whether the foreground window is one of Capta's (popups included).</summary>
+    public static bool IsForegroundOurs() =>
+        GetWindowThreadProcessId(GetForegroundWindow(), out var pid) != 0 && pid == (uint)Environment.ProcessId;
 
     public static double GetScale(this Window window) => GetDpiForWindow(window.GetHwnd()) / 96.0;
 
