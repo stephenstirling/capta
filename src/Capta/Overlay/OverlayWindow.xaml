@@ -258,7 +258,8 @@
                             <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="Shift" /></Border>
                             <TextBlock Text="square" />
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="6">
+                        <!-- Only Scrolling and Record wait for Enter; Region and Grab text capture on release. -->
+                        <StackPanel x:Name="EnterHint" Orientation="Horizontal" Spacing="6">
                             <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="Enter" /></Border>
                             <TextBlock Text="capture" />
                         </StackPanel>
@@ -269,7 +270,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Border Style="{StaticResource KeyCap}"><TextBlock FontFamily="{StaticResource CaptaMonoFont}" Text="Esc" /></Border>
-                        <TextBlock x:Name="EscHint" Text="cancel" />
+                        <TextBlock Text="cancel" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

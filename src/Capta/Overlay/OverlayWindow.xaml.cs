@@ -25,9 +25,10 @@ namespace Capta.Overlay;
 /// to DIPs only for layout.
 /// </summary>
 /// <remarks>
-/// Region mode: drag to draw; afterwards the selection stays editable (handles resize,
-/// dragging inside moves). Space moves while drawing, Shift keeps it square, Enter or a
-/// double-click captures. Window mode: click the highlighted window.
+/// Region and Grab text: drag to draw; releasing captures. Space moves while drawing, Shift keeps
+/// it square. Scrolling and Record keep the selection editable (handles resize, dragging inside
+/// moves) until Enter or a double-click, as finishing starts something long-running. Window
+/// mode: click the highlighted window.
 /// </remarks>
 public sealed partial class OverlayWindow : Window
 {
@@ -145,6 +146,7 @@ public sealed partial class OverlayWindow : Window
             _ => "Drag to select",
         };
         RegionHints.Visibility = IsRegionLike ? Visibility.Visible : Visibility.Collapsed;
+        EnterHint.Visibility = CapturesOnRelease ? Visibility.Collapsed : Visibility.Visible;
         _selection = default;
         _lasso.Clear();
         _hoverWindow = null;
@@ -170,11 +172,8 @@ public sealed partial class OverlayWindow : Window
 
     private bool HasSelection => _selection.Width > 0 && _selection.Height > 0;
 
-    /// <summary>
-    /// Esc finishes rather than cancels once a Region or Grab text selection is drawn. Scrolling and
-    /// Record keep Esc as cancel: for them, finishing starts something long-running.
-    /// </summary>
-    private bool EscCaptures => _mode is CaptureMode.Region or CaptureMode.GrabText && HasSelection && _drag == Drag.None;
+    /// <summary>Region and Grab text capture as soon as the drag ends, like Freeform.</summary>
+    private bool CapturesOnRelease => _mode is CaptureMode.Region or CaptureMode.GrabText;
 
     // ---- Pointer ----
 
@@ -326,6 +325,11 @@ public sealed partial class OverlayWindow : Window
         // A click without a drag clears the selection rather than leaving a 1px one.
         if (wasNew && (_selection.Width < 3 || _selection.Height < 3))
             _selection = default;
+        if (wasNew && CapturesOnRelease && HasSelection)
+        {
+            CompleteSelection();
+            return;
+        }
         UpdateSelectionVisuals();
     }
 
@@ -346,9 +350,6 @@ public sealed partial class OverlayWindow : Window
     {
         switch (e.Key)
         {
-            case VirtualKey.Escape when EscCaptures:
-                CompleteSelection(); // a finished selection: Esc takes it (copied with Auto-copy)
-                break;
             case VirtualKey.Escape:
                 _session.Cancel();
                 break;
@@ -594,7 +595,6 @@ public sealed partial class OverlayWindow : Window
         if (_lasso.Count >= 2)
             group.Children.Add(LassoGeometry(closed: true));
         Shade.Data = group;
-        EscHint.Text = EscCaptures ? "capture" : "cancel";
         Lasso.Data = _lasso.Count >= 2 ? LassoGeometry(closed: false) : null;
 
         if (!HasSelection)

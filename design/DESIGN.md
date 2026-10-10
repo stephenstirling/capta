@@ -41,8 +41,11 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    | Ctrl+PrtSc | Record video: choose an area, then Ctrl+PrtSc or Stop to finish. The floating toolbar is in the tray menu. |
    | Ctrl+Shift+PrtSc | Grab text from screen |
 
-2. **Edit** opens `ocula:edit?file=…` if Ocula is registered, otherwise the default image app. Button label and tooltip say just "Edit". Capta does not get its own editor; `Editor.html` is reference for Ocula.
-3. **One theme file:** `src/Stirling.Shared/Themes/Colors.xaml`. There is no theme file in `design/`.
+2. **Region and Grab text capture when the drag ends**, like Snipping Tool, and copy with Auto-copy on. Only
+   Scrolling and Record keep an adjustable selection with handles, confirmed with Enter, since finishing starts
+   something long-running. The overlay's Enter hint shows only in those modes.
+3. **Edit** opens `ocula:edit?file=…` if Ocula is registered, otherwise the default image app. Button label and tooltip say just "Edit". Capta does not get its own editor; `Editor.html` is reference for Ocula.
+4. **One theme file:** `src/Stirling.Shared/Themes/Colors.xaml`. There is no theme file in `design/`.
 
 ## Visual rules
 
