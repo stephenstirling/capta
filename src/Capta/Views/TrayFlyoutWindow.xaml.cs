@@ -187,7 +187,7 @@ public sealed partial class TrayFlyoutWindow : Window
     private async void OnOpenInOcula(object sender, RoutedEventArgs e)
     {
         Hide();
-        await Windows.System.Launcher.LaunchUriAsync(new Uri("ocula:captures"));
+        await CaptureActions.OpenCapturesInOculaAsync();
     }
 
     private void OnEscape(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)

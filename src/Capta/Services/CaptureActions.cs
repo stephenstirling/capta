@@ -25,12 +25,19 @@ public static partial class CaptureActions
             await Launcher.LaunchFileAsync(file);
     }
 
-    /// <summary>Adds the capture to Ocula's library via <c>ocula:import?file=&lt;path&gt;</c>.</summary>
+    /// <summary>
+    /// Adds the capture to Ocula's library via <c>ocula:import?file=&lt;path&gt;</c>. Ocula copies a
+    /// temporary file into the capture folder, in the background.
+    /// </summary>
     public static async Task SendToOculaAsync(CaptureResult capture)
     {
         var path = capture.VideoPath ?? (await SaveTempAsync(capture, "Ocula")).Path;
         await Launcher.LaunchUriAsync(OculaUri("import", path));
     }
+
+    /// <summary>Opens Ocula's "All captures" smart album via <c>ocula:captures</c>.</summary>
+    public static async Task OpenCapturesInOculaAsync() =>
+        await Launcher.LaunchUriAsync(new Uri($"ocula:captures?folder={Uri.EscapeDataString(CaptureFolderOrScreenshots())}"));
 
     /// <summary>Copies a recording as a file (pastes into Explorer, email and chat).</summary>
     public static async Task CopyFileAsync(string path)
@@ -67,7 +74,12 @@ public static partial class CaptureActions
     public static async Task<bool> IsOculaInstalledAsync() =>
         await Launcher.QueryUriSupportAsync(new Uri("ocula:"), LaunchQuerySupportType.Uri) == LaunchQuerySupportStatus.Available;
 
-    private static Uri OculaUri(string verb, string path) => new($"ocula:{verb}?file={Uri.EscapeDataString(path)}");
+    /// <summary>
+    /// An ocula: link (Ocula's Services/OculaLink.cs reads them). The capture folder goes along so
+    /// Ocula files handed-over captures in the same place Capta saves them.
+    /// </summary>
+    private static Uri OculaUri(string verb, string path) =>
+        new($"ocula:{verb}?file={Uri.EscapeDataString(path)}&folder={Uri.EscapeDataString(CaptureFolderOrScreenshots())}");
 
     /// <summary>Copies the capture as a PNG file (pastes into Explorer, email and chat apps).</summary>
     public static async Task CopyAsFileAsync(CaptureResult capture)
