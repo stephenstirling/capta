@@ -24,6 +24,8 @@ See README.md for layout and build commands.
 ## Building and running
 
 - Build: `msbuild Capta.slnx -restore -p:Configuration=Debug -p:Platform=x64`.
+- Tests: `dotnet test tests/Capta.Tests/Capta.Tests.csproj -p:Platform=x64`. The test project compiles app source files
+  directly (see its `.csproj`); add a file there when testing new logic that needs no WinUI.
 - MSIX packages can't be registered from a network share. On a mapped drive, put a git-ignored
   `Directory.Build.user.props` at the repo root that sets `StirlingLocalBuildRoot` (see `Directory.Build.props`).
 - Diagnostics: `%LOCALAPPDATA%\Packages\StephenStirling.Capta_*\LocalState\capta.log`.

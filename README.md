@@ -44,13 +44,23 @@ msbuild Capta.slnx -restore -p:Configuration=Debug -p:Platform=x64
 
 Open `Capta.slnx` in Visual Studio and press F5 to deploy and run the packaged app.
 
+Unit tests (colour maths, PNG and ICC handling, cropping, scroll stitching, shortcuts) need no screen:
+
+```powershell
+dotnet test tests\Capta.Tests\Capta.Tests.csproj -p:Platform=x64
+```
+
+GitHub Actions builds and tests every pull request (`.github/workflows/build.yml`).
+
 ## Layout
 
 | Path | Purpose |
 | --- | --- |
 | `src/Capta` | The WinUI 3 app, packaged as MSIX (single-project packaging). |
 | `src/Stirling.Shared` | Brand resources shared with other Stirling apps (e.g. Ocula): theme colours and app icons. |
+| `tests/Capta.Tests` | xUnit tests for the app's pure logic; they compile its source files directly. |
 | `tools/generate_icons.py` | Regenerates the logo/ico set in `src/Stirling.Shared/Assets/<App>`. |
+| `tools/generate_display_p3_icc.py` | Regenerates the Display P3 profile saved PNGs embed. |
 
 ### Using Stirling.Shared from another app
 
