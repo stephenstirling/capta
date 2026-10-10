@@ -22,20 +22,28 @@ Until it does, Capta's **Edit** falls back to the default image app, and **Send 
 
 ## URIs
 
-`file` values are absolute Windows paths, percent-encoded with `Uri.EscapeDataString`.
+`file` and `folder` values are absolute Windows paths, percent-encoded with `Uri.EscapeDataString`.
+`folder` is Capta's capture folder (Settings: Capture folder, `Pictures\Captures` by default); Ocula
+copies temporary files there and adds it to its library. Ocula ignores parameters it doesn't know.
 
 | URI | Sent when | Ocula should |
 | --- | --- | --- |
-| `ocula:edit?file=<path>` | The card's or a pin's **Edit** button | Import the file (see below) and open it in the editor, in the foreground. |
-| `ocula:import?file=<path>` | **Send to Ocula** on the card; also after every capture when "Send every capture to Ocula automatically" is on | Add the file to the library without stealing focus. Many can arrive in a row. |
-| `ocula:captures` | **Open in Ocula** in the tray flyout | Open the library filtered to Capta captures (`12-ocula-captures-folder.png`). |
+| `ocula:edit?file=<path>&folder=<path>` | The card's or a pin's **Edit** button | Import the file (see below) and open it in the editor, in the foreground. |
+| `ocula:import?file=<path>&folder=<path>` | **Send to Ocula** on the card; also after every capture when "Send every capture to Ocula automatically" is on | Add the file to the library without stealing focus, without opening a window if Ocula isn't running. Many can arrive in a row. |
+| `ocula:captures?folder=<path>` | **Open all captures in Ocula** in the tray flyout | Open the "All captures" smart album (`12-ocula-captures-folder.png`). |
+
+Ocula's side is `Services/OculaLink.cs`, `Services/CaptaCapture.cs` and `MainWindow.Captures.cs` in
+the Ocula repository. It indexes the PNG metadata below, so captures can be searched by source app,
+window title and the text in them (search words, or the filters `capture`, `hastext` and `app:`).
 
 ### The files are temporary
 
 Capta writes these PNGs to its own `TempState` folder
 (`%LOCALAPPDATA%\Packages\StephenStirling.Capta_*\TempState\Edit|Ocula\`). Windows may clear that
 folder at any time. **Ocula must copy the file into its own library on import** and must not keep the
-path. Ocula needs `runFullTrust` (normal for a WinUI 3 desktop app) to read another package's folder.
+path. It copies them into the capture folder (`folder`), picking a free name if one is taken; files
+outside a temporary folder, such as recordings already in the capture folder, stay where they are.
+Ocula needs `runFullTrust` (normal for a WinUI 3 desktop app) to read another package's folder.
 
 ## PNG metadata
 
