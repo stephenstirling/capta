@@ -30,6 +30,11 @@
     <ProjectReference Include="..\Stirling.Shared\Stirling.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Embedded in PNGs saved in Display P3; regenerate with tools/generate_display_p3_icc.py. -->
+    <EmbeddedResource Include="Capture\DisplayP3.icc" LogicalName="DisplayP3.icc" />
+  </ItemGroup>
+
   <!-- Enables the Package and Publish context menu in Visual Studio Solution Explorer. -->
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>

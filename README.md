@@ -13,9 +13,15 @@ takes over the Print Screen key and copies captures to the clipboard as PNG.
 | Ctrl+PrtSc | Record video: choose an area, then Ctrl+PrtSc or Stop to finish |
 | Ctrl+Shift+PrtSc | Grab text from screen: select a region and its text is copied |
 
-In the region overlay, **Esc** captures the selection once you've drawn one (and copies it, with Auto-copy on);
-with nothing selected it cancels. Press **C** to pick the colour under the cursor: its hex code is copied and
-pinned as a small chip (click the code to copy again, double-click or Esc to unpin).
+In the region overlay, letting go of the mouse captures the area you drew (and copies it, with Auto-copy on);
+**Esc** cancels. Scrolling and Record keep the selection adjustable until you press Enter. Press **C** to pick the colour under the cursor: its hex code is copied and
+pinned as a small chip (click the code to copy again, double-click or Esc to unpin). The settings button at
+the end of the overlay's bar switches Auto-copy and opens the settings windows.
+
+**Colour & HDR** (tray menu) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
+Display P3 (which keeps wide-gamut colours and embeds its profile; the clipboard always gets sRGB). It can also
+correct captures of an SDR monitor for its colour profile, so they look as they did on a calibrated or
+wide-gamut screen.
 
 Recordings are MP4 (H.264 + AAC) in your capture folder, with system audio and, if you switch it on,
 the microphone. The card after a recording can play it, copy the file or save a GIF of the first
@@ -38,13 +44,23 @@ msbuild Capta.slnx -restore -p:Configuration=Debug -p:Platform=x64
 
 Open `Capta.slnx` in Visual Studio and press F5 to deploy and run the packaged app.
 
+Unit tests (colour maths, PNG and ICC handling, cropping, scroll stitching, shortcuts) need no screen:
+
+```powershell
+dotnet test tests\Capta.Tests\Capta.Tests.csproj -p:Platform=x64
+```
+
+GitHub Actions builds and tests every pull request (`.github/workflows/build.yml`).
+
 ## Layout
 
 | Path | Purpose |
 | --- | --- |
 | `src/Capta` | The WinUI 3 app, packaged as MSIX (single-project packaging). |
 | `src/Stirling.Shared` | Brand resources shared with other Stirling apps (e.g. Ocula): theme colours and app icons. |
+| `tests/Capta.Tests` | xUnit tests for the app's pure logic; they compile its source files directly. |
 | `tools/generate_icons.py` | Regenerates the logo/ico set in `src/Stirling.Shared/Assets/<App>`. |
+| `tools/generate_display_p3_icc.py` | Regenerates the Display P3 profile saved PNGs embed. |
 
 ### Using Stirling.Shared from another app
 

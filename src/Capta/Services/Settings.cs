@@ -111,6 +111,19 @@ public static class Settings
         set => Values[nameof(EmbedColourProfile)] = value;
     }
 
+    public static ColourSpace ColourSpace
+    {
+        get => (ColourSpace)Get(nameof(ColourSpace), (int)ColourSpace.Srgb);
+        set => Values[nameof(ColourSpace)] = (int)value;
+    }
+
+    /// <summary>Off by default: most monitor profiles are vendor defaults, and correcting shifts app colours.</summary>
+    public static bool CorrectMonitorProfiles
+    {
+        get => Get(nameof(CorrectMonitorProfiles), false);
+        set => Values[nameof(CorrectMonitorProfiles)] = value;
+    }
+
     public static bool RecordSystemAudio
     {
         get => Get(nameof(RecordSystemAudio), true);
@@ -136,6 +149,8 @@ public static class Settings
         SdrWhiteNits = (float)SdrWhiteNits,
         RollOff = RollOff,
         EmbedColourProfile = EmbedColourProfile,
+        ColourSpace = ColourSpace,
+        CorrectMonitorProfiles = CorrectMonitorProfiles,
     };
 
     // ---- Shortcuts (see Shortcuts) ----

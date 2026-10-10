@@ -79,12 +79,22 @@ public sealed partial class ColourHdrWindow : Window
         {
             var monitor = monitors[i];
             var colour = GraphicsCaptureSource.DisplayColour(monitor.Handle);
-            var detail = colour switch
+            var detail = new TextBlock
             {
-                { Hdr: true } c => $"HDR on · SDR white {c.SdrWhiteNits:0} nits",
-                { Hdr: false } => "SDR · sRGB",
-                _ => "Colour info unavailable",
+                Text = colour switch
+                {
+                    { Hdr: true } c => $"HDR on · SDR white {c.SdrWhiteNits:0} nits",
+                    { AutoColour: true } => "SDR · Auto colour management",
+                    { } => "SDR · sRGB",
+                    _ => "Colour info unavailable",
+                },
+                FontSize = 12,
+                Margin = new Thickness(0, 3, 0, 0),
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                Style = (Style)Root.Resources["CardDetail"],
             };
+            if (colour is { Hdr: false, AutoColour: false })
+                _ = ShowProfileNameAsync(detail, monitor.Handle);
 
             var card = new Border
             {
@@ -94,13 +104,7 @@ public sealed partial class ColourHdrWindow : Window
                     Children =
                     {
                         new TextBlock { Text = $"Display {i + 1}", FontSize = 13, FontWeight = Microsoft.UI.Text.FontWeights.Bold },
-                        new TextBlock
-                        {
-                            Text = detail,
-                            FontSize = 12,
-                            Margin = new Thickness(0, 3, 0, 0),
-                            Style = (Style)Root.Resources["CardDetail"],
-                        },
+                        detail,
                     },
                 },
             };
@@ -108,6 +112,14 @@ public sealed partial class ColourHdrWindow : Window
             Grid.SetColumn(card, i);
             DisplayCards.Children.Add(card);
         }
+    }
+
+    /// <summary>Names an SDR display's colour profile on its card once it has been read.</summary>
+    private static async Task ShowProfileNameAsync(TextBlock detail, nint hmonitor)
+    {
+        var profile = await GraphicsCaptureSource.MonitorProfileAsync(hmonitor);
+        if (profile is not null && IccProfile.Describe(profile) is { } name)
+            detail.Text = $"SDR · {name}";
     }
 
     // ---- Settings ----
@@ -122,7 +134,8 @@ public sealed partial class ColourHdrWindow : Window
             ApplySdrWhiteState();
             ApplyRollOff(Settings.RollOff);
             ApplyHdrHandling(Settings.HdrHandling);
-            EmbedProfile.IsOn = Settings.EmbedColourProfile;
+            ApplyColourSpace(Settings.ColourSpace);
+            CorrectProfiles.IsOn = Settings.CorrectMonitorProfiles;
         }
         finally
         {
@@ -193,6 +206,36 @@ public sealed partial class ColourHdrWindow : Window
         Settings.ApplyCaptureOptions();
     }
 
+    /// <summary>Display P3 files always carry their profile, so Embed shows on and can't be changed.</summary>
+    private void ApplyColourSpace(ColourSpace space)
+    {
+        var p3 = space == ColourSpace.DisplayP3;
+        ColourSpaceText.Text = p3 ? "Display P3" : "sRGB";
+        SpaceSrgb.IsChecked = !p3;
+        SpaceP3.IsChecked = p3;
+        var loading = _loading;
+        _loading = true;
+        EmbedProfile.IsOn = p3 || Settings.EmbedColourProfile;
+        _loading = loading;
+        EmbedProfile.IsEnabled = !p3;
+        EmbedProfileNote.Visibility = p3 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void OnColourSpace(object sender, RoutedEventArgs e)
+    {
+        var space = Enum.Parse<ColourSpace>((string)((FrameworkElement)sender).Tag);
+        Settings.ColourSpace = space;
+        ApplyColourSpace(space); // also keeps one item checked
+        Settings.ApplyCaptureOptions();
+    }
+
+    private void OnCorrectProfiles(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        Settings.CorrectMonitorProfiles = CorrectProfiles.IsOn;
+        Settings.ApplyCaptureOptions();
+    }
+
     private void OnReset(object sender, RoutedEventArgs e)
     {
         Settings.MatchWindowsSdrWhite = true;
@@ -200,6 +243,8 @@ public sealed partial class ColourHdrWindow : Window
         Settings.RollOff = HighlightRollOff.Clip;
         Settings.HdrHandling = HdrHandling.ToneMap;
         Settings.EmbedColourProfile = true;
+        Settings.ColourSpace = ColourSpace.Srgb;
+        Settings.CorrectMonitorProfiles = false;
         Settings.ApplyCaptureOptions();
         Load();
     }
