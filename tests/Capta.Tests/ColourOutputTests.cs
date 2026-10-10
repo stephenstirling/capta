@@ -31,7 +31,7 @@ public class ColourOutputTests
         {
             HdrPixels = [one, 0, 0, one, 0, 0, 0, 0], // RGBA half floats
             HasTransparency = true,
-            SdrWhiteNits = 80f,
+            ToneMap = new HdrToneMap(80f, HighlightRollOff.Clip, null),
         };
 
         var (pixels, space) = await ColourOutput.ConvertAsync(image, ColourSpace.DisplayP3);
@@ -40,6 +40,28 @@ public class ColourOutputTests
         Assert.Equal(new byte[] { 35, 51, 234, 255, 0, 0, 0, 0 }, pixels);
         // The sRGB pixels shown in Capta are untouched.
         Assert.Equal(new byte[] { 0, 0, 255, 255, 0, 0, 0, 0 }, image.Pixels);
+    }
+
+    [Theory]
+    [InlineData(HighlightRollOff.Balanced)]
+    [InlineData(HighlightRollOff.Soft)]
+    public async Task ACropRollsOffAgainstTheWholeFramesHighlights(HighlightRollOff rollOff)
+    {
+        // A frame with a highlight at 4x SDR white and a pixel just under white. Cropping out the
+        // highlight mustn't change how the remaining pixel is mapped to Display P3.
+        ushort Half(float v) => BitConverter.HalfToUInt16Bits((Half)v);
+        ushort[] hdr = [Half(4f), Half(4f), Half(4f), Half(1f), Half(0.95f), Half(0.95f), Half(0.95f), Half(1f)];
+        var peaks = ToneMapper.MeasurePeaks(hdr);
+        var frame = new CapturedImage(2, 1, new byte[8])
+        {
+            HdrPixels = hdr,
+            ToneMap = new HdrToneMap(80f, rollOff, peaks),
+        };
+
+        var (whole, _) = await ColourOutput.ConvertAsync(frame, ColourSpace.DisplayP3);
+        var (crop, _) = await ColourOutput.ConvertAsync(frame.Crop(new Windows.Graphics.RectInt32(1, 0, 1, 1)), ColourSpace.DisplayP3);
+
+        Assert.Equal(whole[4..7], crop[0..3]);
     }
 
     [Fact]

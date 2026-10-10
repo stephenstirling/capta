@@ -11,7 +11,7 @@ namespace Capta.Services;
 public static class ImageExport
 {
     /// <param name="captaJson">Capture metadata for the "Capta" tEXt chunk (saved files only).</param>
-    /// <param name="target">sRGB for the clipboard and Recent; saved files use the Colour &amp; HDR choice.</param>
+    /// <param name="target">sRGB for the clipboard (Copy as file too) and Recent; saved files, Edit and Ocula use the Colour &amp; HDR choice.</param>
     public static async Task<InMemoryRandomAccessStream> EncodePngAsync(CapturedImage image, string? captaJson = null,
         ColourSpace target = ColourSpace.Srgb)
     {
@@ -89,10 +89,10 @@ public static class ImageExport
         Clipboard.Flush();
     }
 
-    /// <summary>Saves a PNG in the colour space chosen in Colour &amp; HDR.</summary>
-    public static async Task SaveAsync(CapturedImage image, StorageFile file, string? captaJson = null)
+    /// <summary>Saves a PNG, by default in the colour space chosen in Colour &amp; HDR.</summary>
+    public static async Task SaveAsync(CapturedImage image, StorageFile file, string? captaJson = null, ColourSpace? space = null)
     {
-        using var png = await EncodePngAsync(image, captaJson, CaptureOptions.Current.ColourSpace);
+        using var png = await EncodePngAsync(image, captaJson, space ?? CaptureOptions.Current.ColourSpace);
         using var output = await file.OpenAsync(FileAccessMode.ReadWrite);
         output.Size = 0;
         await RandomAccessStream.CopyAndCloseAsync(png.GetInputStreamAt(0), output.GetOutputStreamAt(0));

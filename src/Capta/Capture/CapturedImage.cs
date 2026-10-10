@@ -45,10 +45,8 @@ public sealed class CapturedImage
         }
     }
 
-    /// <summary>The SDR white level the HDR original was tone-mapped with (for re-mapping to Display P3).</summary>
-    public float SdrWhiteNits { get; init; } = 80f;
-
-    public HighlightRollOff RollOff { get; init; }
+    /// <summary>How <see cref="HdrPixels"/> was tone-mapped, so Display P3 output maps it the same way.</summary>
+    public HdrToneMap? ToneMap { get; init; }
 
     /// <summary>
     /// ICC profile of the SDR display the pixels came from, when they should be corrected for it on
@@ -81,14 +79,7 @@ public sealed class CapturedImage
             for (var row = 0; row < h; row++)
                 Array.Copy(HdrPixels, ((y0 + row) * Width + x0) * 4, hdr, row * w * 4, w * 4);
         }
-        return new CapturedImage(w, h, dst)
-        {
-            HdrPixels = hdr,
-            HasTransparency = HasTransparency,
-            SdrWhiteNits = SdrWhiteNits,
-            RollOff = RollOff,
-            SourceProfile = SourceProfile,
-        };
+        return Derive(w, h, dst, hdr, HasTransparency);
     }
 
     /// <summary>
@@ -129,15 +120,18 @@ public sealed class CapturedImage
                 if (hdr is not null) Array.Clear(hdr, (y * Width + x) * 4, 4);
             }
         }
-        return new CapturedImage(Width, Height, sdr)
+        return Derive(Width, Height, sdr, hdr, transparent: true);
+    }
+
+    /// <summary>A new image from this one's pixels, keeping how its colours are to be output.</summary>
+    private CapturedImage Derive(int width, int height, byte[] pixels, ushort[]? hdr, bool transparent) =>
+        new(width, height, pixels)
         {
             HdrPixels = hdr,
-            HasTransparency = true,
-            SdrWhiteNits = SdrWhiteNits,
-            RollOff = RollOff,
+            HasTransparency = transparent,
+            ToneMap = ToneMap,
             SourceProfile = SourceProfile,
         };
-    }
 
     public SoftwareBitmap ToSoftwareBitmap()
     {
@@ -146,3 +140,8 @@ public sealed class CapturedImage
         return bitmap;
     }
 }
+
+/// <param name="SdrWhiteNits">The SDR white level the HDR original was mapped with.</param>
+/// <param name="Peaks">The whole frame's peaks, so a crop's highlights roll off as they did in the frame
+/// (null when the roll-off is Clip, which doesn't use them).</param>
+public sealed record HdrToneMap(float SdrWhiteNits, HighlightRollOff RollOff, ToneMapper.FramePeaks? Peaks);

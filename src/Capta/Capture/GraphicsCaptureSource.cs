@@ -38,9 +38,11 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
     {
         var options = CaptureOptions.Current;
         var white = SdrWhiteLevel(hmonitor);
-        var sdr = ToneMapper.ToSdr(fp16, width, height, white, options.RollOff);
+        // Measured once on the whole frame: crops mapped again later must use the same peaks.
+        ToneMapper.FramePeaks? peaks = options.RollOff == HighlightRollOff.Clip ? null : ToneMapper.MeasurePeaks(fp16);
+        var sdr = ToneMapper.ToSdr(fp16, width, height, white, options.RollOff, peaks: peaks);
         if (IsHdr(hmonitor))
-            return new CapturedImage(width, height, sdr.Pixels) { HdrPixels = fp16, SdrWhiteNits = white, RollOff = options.RollOff };
+            return new CapturedImage(width, height, sdr.Pixels) { HdrPixels = fp16, ToneMap = new HdrToneMap(white, options.RollOff, peaks) };
         if (options.CorrectMonitorProfiles && await MonitorProfileAsync(hmonitor) is { } profile)
             return new CapturedImage(width, height, sdr.Pixels) { SourceProfile = profile };
         return sdr;

@@ -60,6 +60,7 @@ public sealed partial class OverlayWindow : Window
     private RectInt32 _dragStartSelection;
     private bool _spaceDown;
     private readonly List<PointInt32> _lasso = [];
+    private bool _leaving; // a settings window was chosen; the session closes this window right away
 
     public OverlayWindow(OverlaySession session, MonitorInfo monitor, CapturedImage frame, CaptureMode mode, IReadOnlyList<WindowTarget> windows)
     {
@@ -100,6 +101,7 @@ public sealed partial class OverlayWindow : Window
         ToolTipService.SetToolTip(GrabTextMode, $"Copy the text in a region ({Shortcuts.For(HotkeyAction.GrabText).Compact})");
         var delay = Settings.CaptureDelaySeconds;
         DelayText.Text = delay == 0 ? "No delay" : $"{delay}s delay";
+        _ = ShowOculaItemIfInstalledAsync();
     }
 
     public async Task PrepareAsync()
@@ -416,13 +418,13 @@ public sealed partial class OverlayWindow : Window
         _session.Complete(new OverlayResult.Delayed(seconds, _mode));
     }
 
-    private async void OnSettingsOpening(object sender, object e)
+    /// <summary>Shows Send to Ocula only when Ocula is installed; checked as the overlay opens, so the menu doesn't change size once open.</summary>
+    private async Task ShowOculaItemIfInstalledAsync()
     {
-        AutoCopyItem.IsChecked = Settings.AutoCopy;
-        SendToOculaItem.IsChecked = Settings.SendToOculaAutomatically;
         try
         {
-            SendToOculaItem.Visibility = await CaptureActions.IsOculaInstalledAsync() ? Visibility.Visible : Visibility.Collapsed;
+            if (await CaptureActions.IsOculaInstalledAsync())
+                SendToOculaItem.Visibility = Visibility.Visible;
         }
         catch (Exception ex)
         {
@@ -430,14 +432,27 @@ public sealed partial class OverlayWindow : Window
         }
     }
 
-    private void OnSettingsClosed(object sender, object e) => FocusHost.Focus(FocusState.Programmatic);
+    private void OnSettingsOpening(object sender, object e)
+    {
+        AutoCopyItem.IsChecked = Settings.AutoCopy;
+        SendToOculaItem.IsChecked = Settings.SendToOculaAutomatically;
+    }
+
+    private void OnSettingsClosed(object sender, object e)
+    {
+        // Opening a settings window has already closed the overlay.
+        if (!_leaving) FocusHost.Focus(FocusState.Programmatic);
+    }
 
     private void OnAutoCopy(object sender, RoutedEventArgs e) => Settings.AutoCopy = AutoCopyItem.IsChecked;
 
     private void OnSendToOcula(object sender, RoutedEventArgs e) => Settings.SendToOculaAutomatically = SendToOculaItem.IsChecked;
 
-    private void OnOpenSettings(object sender, RoutedEventArgs e) =>
+    private void OnOpenSettings(object sender, RoutedEventArgs e)
+    {
+        _leaving = true;
         _session.Complete(new OverlayResult.OpenSettings(Enum.Parse<SettingsPage>((string)((FrameworkElement)sender).Tag)));
+    }
 
     private bool IsOverTopBar(Point dip)
     {

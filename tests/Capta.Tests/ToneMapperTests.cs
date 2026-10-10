@@ -103,6 +103,35 @@ public class ToneMapperTests
         Assert.Equal((255, 0, 0), Map(r, g, b));
     }
 
+    [Theory]
+    [InlineData(HighlightRollOff.Balanced)]
+    [InlineData(HighlightRollOff.Soft)]
+    public void TheBrightestColourReachesFullBrightnessInDisplayP3(HighlightRollOff rollOff)
+    {
+        // The frame's peak is a saturated red, whose largest channel is smaller in P3 than in
+        // Rec.709: the roll-off must still take it to full brightness.
+        var bgra = ToneMapper.ToSdr(Pixels((4f, 0f, 0f), (0.5f, 0.5f, 0.5f)), 2, 1, 80f, rollOff, ColourSpace.DisplayP3).Pixels;
+        Assert.Equal(255, bgra[2]);
+    }
+
+    [Fact]
+    public void PeaksAreMeasuredInBothSpaces()
+    {
+        var peaks = ToneMapper.MeasurePeaks(Pixels((4f, 0f, 0f), (0.5f, 0.5f, 0.5f)));
+        Assert.Equal(4f, peaks.Rec709);
+        Assert.Equal(4f * 0.822462f, peaks.DisplayP3, 0.001f);
+    }
+
+    [Fact]
+    public void GivenPeaksReplaceTheMeasuredOnes()
+    {
+        // A crop without the highlight, mapped with the whole frame's peaks, is compressed as before.
+        var pixel = Pixels((0.95f, 0.95f, 0.95f));
+        var alone = ToneMapper.ToSdr(pixel, 1, 1, 80f, HighlightRollOff.Balanced).Pixels[2];
+        var inFrame = ToneMapper.ToSdr(pixel, 1, 1, 80f, HighlightRollOff.Balanced, peaks: new ToneMapper.FramePeaks(4f, 4f)).Pixels[2];
+        Assert.True(inFrame < alone, $"{inFrame} should be below {alone}");
+    }
+
     [Fact]
     public void GreysAreTheSameInBothSpaces()
     {

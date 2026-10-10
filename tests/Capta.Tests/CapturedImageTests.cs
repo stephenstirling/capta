@@ -5,6 +5,8 @@ namespace Capta.Tests;
 
 public class CapturedImageTests
 {
+    private static readonly HdrToneMap ToneMap = new(240f, HighlightRollOff.Soft, new ToneMapper.FramePeaks(4f, 3.5f));
+
     /// <summary>A width × height image whose pixel (x, y) is B = x, G = y, R = 7, A = 255.</summary>
     private static CapturedImage Gradient(int width, int height, bool withHdr = false)
     {
@@ -20,8 +22,7 @@ public class CapturedImageTests
         return new CapturedImage(width, height, pixels)
         {
             HdrPixels = hdr,
-            SdrWhiteNits = 240f,
-            RollOff = HighlightRollOff.Soft,
+            ToneMap = ToneMap,
             SourceProfile = withHdr ? null : [1, 2, 3],
         };
     }
@@ -53,8 +54,7 @@ public class CapturedImageTests
         Assert.Equal((4, 2), (crop.Width, crop.Height));
         Assert.Equal((2, 3), At(crop, 0, 0));
         Assert.Equal((5, 4), At(crop, 3, 1));
-        Assert.Equal(240f, crop.SdrWhiteNits);
-        Assert.Equal(HighlightRollOff.Soft, crop.RollOff);
+        Assert.Same(ToneMap, crop.ToneMap);
         Assert.Equal(new byte[] { 1, 2, 3 }, crop.SourceProfile);
     }
 
@@ -91,7 +91,7 @@ public class CapturedImageTests
             Assert.Equal(inside ? image.GetPixel(x, y) : 0u, masked.GetPixel(x, y));
             Assert.Equal(inside ? image.HdrPixels![(y * 10 + x) * 4] : (ushort)0, masked.HdrPixels![(y * 10 + x) * 4]);
         }
-        Assert.Equal(240f, masked.SdrWhiteNits);
+        Assert.Same(ToneMap, masked.ToneMap);
         Assert.NotSame(image.Pixels, masked.Pixels); // the original is left alone
     }
 

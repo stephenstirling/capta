@@ -29,7 +29,8 @@ public static class ColourOutput
                 // HDR displays are colour-managed by Windows. For P3, tone-map the original again
                 // rather than converting the sRGB result, which has lost what sRGB can't hold.
                 if (target == ColourSpace.Srgb) return (image.Pixels, ColourSpace.Srgb);
-                var p3 = ToneMapper.ToSdr(hdr, image.Width, image.Height, image.SdrWhiteNits, image.RollOff, target);
+                var map = image.ToneMap ?? new HdrToneMap(80f, HighlightRollOff.Clip, null);
+                var p3 = ToneMapper.ToSdr(hdr, image.Width, image.Height, map.SdrWhiteNits, map.RollOff, target, map.Peaks);
                 return (KeepAlpha(p3.Pixels, image.Pixels), target);
             }
 

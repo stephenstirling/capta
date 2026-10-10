@@ -34,6 +34,9 @@ internal static unsafe partial class WicColour
     [LibraryImport("ole32.dll")]
     private static partial int CoInitializeEx(nint reserved, uint coInit);
 
+    [LibraryImport("ole32.dll")]
+    private static partial void CoUninitialize();
+
     /// <param name="bgra">Top-down BGRA, no row padding. The alpha bytes of the result are undefined.</param>
     /// <param name="from">ICC profile the pixels are in; null for sRGB.</param>
     /// <param name="to">ICC profile to convert to; null for sRGB.</param>
@@ -41,7 +44,8 @@ internal static unsafe partial class WicColour
     {
         if (bgra.Length != width * height * 4)
             throw new ArgumentException("Pixel buffer does not match dimensions.", nameof(bgra));
-        CoInitializeEx(0, COINIT_MULTITHREADED); // S_FALSE / RPC_E_CHANGED_MODE are fine
+        // S_OK and S_FALSE each need a CoUninitialize; RPC_E_CHANGED_MODE (an STA thread) doesn't.
+        var comInitialized = CoInitializeEx(0, COINIT_MULTITHREADED) >= 0;
 
         nint factory = 0, bitmap = 0, source = 0, dest = 0, transform = 0;
         try
@@ -73,6 +77,7 @@ internal static unsafe partial class WicColour
             foreach (var unknown in new[] { transform, dest, source, bitmap, factory })
                 if (unknown != 0)
                     ((delegate* unmanaged[Stdcall]<nint, uint>)Slot(unknown, Release))(unknown);
+            if (comInitialized) CoUninitialize();
         }
     }
 
