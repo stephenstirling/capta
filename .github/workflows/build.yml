@@ -1,0 +1,32 @@
+# Compiles Capta the way README.md does, so a change that doesn't build shows up on its PR.
+# It doesn't package, sign or run the app.
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - name: Build (Debug, x64)
+        run: msbuild Capta.slnx -restore -m -p:Configuration=Debug -p:Platform=x64 -v:minimal
