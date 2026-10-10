@@ -219,8 +219,18 @@
                                     </StackPanel>
                                 </ToggleButton>
                                 <Rectangle Width="1" Height="26" Margin="4,0" Fill="{ThemeResource CaptaDividerBrush}" />
-                                <Button Style="{StaticResource ModeBarButton}" Padding="0" IsEnabled="False" ToolTipService.ToolTip="Capture settings (coming soon)">
+                                <Button Style="{StaticResource ModeBarButton}" Padding="0" ToolTipService.ToolTip="Capture settings">
                                     <c:LineIcon Data="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M18 6a2 2 0 1 1-4 0a2 2 0 1 1 4 0zM12 12a2 2 0 1 1-4 0a2 2 0 1 1 4 0zM20 18a2 2 0 1 1-4 0a2 2 0 1 1 4 0z" />
+                                    <Button.Flyout>
+                                        <!-- The windows close the overlay first: it's topmost and would cover them. -->
+                                        <MenuFlyout Placement="BottomEdgeAlignedRight" Opening="OnSettingsOpening" Closed="OnSettingsClosed">
+                                            <ToggleMenuFlyoutItem x:Name="AutoCopyItem" Text="Copy automatically after capture" Click="OnAutoCopy" />
+                                            <ToggleMenuFlyoutItem x:Name="SendToOculaItem" Text="Send captures to Ocula" Click="OnSendToOcula" Visibility="Collapsed" />
+                                            <MenuFlyoutSeparator />
+                                            <MenuFlyoutItem Text="Colour &amp; HDR…" Tag="ColourAndHdr" Click="OnOpenSettings" />
+                                            <MenuFlyoutItem Text="Startup &amp; shortcuts…" Tag="StartupAndShortcuts" Click="OnOpenSettings" />
+                                        </MenuFlyout>
+                                    </Button.Flyout>
                                 </Button>
                                 <Button Style="{StaticResource ModeBarButton}" Padding="0" Click="OnCancelClick" ToolTipService.ToolTip="Cancel capture (Esc)">
                                     <c:LineIcon Data="M6 6l12 12M18 6L6 18" />

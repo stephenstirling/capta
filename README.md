@@ -15,7 +15,13 @@ takes over the Print Screen key and copies captures to the clipboard as PNG.
 
 In the region overlay, **Esc** captures the selection once you've drawn one (and copies it, with Auto-copy on);
 with nothing selected it cancels. Press **C** to pick the colour under the cursor: its hex code is copied and
-pinned as a small chip (click the code to copy again, double-click or Esc to unpin).
+pinned as a small chip (click the code to copy again, double-click or Esc to unpin). The settings button at
+the end of the overlay's bar switches Auto-copy and opens the settings windows.
+
+**Colour & HDR** (tray menu) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
+Display P3 (which keeps wide-gamut colours and embeds its profile; the clipboard always gets sRGB). It can also
+correct captures of an SDR monitor for its colour profile, so they look as they did on a calibrated or
+wide-gamut screen.
 
 Recordings are MP4 (H.264 + AAC) in your capture folder, with system audio and, if you switch it on,
 the microphone. The card after a recording can play it, copy the file or save a GIF of the first

@@ -1,7 +1,8 @@
 namespace Capta.Capture;
 
 /// <summary>
-/// Converts FP16 scRGB captures (linear, Rec.709 primaries, 1.0 = 80 nits) to 8-bit sRGB.
+/// Converts FP16 scRGB captures (linear, Rec.709 primaries, 1.0 = 80 nits) to 8-bit sRGB, or to
+/// Display P3 for saved files (keeping wide-gamut colours that sRGB would clip).
 /// </summary>
 /// <remarks>
 /// SDR white on an HDR display sits at the SDR white level, not 80 nits, so pixels are first
@@ -13,6 +14,8 @@ namespace Capta.Capture;
 /// an extended Reinhard curve whose white point is the frame's brightest pixel, applied to the
 /// largest channel so hue is kept.</item>
 /// </list>
+/// Display P3 converts the linear values to P3 primaries first (scRGB holds colours outside
+/// Rec.709 as negative components); both spaces use the sRGB tone curve.
 /// </remarks>
 public static class ToneMapper
 {
@@ -23,8 +26,9 @@ public static class ToneMapper
     private static readonly byte[] s_linearToSrgb = BuildSrgbLut();
 
     public static CapturedImage ToSdr(ushort[] rgbaHalf, int width, int height, float sdrWhiteLevelNits,
-        HighlightRollOff rollOff = HighlightRollOff.Clip)
+        HighlightRollOff rollOff = HighlightRollOff.Clip, ColourSpace target = ColourSpace.Srgb)
     {
+        var toP3 = target == ColourSpace.DisplayP3;
         var scale = ScRgbReferenceNits / MathF.Max(sdrWhiteLevelNits, 1f);
         var knee = rollOff switch
         {
@@ -46,9 +50,19 @@ public static class ToneMapper
             for (var x = 0; x < width; x++)
             {
                 var i = x * 4;
-                var r = MathF.Max(s_halfToFloat[src[i]] * scale, 0f);
-                var g = MathF.Max(s_halfToFloat[src[i + 1]] * scale, 0f);
-                var b = MathF.Max(s_halfToFloat[src[i + 2]] * scale, 0f);
+                var r = s_halfToFloat[src[i]] * scale;
+                var g = s_halfToFloat[src[i + 1]] * scale;
+                var b = s_halfToFloat[src[i + 2]] * scale;
+                if (toP3)
+                {
+                    // Linear Rec.709 to Display P3 (D65); from tools/generate_display_p3_icc.py.
+                    (r, g, b) = (0.8224620f * r + 0.1775380f * g,
+                        0.0331942f * r + 0.9668058f * g,
+                        0.0170826f * r + 0.0723974f * g + 0.9105199f * b);
+                }
+                r = MathF.Max(r, 0f);
+                g = MathF.Max(g, 0f);
+                b = MathF.Max(b, 0f);
 
                 var m = MathF.Max(r, MathF.Max(g, b));
                 if (compress && m > knee)

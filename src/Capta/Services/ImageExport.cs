@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.WindowsRuntime;
 using Capta.Capture;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
@@ -10,13 +11,16 @@ namespace Capta.Services;
 public static class ImageExport
 {
     /// <param name="captaJson">Capture metadata for the "Capta" tEXt chunk (saved files only).</param>
-    public static async Task<InMemoryRandomAccessStream> EncodePngAsync(CapturedImage image, string? captaJson = null)
+    /// <param name="target">sRGB for the clipboard and Recent; saved files use the Colour &amp; HDR choice.</param>
+    public static async Task<InMemoryRandomAccessStream> EncodePngAsync(CapturedImage image, string? captaJson = null,
+        ColourSpace target = ColourSpace.Srgb)
     {
+        var (pixels, space) = await ColourOutput.ConvertAsync(image, target);
         var stream = new InMemoryRandomAccessStream();
         var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
         encoder.SetPixelData(BitmapPixelFormat.Bgra8, image.HasTransparency ? BitmapAlphaMode.Premultiplied : BitmapAlphaMode.Ignore,
-            (uint)image.Width, (uint)image.Height, 96, 96, image.Pixels);
-        if (CaptureOptions.Current.EmbedColourProfile)
+            (uint)image.Width, (uint)image.Height, 96, 96, pixels);
+        if (space == ColourSpace.Srgb && CaptureOptions.Current.EmbedColourProfile)
         {
             try
             {
@@ -46,8 +50,27 @@ public static class ImageExport
             }
         }
         await encoder.FlushAsync();
+        if (space == ColourSpace.DisplayP3)
+            return await WithIccProfileAsync(stream, "Display P3", ColourOutput.DisplayP3Profile);
         stream.Seek(0);
         return stream;
+    }
+
+    /// <summary>Adds an iCCP chunk, which the WinRT encoder can't write. Disposes <paramref name="png"/>.</summary>
+    private static async Task<InMemoryRandomAccessStream> WithIccProfileAsync(InMemoryRandomAccessStream png, string name, byte[] profile)
+    {
+        byte[] bytes;
+        using (png)
+        {
+            bytes = new byte[png.Size];
+            using var reader = new DataReader(png.GetInputStreamAt(0));
+            await reader.LoadAsync((uint)png.Size);
+            reader.ReadBytes(bytes);
+        }
+        var tagged = new InMemoryRandomAccessStream();
+        await tagged.WriteAsync(PngChunks.WithIccProfile(bytes, name, profile).AsBuffer());
+        tagged.Seek(0);
+        return tagged;
     }
 
     /// <summary>
@@ -66,9 +89,10 @@ public static class ImageExport
         Clipboard.Flush();
     }
 
+    /// <summary>Saves a PNG in the colour space chosen in Colour &amp; HDR.</summary>
     public static async Task SaveAsync(CapturedImage image, StorageFile file, string? captaJson = null)
     {
-        using var png = await EncodePngAsync(image, captaJson);
+        using var png = await EncodePngAsync(image, captaJson, CaptureOptions.Current.ColourSpace);
         using var output = await file.OpenAsync(FileAccessMode.ReadWrite);
         output.Size = 0;
         await RandomAccessStream.CopyAndCloseAsync(png.GetInputStreamAt(0), output.GetOutputStreamAt(0));

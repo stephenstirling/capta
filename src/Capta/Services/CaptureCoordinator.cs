@@ -22,6 +22,9 @@ public sealed class CaptureCoordinator
     /// <summary>A colour was picked in the overlay (C) instead of a capture.</summary>
     public event Action<Windows.UI.Color, PointInt32>? ColourPicked;
 
+    /// <summary>A settings window was chosen from the overlay's Capture settings (the overlay has closed).</summary>
+    public event Action<SettingsPage>? SettingsRequested;
+
     public async Task RunAsync(CaptureMode mode)
     {
         if (_busy)
@@ -149,6 +152,9 @@ public sealed class CaptureCoordinator
             }
             case OverlayResult.ColourPicked c:
                 ColourPicked?.Invoke(c.Colour, c.ScreenPoint);
+                return null;
+            case OverlayResult.OpenSettings s:
+                SettingsRequested?.Invoke(s.Page);
                 return null;
             case OverlayResult.WindowSelected w:
             {

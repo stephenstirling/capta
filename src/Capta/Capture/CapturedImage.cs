@@ -8,6 +8,11 @@ namespace Capta.Capture;
 /// An SDR capture: 8-bit BGRA (premultiplied), top-down rows with no padding. Opaque unless
 /// <see cref="HasTransparency"/> (freeform captures are transparent outside their shape).
 /// </summary>
+/// <remarks>
+/// The pixels are what the screen showed, for display inside Capta. Anything leaving Capta goes
+/// through <see cref="ColourOutput"/>, which applies <see cref="SourceProfile"/> and the chosen
+/// colour space.
+/// </remarks>
 public sealed class CapturedImage
 {
     public CapturedImage(int width, int height, byte[] pixels)
@@ -40,6 +45,17 @@ public sealed class CapturedImage
         }
     }
 
+    /// <summary>The SDR white level the HDR original was tone-mapped with (for re-mapping to Display P3).</summary>
+    public float SdrWhiteNits { get; init; } = 80f;
+
+    public HighlightRollOff RollOff { get; init; }
+
+    /// <summary>
+    /// ICC profile of the SDR display the pixels came from, when they should be corrected for it on
+    /// the way out (Colour &amp; HDR → "Correct for each monitor's colour profile"). Null: sRGB.
+    /// </summary>
+    public byte[]? SourceProfile { get; init; }
+
     public uint GetPixel(int x, int y)
     {
         if ((uint)x >= (uint)Width || (uint)y >= (uint)Height) return 0;
@@ -65,7 +81,14 @@ public sealed class CapturedImage
             for (var row = 0; row < h; row++)
                 Array.Copy(HdrPixels, ((y0 + row) * Width + x0) * 4, hdr, row * w * 4, w * 4);
         }
-        return new CapturedImage(w, h, dst) { HdrPixels = hdr, HasTransparency = HasTransparency };
+        return new CapturedImage(w, h, dst)
+        {
+            HdrPixels = hdr,
+            HasTransparency = HasTransparency,
+            SdrWhiteNits = SdrWhiteNits,
+            RollOff = RollOff,
+            SourceProfile = SourceProfile,
+        };
     }
 
     /// <summary>
@@ -106,7 +129,14 @@ public sealed class CapturedImage
                 if (hdr is not null) Array.Clear(hdr, (y * Width + x) * 4, 4);
             }
         }
-        return new CapturedImage(Width, Height, sdr) { HdrPixels = hdr, HasTransparency = true };
+        return new CapturedImage(Width, Height, sdr)
+        {
+            HdrPixels = hdr,
+            HasTransparency = true,
+            SdrWhiteNits = SdrWhiteNits,
+            RollOff = RollOff,
+            SourceProfile = SourceProfile,
+        };
     }
 
     public SoftwareBitmap ToSoftwareBitmap()

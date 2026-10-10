@@ -78,10 +78,15 @@ public sealed partial class ToolbarWindow : Window
     {
         SelectMode(Settings.ToolbarMode);
         ApplyDelay(Settings.CaptureDelaySeconds);
-        AutoCopyToggle.IsChecked = Settings.AutoCopy;
-        AutoCopyCheck.Visibility = Settings.AutoCopy ? Visibility.Visible : Visibility.Collapsed;
+        ApplyAutoCopy();
         KeepOnTopToggle.IsChecked = Settings.ToolbarKeepOnTop;
         _presenter.IsAlwaysOnTop = Settings.ToolbarKeepOnTop;
+    }
+
+    private void ApplyAutoCopy()
+    {
+        AutoCopyToggle.IsChecked = Settings.AutoCopy;
+        AutoCopyCheck.Visibility = Settings.AutoCopy ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public void ShowOnCursorMonitor()
@@ -89,6 +94,7 @@ public sealed partial class ToolbarWindow : Window
         var cursor = WindowHelper.CursorPosition();
         UpdateHdrBadge(cursor);
         ApplyDelay(Settings.CaptureDelaySeconds); // may have changed in the tray flyout
+        ApplyAutoCopy(); // or on the card, or in the overlay's Capture settings
         ToolTipService.SetToolTip(RegionMode, $"Region ({Shortcuts.For(HotkeyAction.Region).Compact})");
         ToolTipService.SetToolTip(WindowMode, $"Window ({Shortcuts.For(HotkeyAction.ActiveWindow).Compact} captures the active window)");
         ToolTipService.SetToolTip(FullScreenMode, $"Full screen ({Shortcuts.For(HotkeyAction.FullScreen).Compact})");

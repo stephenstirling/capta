@@ -86,7 +86,8 @@ public sealed class ScrollStitcher
             Buffer.BlockCopy(_rows[y], 0, pixels, y * _width * 4, _width * 4);
         for (var y = 0; y < footer; y++)
             Buffer.BlockCopy(_previous.Pixels, (_height - footer + y) * _width * 4, pixels, (_rows.Count + y) * _width * 4, _width * 4);
-        return new CapturedImage(_width, height, pixels);
+        // The HDR originals aren't stitched; the colour correction still applies.
+        return new CapturedImage(_width, height, pixels) { SourceProfile = _previous.SourceProfile };
     }
 
     /// <summary>

@@ -19,8 +19,7 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
     {
         var item = WinRTInterop.CreateItemForMonitor(monitor.Handle);
         var (pixels, w, h) = await GrabAsync(item);
-        return WithHdr(ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(monitor.Handle), CaptureOptions.Current.RollOff),
-            pixels, monitor.Handle);
+        return await ToImageAsync(pixels, w, h, monitor.Handle);
     }
 
     public async Task<CapturedImage> CaptureWindowAsync(nint hwnd)
@@ -28,21 +27,60 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
         var item = WinRTInterop.CreateItemForWindow(hwnd);
         var (pixels, w, h) = await GrabAsync(item);
         var monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-        return WithHdr(ToneMapper.ToSdr(pixels, w, h, SdrWhiteLevel(monitor), CaptureOptions.Current.RollOff),
-            pixels, monitor);
+        return await ToImageAsync(pixels, w, h, monitor);
     }
 
-    /// <summary>Keeps the FP16 original alongside the SDR image, but only from an HDR display.</summary>
-    private static CapturedImage WithHdr(CapturedImage sdr, ushort[] fp16, nint hmonitor) =>
-        IsHdr(hmonitor) ? new CapturedImage(sdr.Width, sdr.Height, sdr.Pixels) { HdrPixels = fp16 } : sdr;
+    /// <summary>
+    /// The SDR image. From an HDR display it keeps the FP16 original (and how it was tone-mapped);
+    /// from an SDR display it notes the display's profile when captures are corrected for it.
+    /// </summary>
+    private static async Task<CapturedImage> ToImageAsync(ushort[] fp16, int width, int height, nint hmonitor)
+    {
+        var options = CaptureOptions.Current;
+        var white = SdrWhiteLevel(hmonitor);
+        var sdr = ToneMapper.ToSdr(fp16, width, height, white, options.RollOff);
+        if (IsHdr(hmonitor))
+            return new CapturedImage(width, height, sdr.Pixels) { HdrPixels = fp16, SdrWhiteNits = white, RollOff = options.RollOff };
+        if (options.CorrectMonitorProfiles && await MonitorProfileAsync(hmonitor) is { } profile)
+            return new CapturedImage(width, height, sdr.Pixels) { SourceProfile = profile };
+        return sdr;
+    }
 
-    /// <summary>HDR state and the Windows SDR white level for a monitor (null if unavailable).</summary>
-    public static (bool Hdr, float SdrWhiteNits)? DisplayColour(nint hmonitor)
+    /// <summary>
+    /// The ICC profile of an SDR display that Windows doesn't colour-manage itself. Null for HDR and
+    /// Auto Color Management displays, when no profile is set, or if it can't be read.
+    /// </summary>
+    public static async Task<byte[]?> MonitorProfileAsync(nint hmonitor)
+    {
+        try
+        {
+            var display = WinRTInterop.GetDisplayInformation(hmonitor);
+            if (display.GetAdvancedColorInfo().CurrentAdvancedColorKind != Windows.Graphics.Display.AdvancedColorKind.StandardDynamicRange)
+                return null;
+            using var stream = await display.GetColorProfileAsync();
+            if (stream is null || stream.Size == 0) return null;
+            using var bytes = new MemoryStream();
+            await stream.AsStreamForRead().CopyToAsync(bytes);
+            return bytes.ToArray();
+        }
+        catch (Exception ex)
+        {
+            Capta.Services.Log.Info($"Display colour profile unavailable: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// HDR state, whether an SDR display uses Auto Color Management, and the Windows SDR white level
+    /// for a monitor (null if unavailable).
+    /// </summary>
+    public static (bool Hdr, bool AutoColour, float SdrWhiteNits)? DisplayColour(nint hmonitor)
     {
         try
         {
             var info = WinRTInterop.GetDisplayInformation(hmonitor).GetAdvancedColorInfo();
             return (info.CurrentAdvancedColorKind == Windows.Graphics.Display.AdvancedColorKind.HighDynamicRange,
+                info.CurrentAdvancedColorKind == Windows.Graphics.Display.AdvancedColorKind.WideColorGamut,
                 (float)info.SdrWhiteLevelInNits);
         }
         catch

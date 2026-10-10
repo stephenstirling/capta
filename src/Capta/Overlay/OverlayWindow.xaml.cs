@@ -416,6 +416,29 @@ public sealed partial class OverlayWindow : Window
         _session.Complete(new OverlayResult.Delayed(seconds, _mode));
     }
 
+    private async void OnSettingsOpening(object sender, object e)
+    {
+        AutoCopyItem.IsChecked = Settings.AutoCopy;
+        SendToOculaItem.IsChecked = Settings.SendToOculaAutomatically;
+        try
+        {
+            SendToOculaItem.Visibility = await CaptureActions.IsOculaInstalledAsync() ? Visibility.Visible : Visibility.Collapsed;
+        }
+        catch (Exception ex)
+        {
+            Log.Info($"Couldn't check for Ocula: {ex.Message}");
+        }
+    }
+
+    private void OnSettingsClosed(object sender, object e) => FocusHost.Focus(FocusState.Programmatic);
+
+    private void OnAutoCopy(object sender, RoutedEventArgs e) => Settings.AutoCopy = AutoCopyItem.IsChecked;
+
+    private void OnSendToOcula(object sender, RoutedEventArgs e) => Settings.SendToOculaAutomatically = SendToOculaItem.IsChecked;
+
+    private void OnOpenSettings(object sender, RoutedEventArgs e) =>
+        _session.Complete(new OverlayResult.OpenSettings(Enum.Parse<SettingsPage>((string)((FrameworkElement)sender).Tag)));
+
     private bool IsOverTopBar(Point dip)
     {
         var bounds = TopBar.TransformToVisual(Root).TransformBounds(new Rect(0, 0, TopBar.ActualWidth, TopBar.ActualHeight));

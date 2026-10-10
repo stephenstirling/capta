@@ -97,6 +97,7 @@ Fast, HDR-correct screenshots from the Print Screen key, right in your tray.
 > - Screen recording to MP4 with system audio and microphone, plus GIF export
 > - Frozen-screen overlay with a pixel loupe and colour picker (press C to pin a colour)
 > - HDR-aware capture with tone-mapping you can adjust
+> - Save in sRGB or Display P3, with optional correction for your monitor's colour profile
 > - Grab text: on-device text recognition, nothing uploaded
 > - Pin captures above other windows
 > - Copy as HDR (JPEG XR) for HDR-aware apps
