@@ -137,7 +137,7 @@
                         </Button>
                     </Grid>
 
-                    <ScrollViewer Grid.Row="1" Padding="24,0,24,16" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer x:Name="Scroller" Grid.Row="1" Padding="24,0,24,16" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
                         <StackPanel Spacing="20">
 
                             <!-- Startup -->
@@ -161,6 +161,18 @@
                                 <Grid MinHeight="48">
                                     <TextBlock VerticalAlignment="Center" Text="Keep running in the tray when the toolbar is closed" />
                                     <ToggleSwitch x:Name="KeepRunning" Style="{StaticResource Switch}" Toggled="OnKeepRunning" />
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Colour & HDR lives in its own window. -->
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="COLOUR" />
+                                <Grid MinHeight="48">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Colour &amp; HDR" />
+                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="HDR tone-mapping, sRGB or Display P3, monitor profiles" />
+                                    </StackPanel>
+                                    <HyperlinkButton HorizontalAlignment="Right" Padding="8,4" Click="OnColourAndHdr" Content="Open…" />
                                 </Grid>
                             </StackPanel>
 
@@ -274,7 +286,7 @@
                             </StackPanel>
 
                             <!-- About -->
-                            <StackPanel>
+                            <StackPanel x:Name="AboutSection">
                                 <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="ABOUT" />
                                 <Grid MinHeight="48">
                                     <TextBlock VerticalAlignment="Center" Text="Version" />

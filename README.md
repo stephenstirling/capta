@@ -34,7 +34,7 @@ Window captures (Window mode and Alt+PrtSc) keep the window's rounded corners, w
 background outside them. The mouse cursor is left out unless you switch on **Include cursor in window
 captures** in the overlay's Capture settings.
 
-**Colour & HDR** (tray menu → Settings) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
+**Colour & HDR** (tray menu → Settings…, then the Colour & HDR link) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
 Display P3 (which keeps wide-gamut colours and embeds its profile; the clipboard always gets sRGB). It can also
 correct captures of an SDR monitor for its colour profile, so they look as they did on a calibrated or
 wide-gamut screen.

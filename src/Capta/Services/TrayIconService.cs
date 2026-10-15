@@ -1,105 +1,24 @@
 using Capta.Views;
 using H.NotifyIcon;
 using H.NotifyIcon.Core;
-using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.System;
-using DispatcherQueuePriority = Microsoft.UI.Dispatching.DispatcherQueuePriority;
 
 namespace Capta.Services;
 
-/// <summary>Owns the notification-area icon and its Fluent context menu.</summary>
+/// <summary>Owns the notification-area icon; its right-click menu is <see cref="TrayMenuWindow"/>.</summary>
 public sealed class TrayIconService : IDisposable
 {
     private readonly App _app;
     private TaskbarIcon? _icon;
-    private MenuFlyout? _menu;
-    private TrayMenuWindow? _menuWindow;
-    private ToggleMenuFlyoutItem? _startupItem;
-    private MenuFlyoutItem? _printScreenWarning;
-    private MenuFlyoutSeparator? _printScreenWarningSeparator;
-    private MenuFlyoutItem? _clickThroughItem;
-    private readonly List<(MenuFlyoutItem Item, HotkeyAction Action)> _shortcutItems = [];
+    private TrayMenuWindow? _menu;
+    private bool _windowsOwnsKey;
+    private bool _anyClickThroughPins;
 
     public TrayIconService(App app) => _app = app;
 
     public void Create()
     {
-        _startupItem = new ToggleMenuFlyoutItem { Text = "Start with Windows" };
-        _startupItem.Click += async (_, _) => await ToggleStartupAsync();
-
-        var exit = new MenuFlyoutItem { Text = "Exit", Icon = new SymbolIcon(Symbol.Cancel) };
-        exit.Click += (_, _) => _app.Quit();
-
-        var toolbar = new MenuFlyoutItem
-        {
-            Text = "Show toolbar",
-            Icon = new FontIcon { Glyph = "" },
-        };
-        toolbar.Click += (_, _) => _app.ShowToolbar();
-
-        _printScreenWarning = new MenuFlyoutItem
-        {
-            Text = "Fix Print Screen shortcut…",
-            Icon = new FontIcon { Glyph = "" },
-            Visibility = Visibility.Collapsed,
-        };
-        _printScreenWarning.Click += (_, _) => _app.ShowSettings();
-        ToolTipService.SetToolTip(_printScreenWarning, "Windows is using Print Screen for the Snipping Tool");
-
-        var settings = new MenuFlyoutItem { Text = "Startup & shortcuts…", Icon = new FontIcon { Glyph = "" } };
-        settings.Click += (_, _) => _app.ShowSettings();
-
-        var colour = new MenuFlyoutItem { Text = "Colour & HDR\u2026", Icon = new FontIcon { Glyph = "\uE790" } };
-        colour.Click += (_, _) => _app.ShowColourAndHdr();
-
-        var setup = new MenuFlyoutItem { Text = "Set up Capta…" };
-        setup.Click += (_, _) => _app.ShowFirstRun();
-        _printScreenWarningSeparator = new MenuFlyoutSeparator { Visibility = Visibility.Collapsed };
-
-        // The three windows live under one entry, which keeps the menu short.
-        var settingsMenu = new MenuFlyoutSubItem { Text = "Settings", Icon = new FontIcon { Glyph = "\uE713" } };
-        settingsMenu.Items.Add(settings);
-        settingsMenu.Items.Add(colour);
-        settingsMenu.Items.Add(setup);
-
-        var repeatRegion = new MenuFlyoutItem { Text = "Repeat last region", Icon = new FontIcon { Glyph = "\uE72C" } };
-        _shortcutItems.Add((repeatRegion, HotkeyAction.RepeatRegion));
-        repeatRegion.Click += (_, _) => _app.Dispatcher.TryEnqueue(DispatcherQueuePriority.Low, _app.RepeatLastRegion);
-
-        _clickThroughItem = new MenuFlyoutItem
-        {
-            Text = "Make pinned captures clickable",
-            Icon = new FontIcon { Glyph = "" },
-            Visibility = Visibility.Collapsed,
-        };
-        _clickThroughItem.Click += (_, _) => _app.ReleaseClickThroughPins();
-
-        var menu = _menu = new MenuFlyout
-        {
-            Items =
-            {
-                _printScreenWarning, _printScreenWarningSeparator,
-                CaptureItem("Region", "", HotkeyAction.Region, CaptureMode.Region),
-                repeatRegion,
-                CaptureItem("Window", "", null, CaptureMode.Window),
-                CaptureItem("Full screen", "", HotkeyAction.FullScreen, CaptureMode.FullScreen),
-                CaptureItem("Record video", "", HotkeyAction.Record, CaptureMode.Recording),
-                toolbar,
-                _clickThroughItem,
-                new MenuFlyoutSeparator(),
-                _startupItem, settingsMenu, new MenuFlyoutSeparator(), exit,
-            },
-        };
-        menu.Opening += async (_, _) =>
-        {
-            repeatRegion.IsEnabled = Settings.LastRegion is not null;
-            await RefreshStartupStateAsync();
-        };
-        UpdateShortcutLabels();
-        Shortcuts.Changed += UpdateShortcutLabels;
+        Shortcuts.Changed += () => _menu?.UpdateShortcutHints();
 
         _icon = new TaskbarIcon
         {
@@ -112,70 +31,32 @@ public sealed class TrayIconService : IDisposable
         _icon.ForceCreate(enablesEfficiencyMode: false);
     }
 
-    /// <summary>
-    /// Capta shows the menu itself (TrayMenuWindow) rather than through H.NotifyIcon, whose
-    /// SecondWindow mode sized it too small to show the labels.
-    /// </summary>
+    /// <summary>Capta shows the menu itself, so it can size and style it (see TrayMenuWindow).</summary>
     private void ShowMenu()
     {
-        if (_menu is null) return;
-        (_menuWindow ??= new TrayMenuWindow(_menu)).ShowAtCursor();
-    }
-
-    private MenuFlyoutItem CaptureItem(string text, string glyph, HotkeyAction? shortcut, CaptureMode mode)
-    {
-        var item = new MenuFlyoutItem { Text = text, Icon = new FontIcon { Glyph = glyph } };
-        if (shortcut is { } action) _shortcutItems.Add((item, action));
-        // Let the menu window close before the overlay freezes the screen.
-        item.Click += (_, _) => _app.Dispatcher.TryEnqueue(DispatcherQueuePriority.Low, () => _app.StartCapture(mode));
-        return item;
-    }
-
-    /// <summary>Shortcut text in the menu (display only; the hook owns the keys).</summary>
-    private void UpdateShortcutLabels()
-    {
-        foreach (var (item, action) in _shortcutItems)
-            item.KeyboardAcceleratorTextOverride = Shortcuts.For(action).Compact;
-    }
-
-    public async Task RefreshStartupStateAsync()
-    {
-        if (_startupItem is null) return;
-        var state = await StartupTaskService.GetStateAsync();
-        _startupItem.IsChecked = StartupTaskService.IsEnabled(state);
-        _startupItem.Text = StartupTaskService.IsLocked(state)
-            ? "Start with Windows (managed in Settings)"
-            : "Start with Windows";
-    }
-
-    private async Task ToggleStartupAsync()
-    {
-        var current = await StartupTaskService.GetStateAsync();
-        if (StartupTaskService.IsLocked(current))
+        if (_menu is null)
         {
-            // Only the user can undo DisabledByUser; send them to the right page.
-            await Launcher.LaunchUriAsync(new Uri("ms-settings:startupapps"));
+            _menu = new TrayMenuWindow(_app);
+            _menu.SetPrintScreenWarning(_windowsOwnsKey);
+            _menu.SetClickThroughPins(_anyClickThroughPins);
         }
-        else
-        {
-            await StartupTaskService.SetEnabledAsync(!StartupTaskService.IsEnabled(current));
-        }
-        await RefreshStartupStateAsync();
+        _menu.ShowAtCursor();
     }
+
+    public Task RefreshStartupStateAsync() => _menu?.RefreshStartupStateAsync() ?? Task.CompletedTask;
 
     public void SetPrintScreenWarning(bool windowsOwnsKey)
     {
-        var v = windowsOwnsKey ? Visibility.Visible : Visibility.Collapsed;
-        if (_printScreenWarning is not null) _printScreenWarning.Visibility = v;
-        if (_printScreenWarningSeparator is not null) _printScreenWarningSeparator.Visibility = v;
+        _windowsOwnsKey = windowsOwnsKey;
+        _menu?.SetPrintScreenWarning(windowsOwnsKey);
         if (_icon is not null)
             _icon.ToolTipText = windowsOwnsKey ? "Capta: Print Screen is still used by Windows" : "Capta";
     }
 
     public void SetClickThroughPins(bool any)
     {
-        if (_clickThroughItem is not null)
-            _clickThroughItem.Visibility = any ? Visibility.Visible : Visibility.Collapsed;
+        _anyClickThroughPins = any;
+        _menu?.SetClickThroughPins(any);
     }
 
     public void ShowInfo(string title, string message) =>
@@ -195,5 +76,7 @@ public sealed class TrayIconService : IDisposable
     {
         _icon?.Dispose();
         _icon = null;
+        _menu?.Close();
+        _menu = null;
     }
 }

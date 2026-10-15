@@ -130,6 +130,9 @@ public partial class App : Application
         }
     }
 
+    /// <summary>Check for updates: opens the releases page in the browser.</summary>
+    public async void CheckForUpdates() => await Links.OpenAsync(Links.Releases);
+
     public void ShowToolbar()
     {
         if (_toolbar is null)
@@ -428,10 +431,15 @@ public partial class App : Application
     }
 
     /// <summary>Startup &amp; shortcuts, which also explains the Print Screen conflict.</summary>
-    public void ShowSettings()
+    public void ShowSettings() => ShowSettings(toAbout: false);
+
+    /// <summary>The same window scrolled to its About section.</summary>
+    public void ShowAbout() => ShowSettings(toAbout: true);
+
+    private void ShowSettings(bool toAbout)
     {
         _settings ??= new StartupSettingsWindow(this);
-        _settings.ShowCentered(_ownership?.WindowsOwnsKey ?? false);
+        _settings.ShowCentered(_ownership?.WindowsOwnsKey ?? false, toAbout);
     }
 
     /// <summary>Captures the next key chord for changing a shortcut (null = cancelled with Esc).</summary>

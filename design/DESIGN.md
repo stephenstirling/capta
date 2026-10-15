@@ -63,6 +63,19 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    transparent outside the corners (a PNG with alpha), not a rectangle with black corners. The cursor is not
    drawn unless "Include cursor in window captures" is on in the overlay's Capture settings (off by default).
    Full screen and region captures never include it.
+8. **The tray menu is compact and consistent** (`Views/TrayMenuWindow`, Capta's own window, not a MenuFlyout):
+   - 32 px rows, 8 px padding above and below, 220–280 px wide, 10 px corners, `CaptaMenuSurfaceBrush`.
+     Hover and pressed use `CaptaHoverOverlayBrush` / `CaptaPressedOverlayBrush`, so dark and light match.
+   - Every row has the same 16 px icon column, so labels line up. "Start with Windows" has no icon of its own:
+     its tick sits in that column.
+   - Shortcut hints sit beside their labels, 12 px away, in the muted mono style (not at the far edge).
+   - Order, with a divider at each `|`: Region, Window, Full screen, Record video, Repeat last region | Show
+     toolbar | Start with Windows | Settings… | Check for updates | About Capta… | Exit.
+   - "Print Screen still opens Snipping Tool" + a **Fix** link tops the menu while Windows owns the key. It
+     wraps, never truncates.
+   - Settings… opens Startup & shortcuts, which has a link to Colour & HDR. "Set up Capta…" shows under
+     Settings… only until first-run setup is done. "Check for updates" is hidden in Store builds. "Make
+     pinned captures clickable" appears under Show toolbar while a pin is click-through.
 
 ## Visual rules
 

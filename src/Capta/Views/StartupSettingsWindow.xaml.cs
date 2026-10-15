@@ -170,7 +170,7 @@ public sealed partial class StartupSettingsWindow : Window
         ShortcutMessage.Text = "Shortcuts reset to the defaults.";
     }
 
-    public async void ShowCentered(bool windowsOwnsPrintScreen)
+    public async void ShowCentered(bool windowsOwnsPrintScreen, bool toAbout = false)
     {
         await LoadAsync(windowsOwnsPrintScreen);
 
@@ -186,6 +186,15 @@ public sealed partial class StartupSettingsWindow : Window
         this.ResizeDip(Panel.Width + pad.Left + pad.Right, Panel.Height + pad.Top + pad.Bottom);
         this.CenterOnCursorMonitor();
         this.BringToFront();
+
+        // Once it has laid out: the About section, or back to the top.
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (toAbout)
+                AboutSection.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = false, VerticalAlignmentRatio = 0 });
+            else
+                Scroller.ChangeView(null, 0, null, disableAnimation: true);
+        });
     }
 
     private async Task LoadAsync(bool windowsOwnsPrintScreen)
@@ -257,6 +266,8 @@ public sealed partial class StartupSettingsWindow : Window
     private async void OnGitHub(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.GitHub);
 
     private async void OnBuyMeACoffee(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.BuyMeACoffee);
+
+    private void OnColourAndHdr(object sender, RoutedEventArgs e) => _app.ShowColourAndHdr();
 
     private async void OnLicense(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.License);
 

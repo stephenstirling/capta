@@ -14,6 +14,7 @@ public static class Links
     /// </summary>
     public static Uri? OculaStore => null;
 
+    public static readonly Uri Releases = new("https://github.com/stephenstirling/capta/releases/latest");
     public static readonly Uri License = new("https://www.apache.org/licenses/LICENSE-2.0");
 
     public static Task OpenAsync(Uri uri) => Launcher.LaunchUriAsync(uri).AsTask();
