@@ -27,6 +27,7 @@ public sealed partial class CaptureCardWindow : Window
     private bool _busy;
     private bool _hovered;
     private bool _reviewOpen;
+    private bool _oculaMissing;
 
     public event Action<CaptureResult>? PinRequested;
 
@@ -107,9 +108,7 @@ public sealed partial class CaptureCardWindow : Window
         else
             SetStatus(copied ? "Copied to clipboard" : "Capture ready", success: copied);
 
-        var oculaInstalled = await CaptureActions.IsOculaInstalledAsync();
-        OculaButton.IsEnabled = oculaInstalled;
-        ToolTipService.SetToolTip(OculaButton, oculaInstalled ? "Send to Ocula" : "Send to Ocula (Ocula isn't installed)");
+        ApplyOculaButton(await CaptureActions.IsOculaInstalledAsync());
 
         await SetThumbnailAsync(result);
         if (_current != result) return; // superseded by a newer capture
@@ -117,6 +116,19 @@ public sealed partial class CaptureCardWindow : Window
         PlaceOn(result.Monitor);
         this.BringToFront();
         RestartTimer();
+    }
+
+    /// <summary>Send to Ocula; or, without Ocula, Get Ocula (once it has a Store page) or a disabled button.</summary>
+    private void ApplyOculaButton(bool installed)
+    {
+        _oculaMissing = !installed;
+        var getOcula = !installed && CaptureActions.CanGetOcula;
+        OculaText.Visibility = getOcula ? Visibility.Visible : Visibility.Collapsed;
+        OculaButton.Padding = getOcula ? new Thickness(14, 0, 14, 0) : new Thickness(0);
+        OculaButton.IsEnabled = installed || getOcula;
+        ToolTipService.SetToolTip(OculaButton, installed ? "Send to Ocula"
+            : getOcula ? "Get Ocula from the Microsoft Store"
+            : "Send to Ocula (Ocula isn't installed)");
     }
 
     private async Task SetThumbnailAsync(CaptureResult result)
@@ -451,6 +463,11 @@ public sealed partial class CaptureCardWindow : Window
 
     private async void OnSendToOcula(object sender, RoutedEventArgs e)
     {
+        if (_oculaMissing)
+        {
+            await RunAsync(CaptureActions.GetOculaAsync);
+            return;
+        }
         if (_current is null) return;
         await RunAsync(async () =>
         {

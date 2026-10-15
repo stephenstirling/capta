@@ -361,8 +361,11 @@
                         <Button x:Name="PinButton" Grid.Column="3" Width="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnPin" ToolTipService.ToolTip="Pin to screen">
                             <c:LineIcon Size="17" Data="M14 4l6 6M16 6l-5 5-4-1-2 2 7 7 2-2-1-4 5-5M8 16l-4 4" />
                         </Button>
-                        <Button x:Name="OculaButton" Grid.Column="4" Width="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnSendToOcula" ToolTipService.ToolTip="Send to Ocula">
-                            <c:LineIcon Size="17" StrokeWidth="1.9" Data="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0z" />
+                        <Button x:Name="OculaButton" Grid.Column="4" MinWidth="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnSendToOcula" ToolTipService.ToolTip="Send to Ocula">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <c:LineIcon x:Name="OculaIcon" Size="17" StrokeWidth="1.9" Data="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0z" />
+                                <TextBlock x:Name="OculaText" Text="Get Ocula" FontWeight="SemiBold" Visibility="Collapsed" />
+                            </StackPanel>
                         </Button>
                     </Grid>
                 </StackPanel>

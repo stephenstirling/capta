@@ -22,6 +22,7 @@ public sealed partial class TrayFlyoutWindow : Window
     private const double MarginDip = 12;
 
     private readonly App _app;
+    private bool _oculaInstalled;
 
     public TrayFlyoutWindow(App app)
     {
@@ -66,8 +67,13 @@ public sealed partial class TrayFlyoutWindow : Window
         ApplyDelay(Settings.CaptureDelaySeconds);
         RegionKeys.Text = Shortcuts.For(HotkeyAction.Region).Compact;
         WindowKeys.Text = Shortcuts.For(HotkeyAction.ActiveWindow).Compact;
-        OculaButton.IsEnabled = await CaptureActions.IsOculaInstalledAsync();
-        ToolTipService.SetToolTip(OculaButton, OculaButton.IsEnabled ? null : "Ocula isn't installed yet");
+        _oculaInstalled = await CaptureActions.IsOculaInstalledAsync();
+        var getOcula = !_oculaInstalled && CaptureActions.CanGetOcula;
+        OculaText.Text = getOcula ? "Get Ocula" : "Open all captures in Ocula";
+        OculaButton.IsEnabled = _oculaInstalled || getOcula;
+        ToolTipService.SetToolTip(OculaButton, _oculaInstalled ? null
+            : getOcula ? "Get Ocula from the Microsoft Store"
+            : "Ocula isn't installed yet");
         await FillRecentAsync(recent);
 
         // Bottom-right of the work area on the cursor's monitor (the tray is there by default).
@@ -187,7 +193,8 @@ public sealed partial class TrayFlyoutWindow : Window
     private async void OnOpenInOcula(object sender, RoutedEventArgs e)
     {
         Hide();
-        await CaptureActions.OpenCapturesInOculaAsync();
+        if (_oculaInstalled) await CaptureActions.OpenCapturesInOculaAsync();
+        else await CaptureActions.GetOculaAsync();
     }
 
     private void OnEscape(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
