@@ -437,6 +437,7 @@ public sealed partial class OverlayWindow : Window
     {
         AutoCopyItem.IsChecked = Settings.AutoCopy;
         AutoRedactItem.IsChecked = Settings.AutoRedact;
+        IncludeCursorItem.IsChecked = Settings.IncludeCursor;
         SendToOculaItem.IsChecked = Settings.SendToOculaAutomatically;
     }
 
@@ -449,6 +450,12 @@ public sealed partial class OverlayWindow : Window
     private void OnAutoCopy(object sender, RoutedEventArgs e) => Settings.AutoCopy = AutoCopyItem.IsChecked;
 
     private void OnAutoRedact(object sender, RoutedEventArgs e) => Settings.AutoRedact = AutoRedactItem.IsChecked;
+
+    private void OnIncludeCursor(object sender, RoutedEventArgs e)
+    {
+        Settings.IncludeCursor = IncludeCursorItem.IsChecked;
+        Settings.ApplyCaptureOptions();
+    }
 
     private void OnSendToOcula(object sender, RoutedEventArgs e) => Settings.SendToOculaAutomatically = SendToOculaItem.IsChecked;
 

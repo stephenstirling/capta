@@ -59,6 +59,11 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    **Undo** (which becomes "Blur again"). On by default, with a "Blur personal info" switch in the overlay's
    Capture settings. Grab text and recordings are not touched.
 
+7. **Window captures keep their shape.** Windows 11 windows are rounded, so a Window or Active window capture is
+   transparent outside the corners (a PNG with alpha), not a rectangle with black corners. The cursor is not
+   drawn unless "Include cursor in window captures" is on in the overlay's Capture settings (off by default).
+   Full screen and region captures never include it.
+
 ## Visual rules
 
 - **Fonts:** Segoe UI Variable Text for UI; Cascadia Mono for sizes, coordinates, hex values and shortcut keys.

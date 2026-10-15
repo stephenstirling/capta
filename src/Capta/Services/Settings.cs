@@ -151,6 +151,13 @@ public static class Settings
         set => Values[nameof(CorrectMonitorProfiles)] = value;
     }
 
+    /// <summary>Show the mouse cursor in window captures. Off by default.</summary>
+    public static bool IncludeCursor
+    {
+        get => Get(nameof(IncludeCursor), false);
+        set => Values[nameof(IncludeCursor)] = value;
+    }
+
     public static bool RecordSystemAudio
     {
         get => Get(nameof(RecordSystemAudio), true);
@@ -178,6 +185,7 @@ public static class Settings
         EmbedColourProfile = EmbedColourProfile,
         ColourSpace = ColourSpace,
         CorrectMonitorProfiles = CorrectMonitorProfiles,
+        IncludeCursor = IncludeCursor,
     };
 
     // ---- Shortcuts (see Shortcuts) ----

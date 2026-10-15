@@ -25,6 +25,10 @@ saved or sent to Ocula. The card that follows says what was blurred, with **Revi
 item) and **Undo**. It only sees what OCR reads, so check anything sensitive, and it will blur some numbers
 that aren't personal: that's what Review and Undo are for.
 
+Window captures (Window mode and Alt+PrtSc) keep the window's rounded corners, with a transparent
+background outside them. The mouse cursor is left out unless you switch on **Include cursor in window
+captures** in the overlay's Capture settings.
+
 **Colour & HDR** (tray menu → Settings) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
 Display P3 (which keeps wide-gamut colours and embeds its profile; the clipboard always gets sRGB). It can also
 correct captures of an SDR monitor for its colour profile, so they look as they did on a calibrated or

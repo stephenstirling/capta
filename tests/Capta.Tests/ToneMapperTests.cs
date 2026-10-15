@@ -73,6 +73,34 @@ public class ToneMapperTests
     }
 
     [Fact]
+    public void KeepAlphaCarriesTransparentCornersAndPremultipliesSoftEdges()
+    {
+        // Opaque white, white at half alpha (premultiplied: 0.5 each) and a fully transparent pixel.
+        ushort[] frame = [Half(1), Half(1), Half(1), Half(1), Half(.5f), Half(.5f), Half(.5f), Half(.5f), 0, 0, 0, 0];
+        var image = ToneMapper.ToSdr(frame, 3, 1, 80f, keepAlpha: true);
+
+        Assert.True(image.HasTransparency);
+        Assert.Equal(new byte[] { 255, 255, 255, 255, 128, 128, 128, 128, 0, 0, 0, 0 }, image.Pixels);
+    }
+
+    [Fact]
+    public void KeepAlphaOnAnOpaqueFrameIsNotTransparent()
+    {
+        var image = ToneMapper.ToSdr(Pixels((1f, 1f, 1f), (0.5f, 0.5f, 0.5f)), 2, 1, 80f, keepAlpha: true);
+        Assert.False(image.HasTransparency);
+        Assert.All(new[] { image.Pixels[3], image.Pixels[7] }, a => Assert.Equal(255, a));
+    }
+
+    [Fact]
+    public void WithoutKeepAlphaTheFrameIsOpaqueWhateverItsAlpha()
+    {
+        ushort[] frame = [Half(1), Half(1), Half(1), 0];
+        var image = ToneMapper.ToSdr(frame, 1, 1, 80f);
+        Assert.False(image.HasTransparency);
+        Assert.Equal(new byte[] { 255, 255, 255, 255 }, image.Pixels);
+    }
+
+    [Fact]
     public void OutputIsOpaque()
     {
         var bgra = ToneMapper.ToSdr(Pixels((0f, 0f, 0f), (0.5f, 0.5f, 0.5f)), 2, 1, 80f).Pixels;

@@ -30,7 +30,7 @@ public static class ColourOutput
                 // rather than converting the sRGB result, which has lost what sRGB can't hold.
                 if (target == ColourSpace.Srgb) return (image.Pixels, ColourSpace.Srgb);
                 var map = image.ToneMap ?? new HdrToneMap(80f, HighlightRollOff.Clip, null);
-                var p3 = ToneMapper.ToSdr(hdr, image.Width, image.Height, map.SdrWhiteNits, map.RollOff, target, map.Peaks);
+                var p3 = ToneMapper.ToSdr(hdr, image.Width, image.Height, map.SdrWhiteNits, map.RollOff, target, map.Peaks, keepAlpha: image.HasTransparency);
                 return (KeepAlpha(p3.Pixels, image.Pixels), target);
             }
 

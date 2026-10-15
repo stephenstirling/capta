@@ -25,26 +25,40 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
     public async Task<CapturedImage> CaptureWindowAsync(nint hwnd)
     {
         var item = WinRTInterop.CreateItemForWindow(hwnd);
-        var (pixels, w, h) = await GrabAsync(item);
+        var (pixels, w, h) = await GrabAsync(item, CaptureOptions.Current.IncludeCursor);
         var monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-        return await ToImageAsync(pixels, w, h, monitor);
+        // Windows 11 windows have rounded corners; the frame is transparent outside them.
+        return await ToImageAsync(pixels, w, h, monitor, keepAlpha: HasUsableAlpha(pixels));
+    }
+
+    /// <summary>
+    /// Whether a window frame's alpha channel can be trusted: most of the window is opaque. If a driver
+    /// or window left alpha at zero everywhere, keeping it would turn the whole capture transparent.
+    /// </summary>
+    private static bool HasUsableAlpha(ushort[] fp16)
+    {
+        var opaque = (Half)0.999f;
+        int pixels = fp16.Length / 4, step = Math.Max(1, pixels / 10_000), sampled = 0, solid = 0;
+        for (var p = 0; p < pixels; p += step, sampled++)
+            if (BitConverter.UInt16BitsToHalf(fp16[p * 4 + 3]) >= opaque) solid++;
+        return sampled > 0 && solid * 2 >= sampled;
     }
 
     /// <summary>
     /// The SDR image. From an HDR display it keeps the FP16 original (and how it was tone-mapped);
     /// from an SDR display it notes the display's profile when captures are corrected for it.
     /// </summary>
-    private static async Task<CapturedImage> ToImageAsync(ushort[] fp16, int width, int height, nint hmonitor)
+    private static async Task<CapturedImage> ToImageAsync(ushort[] fp16, int width, int height, nint hmonitor, bool keepAlpha = false)
     {
         var options = CaptureOptions.Current;
         var white = SdrWhiteLevel(hmonitor);
         // Measured once on the whole frame: crops mapped again later must use the same peaks.
         ToneMapper.FramePeaks? peaks = options.RollOff == HighlightRollOff.Clip ? null : ToneMapper.MeasurePeaks(fp16);
-        var sdr = ToneMapper.ToSdr(fp16, width, height, white, options.RollOff, peaks: peaks);
+        var sdr = ToneMapper.ToSdr(fp16, width, height, white, options.RollOff, peaks: peaks, keepAlpha: keepAlpha);
         if (IsHdr(hmonitor))
-            return new CapturedImage(width, height, sdr.Pixels) { HdrPixels = fp16, ToneMap = new HdrToneMap(white, options.RollOff, peaks) };
+            return new CapturedImage(width, height, sdr.Pixels) { HdrPixels = fp16, ToneMap = new HdrToneMap(white, options.RollOff, peaks), HasTransparency = sdr.HasTransparency };
         if (options.CorrectMonitorProfiles && await MonitorProfileAsync(hmonitor) is { } profile)
-            return new CapturedImage(width, height, sdr.Pixels) { SourceProfile = profile };
+            return new CapturedImage(width, height, sdr.Pixels) { SourceProfile = profile, HasTransparency = sdr.HasTransparency };
         return sdr;
     }
 
@@ -126,7 +140,7 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
         }
     }
 
-    private async Task<(ushort[] Pixels, int Width, int Height)> GrabAsync(GraphicsCaptureItem item)
+    private async Task<(ushort[] Pixels, int Width, int Height)> GrabAsync(GraphicsCaptureItem item, bool includeCursor = false)
     {
         await EnsureBorderlessAccessAsync();
         var d3d = _d3d ??= Direct3D.Create();
@@ -135,7 +149,7 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
             using var pool = Direct3D11CaptureFramePool.CreateFreeThreaded(
                 d3d.WinRTDevice, DirectXPixelFormat.R16G16B16A16Float, 1, item.Size);
             using var session = pool.CreateCaptureSession(item);
-            session.IsCursorCaptureEnabled = false;
+            session.IsCursorCaptureEnabled = includeCursor;
             try { session.IsBorderRequired = false; }
             catch (Exception ex) { Capta.Services.Log.Info($"Borderless capture unavailable: {ex.Message}"); }
 
