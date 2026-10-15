@@ -139,6 +139,7 @@ public partial class App : Application
         {
             _toolbar = new ToolbarWindow();
             _toolbar.CaptureRequested += StartCapture;
+            _toolbar.RepeatRegionRequested += RepeatLastRegion;
             _toolbar.SettingsRequested += ShowSettings;
             _toolbar.ColourRequested += ShowColourAndHdr;
             _toolbar.CloseRequested += OnToolbarCloseRequested;

@@ -90,12 +90,12 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
 ## Per-screen checklist
 
 **Floating toolbar** (one row, 6 px padding, 16 px corners)
-drag grip · amber **New** button (Aperture glyph + "New") · dark inset group of icon-only mode buttons (Region active: soft-amber fill, amber icon; Window, Full screen, Freeform, Scrolling, Record) · divider · Delay dropdown ("Off") · Auto-copy toggle · "HDR → SDR" badge (shown only when a display is in HDR) · divider · keep-on-top (amber when on) · settings · hide to tray · close.
+drag grip · amber **New** button (Aperture glyph + "New") · dark inset group of icon-only mode buttons (Region active: soft-amber fill, amber icon; Window, Full screen, Freeform, Scrolling, Record) · **Repeat last region** icon button (greyed until a region has been captured) · divider · Delay dropdown ("Off") · Auto-copy toggle · "HDR → SDR" badge (shown only when a display is in HDR) · divider · keep-on-top (amber when on) · settings · hide to tray · close.
 
 **After-capture card** (bottom right, 400 px wide, 14 px padding, 16 px corners)
 Row 1: 96 × 60 thumbnail · green dot + "Copied to clipboard" (bold 14 px) with a muted line under it ("Region · 680 × 430 · tone-mapped from HDR") · dismiss ×.
 Row 2: **Copy** split button (Copy + chevron opening the menu) · **Edit**, wide amber primary · Save, Pin, Send to Ocula as 44 × 40 icon buttons.
-When personal info was blurred, a "Personal info found" block sits between row 1 and row 2 (`Editor.html`'s card: shield icon, "1 email address · redacted automatically", Review and Undo buttons; Decision 6).
+When personal info was redacted, a "Personal info found" block sits between row 1 and row 2 (`Editor.html`'s card: shield icon, "1 email address · redacted automatically", Review and Undo buttons; Decision 6).
 Copy menu: Copy image (Ctrl+C, checked default) · Copy for chat (a smaller sRGB copy: long edge at most 1568 px, never scaled up, no metadata; a PNG, or a JPEG at quality 85 if the PNG is over 1 MB; status line "Copied for chat · 1568 × 980 · 412 KB") · Copy image as HDR · Copy text in image (Ctrl+Shift+C) · Copy as file · Copy file path · separator · "Copy automatically after capture" toggle.
 
 **Capture overlay**

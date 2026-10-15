@@ -12,7 +12,7 @@ takes over the Print Screen key and copies captures to the clipboard as PNG.
 | Alt+PrtSc | Active window |
 | Ctrl+PrtSc | Record video: choose an area, then Ctrl+PrtSc or Stop to finish |
 | Ctrl+Shift+PrtSc | Grab text from screen: select a region and its text is copied |
-| Ctrl+Alt+PrtSc | Repeat last region: captures the last Region selection again, without the overlay |
+| Ctrl+Alt+PrtSc | Repeat last region: captures the last Region selection again, without the overlay (also in the tray menu and on the toolbar) |
 
 In the region overlay, letting go of the mouse captures the area you drew (and copies it, with Auto-copy on);
 **Esc** cancels. Scrolling and Record keep the selection adjustable until you press Enter. Press **C** to pick the colour under the cursor: its hex code is copied and

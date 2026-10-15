@@ -26,6 +26,9 @@ public sealed partial class ToolbarWindow : Window
     /// <summary>New was pressed: capture in this mode after this many seconds.</summary>
     public event Action<CaptureMode, int>? CaptureRequested;
 
+    /// <summary>"Repeat last region" was pressed.</summary>
+    public event Action? RepeatRegionRequested;
+
     public event Action? SettingsRequested;
 
     /// <summary>The HDR badge was clicked.</summary>
@@ -95,6 +98,11 @@ public sealed partial class ToolbarWindow : Window
         UpdateHdrBadge(cursor);
         ApplyDelay(Settings.CaptureDelaySeconds); // may have changed in the tray flyout
         ApplyAutoCopy(); // or on the card, or in the overlay's Capture settings
+        var hasRegion = Settings.LastRegion is not null;
+        RepeatButton.IsEnabled = hasRegion;
+        ToolTipService.SetToolTip(RepeatButton, hasRegion
+            ? $"Repeat last region ({Shortcuts.For(HotkeyAction.RepeatRegion).Compact})"
+            : "Repeat last region (capture a region first)");
         ToolTipService.SetToolTip(RegionMode, $"Region ({Shortcuts.For(HotkeyAction.Region).Compact})");
         ToolTipService.SetToolTip(WindowMode, $"Window ({Shortcuts.For(HotkeyAction.ActiveWindow).Compact} captures the active window)");
         ToolTipService.SetToolTip(FullScreenMode, $"Full screen ({Shortcuts.For(HotkeyAction.FullScreen).Compact})");
@@ -153,6 +161,12 @@ public sealed partial class ToolbarWindow : Window
         Settings.ToolbarMode = mode;
         // Also re-checks the clicked button, so the active mode can't be toggled off.
         SelectMode(mode);
+    }
+
+    private void OnRepeatRegion(object sender, RoutedEventArgs e)
+    {
+        Hide();
+        RepeatRegionRequested?.Invoke();
     }
 
     private void OnNew(object sender, RoutedEventArgs e)
