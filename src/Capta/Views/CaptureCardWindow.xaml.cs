@@ -26,6 +26,8 @@ public sealed partial class CaptureCardWindow : Window
     private CaptureResult? _current;
     private bool _busy;
     private bool _hovered;
+    private bool _reviewOpen;
+    private bool _oculaMissing;
 
     public event Action<CaptureResult>? PinRequested;
 
@@ -59,7 +61,7 @@ public sealed partial class CaptureCardWindow : Window
         };
         ShadowHost.HorizontalAlignment = Panel.HorizontalAlignment = HorizontalAlignment.Left;
         ShadowHost.VerticalAlignment = Panel.VerticalAlignment = VerticalAlignment.Top;
-        Interop.Shadow.Attach(ShadowHost, cornerRadius: 16, offsetY: 20, blur: 50, opacity: 0.55);
+        Interop.Shadow.Attach(ShadowHost, cornerRadius: 16, offsetY: 2, blur: 8, opacity: 0.22);
         Interop.ClickThroughMargins.Attach(this, Panel);
 
         AppWindow.Closing += (_, e) =>
@@ -100,30 +102,144 @@ public sealed partial class CaptureCardWindow : Window
             ? $"Recording · {FormatLength(result.VideoLength)} · {result.ScreenBounds.Width} × {result.ScreenBounds.Height}"
             : $"{result.ModeName} · {image.Width} × {image.Height}" + (result.WasHdr ? " · tone-mapped from HDR" : "");
         ApplyKind(video);
+        ShowRedaction(result);
         if (status is not null)
             SetStatus(status, success);
         else
             SetStatus(copied ? "Copied to clipboard" : "Capture ready", success: copied);
 
-        var oculaInstalled = await CaptureActions.IsOculaInstalledAsync();
-        OculaButton.IsEnabled = oculaInstalled;
-        ToolTipService.SetToolTip(OculaButton, oculaInstalled ? "Send to Ocula" : "Send to Ocula (Ocula isn't installed)");
+        ApplyOculaButton(await CaptureActions.IsOculaInstalledAsync());
 
-        var source = new SoftwareBitmapSource();
-        await source.SetBitmapAsync(image.ToSoftwareBitmap());
+        await SetThumbnailAsync(result);
         if (_current != result) return; // superseded by a newer capture
-        Thumbnail.Source = source;
 
         PlaceOn(result.Monitor);
         this.BringToFront();
         RestartTimer();
     }
 
+    /// <summary>Send to Ocula; or, without Ocula, Get Ocula (once it has a Store page) or a disabled button.</summary>
+    private void ApplyOculaButton(bool installed)
+    {
+        _oculaMissing = !installed;
+        var getOcula = !installed && CaptureActions.CanGetOcula;
+        OculaText.Visibility = getOcula ? Visibility.Visible : Visibility.Collapsed;
+        OculaButton.Padding = getOcula ? new Thickness(14, 0, 14, 0) : new Thickness(0);
+        OculaButton.IsEnabled = installed || getOcula;
+        ToolTipService.SetToolTip(OculaButton, installed ? "Send to Ocula"
+            : getOcula ? "Get Ocula from the Microsoft Store"
+            : "Send to Ocula (Ocula isn't installed)");
+    }
+
+    private async Task SetThumbnailAsync(CaptureResult result)
+    {
+        var source = new SoftwareBitmapSource();
+        await source.SetBitmapAsync(result.Image.ToSoftwareBitmap());
+        if (_current == result) Thumbnail.Source = source; // not superseded by a newer capture
+    }
+
+    // ---- Personal info (redacted before the copy) ----
+
+    private void ShowRedaction(CaptureResult result)
+    {
+        var redaction = result.Redaction;
+        RedactionCard.Visibility = redaction is null ? Visibility.Collapsed : Visibility.Visible;
+        if (redaction is not null) UpdateRedactionText(redaction);
+    }
+
+    private void UpdateRedactionText(Redaction redaction)
+    {
+        var summary = PersonalInfo.Describe(redaction.Matches);
+        var covered = redaction.RedactedCount;
+        RedactionDetail.Text = covered == redaction.Matches.Count ? $"{summary} · redacted automatically"
+            : covered == 0 ? $"{summary} · not redacted"
+            : $"{covered} of {redaction.Matches.Count} redacted";
+        UndoRedactionButton.Content = covered == 0 ? "Redact again" : "Undo";
+    }
+
+    /// <summary>Review: one switch per thing found.</summary>
+    private void OnReviewOpening(object? sender, object e)
+    {
+        _reviewOpen = true;
+        _timer.Stop();
+        ReviewList.Children.Clear();
+        if (_current?.Redaction is not { } redaction) return;
+        var mono = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["CaptaMonoFont"];
+        for (var i = 0; i < redaction.Matches.Count; i++)
+        {
+            var index = i;
+            var match = redaction.Matches[i];
+            var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+            text.Children.Add(new TextBlock { Text = match.Label, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
+            text.Children.Add(new TextBlock
+            {
+                Text = match.Text,
+                FontFamily = mono,
+                FontSize = 11.5,
+                Opacity = 0.65,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+            });
+            var toggle = new ToggleSwitch
+            {
+                IsOn = redaction.IsRedacted(index),
+                OnContent = "",
+                OffContent = "",
+                MinWidth = 0,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            toggle.Toggled += async (_, _) => await ChangeRedactionAsync(() => redaction.Set(index, toggle.IsOn));
+            var row = new Grid { MinHeight = 48, Padding = new Thickness(8, 4, 8, 4), ColumnSpacing = 10 };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            row.Children.Add(text);
+            Grid.SetColumn(toggle, 1);
+            row.Children.Add(toggle);
+            ReviewList.Children.Add(row);
+        }
+    }
+
+    private void OnReviewClosed(object? sender, object e)
+    {
+        _reviewOpen = false;
+        if (!_hovered && !_busy) RestartTimer();
+    }
+
+    private async void OnUndoRedaction(object sender, RoutedEventArgs e)
+    {
+        if (_current?.Redaction is not { } redaction) return;
+        _timer.Stop();
+        await ChangeRedactionAsync(() => redaction.SetAll(redaction.RedactedCount == 0));
+        if (!_hovered && !_busy && !_reviewOpen) RestartTimer();
+    }
+
+    /// <summary>Applies a change to what's redacted: new image on the card, and on the clipboard if it was auto-copied.</summary>
+    private async Task ChangeRedactionAsync(Action change)
+    {
+        if (_current is not { Redaction: { } redaction } result) return;
+        try
+        {
+            change();
+            result.Image = await Task.Run(redaction.Render);
+            UpdateRedactionText(redaction);
+            await SetThumbnailAsync(result);
+            if (Settings.AutoCopy)
+            {
+                await ImageExport.CopyToClipboardAsync(result.Image);
+                SetStatus("Copied to clipboard");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Changing the redacted areas failed", ex);
+            SetStatus(ex.Message, success: false);
+        }
+    }
+
     /// <summary>Recordings: Play instead of Edit, file copies instead of image copies, GIF export, no pin.</summary>
     private void ApplyKind(bool video)
     {
         var image = video ? Visibility.Collapsed : Visibility.Visible;
-        CopyImageRow.Visibility = CopyHdrRow.Visibility = CopyTextRow.Visibility = image;
+        CopyImageRow.Visibility = CopyChatRow.Visibility = CopyHdrRow.Visibility = CopyTextRow.Visibility = image;
         GifRow.Visibility = video ? Visibility.Visible : Visibility.Collapsed;
         CopyAsFileText.Text = video ? "Copy video file" : "Copy as file";
         EditText.Text = video ? "Play" : "Edit";
@@ -218,6 +334,17 @@ public sealed partial class CaptureCardWindow : Window
         {
             await ImageExport.CopyToClipboardAsync(_current.Image);
             SetStatus("Copied to clipboard");
+        });
+    }
+
+    private async void OnCopyForChat(object sender, RoutedEventArgs e)
+    {
+        CopyMenu.Hide();
+        if (_current is null || _current.IsVideo) return;
+        await RunAsync(async () =>
+        {
+            var copy = await ImageExport.CopyForChatAsync(_current.Image);
+            SetStatus(copy.Describe());
         });
     }
 
@@ -347,6 +474,11 @@ public sealed partial class CaptureCardWindow : Window
 
     private async void OnSendToOcula(object sender, RoutedEventArgs e)
     {
+        if (_oculaMissing)
+        {
+            await RunAsync(CaptureActions.GetOculaAsync);
+            return;
+        }
         if (_current is null) return;
         await RunAsync(async () =>
         {

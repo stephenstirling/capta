@@ -36,6 +36,8 @@
             <Color x:Key="CaptaSuccessColor">#5FD3A5</Color>
             <Color x:Key="CaptaInfoColor">#9CD4FF</Color>
             <Color x:Key="CaptaInfoSurfaceColor">#18202B</Color>
+            <Color x:Key="CaptaInfoBorderColor">#2C3E55</Color>
+            <Color x:Key="CaptaInfoButtonColor">#22304A</Color>
             <Color x:Key="CaptaWarningSurfaceColor">#2A2418</Color>
             <Color x:Key="CaptaLensColor">#3A4D70</Color>
             <!-- Capture-overlay dim, from mockups/Main.html: rgba(5,6,8,0.62). -->
@@ -58,6 +60,8 @@
             <SolidColorBrush x:Key="CaptaSuccessBrush" Color="{StaticResource CaptaSuccessColor}" />
             <SolidColorBrush x:Key="CaptaInfoBrush" Color="{StaticResource CaptaInfoColor}" />
             <SolidColorBrush x:Key="CaptaInfoSurfaceBrush" Color="{StaticResource CaptaInfoSurfaceColor}" />
+            <SolidColorBrush x:Key="CaptaInfoBorderBrush" Color="{StaticResource CaptaInfoBorderColor}" />
+            <SolidColorBrush x:Key="CaptaInfoButtonBrush" Color="{StaticResource CaptaInfoButtonColor}" />
             <SolidColorBrush x:Key="CaptaWarningSurfaceBrush" Color="{StaticResource CaptaWarningSurfaceColor}" />
             <SolidColorBrush x:Key="CaptaLensBrush" Color="{StaticResource CaptaLensColor}" />
             <SolidColorBrush x:Key="CaptaScrimBrush" Color="{StaticResource CaptaScrimColor}" />
@@ -227,6 +231,8 @@
             <Color x:Key="CaptaSuccessColor">#1F8A62</Color>
             <Color x:Key="CaptaInfoColor">#1F5FA8</Color>
             <Color x:Key="CaptaInfoSurfaceColor">#EAF3FF</Color>
+            <Color x:Key="CaptaInfoBorderColor">#B9D4F4</Color>
+            <Color x:Key="CaptaInfoButtonColor">#D3E5FA</Color>
             <Color x:Key="CaptaWarningSurfaceColor">#FFF4E0</Color>
             <Color x:Key="CaptaLensColor">#22304A</Color>
             <!-- The overlay is always dark, so the scrim doesn't change with theme. -->
@@ -249,6 +255,8 @@
             <SolidColorBrush x:Key="CaptaSuccessBrush" Color="{StaticResource CaptaSuccessColor}" />
             <SolidColorBrush x:Key="CaptaInfoBrush" Color="{StaticResource CaptaInfoColor}" />
             <SolidColorBrush x:Key="CaptaInfoSurfaceBrush" Color="{StaticResource CaptaInfoSurfaceColor}" />
+            <SolidColorBrush x:Key="CaptaInfoBorderBrush" Color="{StaticResource CaptaInfoBorderColor}" />
+            <SolidColorBrush x:Key="CaptaInfoButtonBrush" Color="{StaticResource CaptaInfoButtonColor}" />
             <SolidColorBrush x:Key="CaptaWarningSurfaceBrush" Color="{StaticResource CaptaWarningSurfaceColor}" />
             <SolidColorBrush x:Key="CaptaLensBrush" Color="{StaticResource CaptaLensColor}" />
             <SolidColorBrush x:Key="CaptaScrimBrush" Color="{StaticResource CaptaScrimColor}" />
@@ -390,6 +398,8 @@
             <SolidColorBrush x:Key="CaptaSuccessBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="CaptaInfoBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="CaptaInfoSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="CaptaInfoBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="CaptaInfoButtonBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="CaptaWarningSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="CaptaLensBrush" Color="{ThemeResource SystemColorWindowColor}" />
             <SolidColorBrush x:Key="CaptaScrimBrush" Color="#99000000" />

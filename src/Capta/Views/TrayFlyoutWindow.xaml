@@ -8,7 +8,7 @@
     Title="Capta">
 
     <!-- Transparent window; the padding leaves room for the panel's shadow. -->
-    <Grid x:Name="Root" Padding="24,12,24,36">
+    <Grid x:Name="Root" Padding="8,4,8,8">
         <Grid.KeyboardAccelerators>
             <KeyboardAccelerator Key="Escape" Invoked="OnEscape" />
         </Grid.KeyboardAccelerators>
@@ -294,7 +294,7 @@
                         </Button.Resources>
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <c:LineIcon Size="17" StrokeWidth="1.9" Data="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0z" />
-                            <TextBlock Text="Open all captures in Ocula" />
+                            <TextBlock x:Name="OculaText" Text="Open all captures in Ocula" />
                         </StackPanel>
                     </Button>
                 </Grid>

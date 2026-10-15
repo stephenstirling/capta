@@ -35,6 +35,16 @@ public static partial class CaptureActions
         await Launcher.LaunchUriAsync(OculaUri("import", path));
     }
 
+    /// <summary>Whether a missing Ocula can be fetched: it has a Store listing (<see cref="Links.OculaStore"/>).</summary>
+    public static bool CanGetOcula => Links.OculaStore is not null;
+
+    /// <summary>Opens Ocula's Microsoft Store page, if it has one.</summary>
+    public static async Task GetOculaAsync()
+    {
+        if (Links.OculaStore is { } store)
+            await Launcher.LaunchUriAsync(store);
+    }
+
     /// <summary>Opens Ocula's "All captures" smart album via <c>ocula:captures</c>.</summary>
     public static async Task OpenCapturesInOculaAsync() =>
         await Launcher.LaunchUriAsync(new Uri($"ocula:captures?folder={Uri.EscapeDataString(CaptureFolderOrScreenshots())}"));

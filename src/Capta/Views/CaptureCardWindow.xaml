@@ -7,10 +7,10 @@
     xmlns:c="using:Capta.Controls"
     Title="Capta">
 
-    <!-- Transparent window; the padding leaves room for the panel's shadow. -->
+    <!-- Transparent window; the padding leaves room for the panel's shadow (see DESIGN.md decision 5). -->
     <Grid
         x:Name="Root"
-        Padding="28,8,28,48"
+        Padding="8,4,8,8"
         PointerEntered="OnPointerEntered"
         PointerExited="OnPointerExited">
         <Grid.KeyboardAccelerators>
@@ -83,6 +83,74 @@
                             <c:LineIcon Size="14" StrokeWidth="2" Data="M6 6l12 12M18 6L6 18" />
                         </Button>
                     </Grid>
+
+                    <!-- Personal info that was redacted before the copy (design/mockups/Editor.html). -->
+                    <Border
+                        x:Name="RedactionCard"
+                        Padding="14"
+                        Background="{ThemeResource CaptaInfoSurfaceBrush}"
+                        BorderBrush="{ThemeResource CaptaInfoBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Visibility="Collapsed">
+                        <StackPanel Spacing="10">
+                            <Grid ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="18" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <c:LineIcon Size="18" StrokeWidth="1.9" VerticalAlignment="Top" Foreground="{ThemeResource CaptaInfoBrush}" Data="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4" />
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock FontSize="13.5" FontWeight="Bold" Foreground="{ThemeResource CaptaTextBrush}" Text="Personal info found" />
+                                    <TextBlock x:Name="RedactionDetail" Margin="0,2,0,0" FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Margin="28,0,0,0" Orientation="Horizontal" Spacing="6">
+                                <Button
+                                    x:Name="ReviewButton"
+                                    Height="32"
+                                    Padding="12,0"
+                                    Background="{ThemeResource CaptaInfoButtonBrush}"
+                                    BorderThickness="0"
+                                    CornerRadius="8"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Content="Review"
+                                    ToolTipService.ToolTip="Choose what's redacted">
+                                    <Button.Flyout>
+                                        <Flyout x:Name="ReviewFlyout" Placement="TopEdgeAlignedLeft" ShouldConstrainToRootBounds="False" Opening="OnReviewOpening" Closed="OnReviewClosed">
+                                            <Flyout.FlyoutPresenterStyle>
+                                                <Style TargetType="FlyoutPresenter">
+                                                    <Setter Property="Background" Value="{ThemeResource CaptaMenuSurfaceBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{ThemeResource CaptaDividerBrush}" />
+                                                    <Setter Property="BorderThickness" Value="1" />
+                                                    <Setter Property="CornerRadius" Value="12" />
+                                                    <Setter Property="Padding" Value="10" />
+                                                    <Setter Property="MinWidth" Value="320" />
+                                                    <Setter Property="MaxWidth" Value="320" />
+                                                </Style>
+                                            </Flyout.FlyoutPresenterStyle>
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Margin="2,0,0,6" FontSize="11" FontWeight="Bold" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="REDACTED" />
+                                                <StackPanel x:Name="ReviewList" Spacing="2" />
+                                            </StackPanel>
+                                        </Flyout>
+                                    </Button.Flyout>
+                                </Button>
+                                <Button
+                                    x:Name="UndoRedactionButton"
+                                    Height="32"
+                                    Padding="12,0"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    CornerRadius="8"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Content="Undo"
+                                    Click="OnUndoRedaction" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
 
                     <!-- Actions. Copy is a split button; Edit is the primary action. -->
                     <Grid ColumnSpacing="6">
@@ -185,6 +253,12 @@
                                                         </StackPanel>
                                                         <TextBlock Grid.Column="2" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Ctrl+C" />
                                                     </Grid>
+                                                </Button>
+                                                <Button x:Name="CopyChatRow" Style="{StaticResource MenuRow}" Click="OnCopyForChat">
+                                                    <StackPanel>
+                                                        <TextBlock FontWeight="SemiBold" Text="Copy for chat" />
+                                                        <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Smaller · for AI chats and messaging apps" />
+                                                    </StackPanel>
                                                 </Button>
                                                 <Button x:Name="CopyHdrRow" Style="{StaticResource MenuRow}" Click="OnCopyHdr">
                                                     <StackPanel>
@@ -293,8 +367,11 @@
                         <Button x:Name="PinButton" Grid.Column="3" Width="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnPin" ToolTipService.ToolTip="Pin to screen">
                             <c:LineIcon Size="17" Data="M14 4l6 6M16 6l-5 5-4-1-2 2 7 7 2-2-1-4 5-5M8 16l-4 4" />
                         </Button>
-                        <Button x:Name="OculaButton" Grid.Column="4" Width="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnSendToOcula" ToolTipService.ToolTip="Send to Ocula">
-                            <c:LineIcon Size="17" StrokeWidth="1.9" Data="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0z" />
+                        <Button x:Name="OculaButton" Grid.Column="4" MinWidth="44" Height="40" Padding="0" CornerRadius="10" BorderThickness="0" Click="OnSendToOcula" ToolTipService.ToolTip="Send to Ocula">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <c:LineIcon x:Name="OculaIcon" Size="17" StrokeWidth="1.9" Data="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0z" />
+                                <TextBlock x:Name="OculaText" Text="Get Ocula" FontWeight="SemiBold" Visibility="Collapsed" />
+                            </StackPanel>
                         </Button>
                     </Grid>
                 </StackPanel>

@@ -28,6 +28,7 @@ public sealed partial class StartupSettingsWindow : Window
         (HotkeyAction.ActiveWindow, "Active window", null),
         (HotkeyAction.Record, "Record video", "Press again to stop. The toolbar is in the tray menu"),
         (HotkeyAction.GrabText, "Grab text from screen", null),
+        (HotkeyAction.RepeatRegion, "Repeat last region", "Captures the same area again, without the overlay"),
     ];
 
     public StartupSettingsWindow(App app)
@@ -63,6 +64,15 @@ public sealed partial class StartupSettingsWindow : Window
         };
         Shortcuts.Changed += BuildShortcutRows;
         BuildShortcutRows();
+
+        VersionText.Text = AboutInfo.Version;
+        CopyrightText.Text = AboutInfo.Copyright;
+        LicenseLink.Content = AboutInfo.License;
+        if (AboutInfo.IsStoreBuild)
+        {
+            WebsiteUpdates.Visibility = Visibility.Collapsed;
+            StoreUpdatesText.Visibility = Visibility.Visible;
+        }
     }
 
     private void Hide()
@@ -165,7 +175,7 @@ public sealed partial class StartupSettingsWindow : Window
         ShortcutMessage.Text = "Shortcuts reset to the defaults.";
     }
 
-    public async void ShowCentered(bool windowsOwnsPrintScreen)
+    public async void ShowCentered(bool windowsOwnsPrintScreen, bool toAbout = false)
     {
         await LoadAsync(windowsOwnsPrintScreen);
 
@@ -181,6 +191,15 @@ public sealed partial class StartupSettingsWindow : Window
         this.ResizeDip(Panel.Width + pad.Left + pad.Right, Panel.Height + pad.Top + pad.Bottom);
         this.CenterOnCursorMonitor();
         this.BringToFront();
+
+        // Once it has laid out: the About section, or back to the top.
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (toAbout)
+                AboutSection.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = false, VerticalAlignmentRatio = 0 });
+            else
+                Scroller.ChangeView(null, 0, null, disableAnimation: true);
+        });
     }
 
     private async Task LoadAsync(bool windowsOwnsPrintScreen)
@@ -192,6 +211,9 @@ public sealed partial class StartupSettingsWindow : Window
             StartQuietly.IsOn = Settings.StartQuietly;
             ShowToolbarAtStartup.IsOn = Settings.ShowToolbarAtStartup;
             KeepRunning.IsOn = Settings.KeepRunningWhenToolbarClosed;
+            AutoRedactSwitch.IsOn = Settings.AutoRedact;
+            IncludeCursorSwitch.IsOn = Settings.IncludeCursor;
+            CheckForUpdatesSwitch.IsOn = Settings.CheckForUpdates;
             SetPrintScreenOwnership(windowsOwnsPrintScreen);
         }
         finally
@@ -239,6 +261,25 @@ public sealed partial class StartupSettingsWindow : Window
         if (!_loading) Settings.ShowToolbarAtStartup = ShowToolbarAtStartup.IsOn;
     }
 
+    private void OnAutoRedact(object sender, RoutedEventArgs e)
+    {
+        if (!_loading) Settings.AutoRedact = AutoRedactSwitch.IsOn;
+    }
+
+    private void OnIncludeCursor(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        Settings.IncludeCursor = IncludeCursorSwitch.IsOn;
+        Settings.ApplyCaptureOptions();
+    }
+
+    private void OnCheckForUpdatesToggled(object sender, RoutedEventArgs e)
+    {
+        if (!_loading) Settings.CheckForUpdates = CheckForUpdatesSwitch.IsOn;
+    }
+
+    private void OnCheckNow(object sender, RoutedEventArgs e) => _app.CheckForUpdates();
+
     private void OnKeepRunning(object sender, RoutedEventArgs e)
     {
         if (!_loading) Settings.KeepRunningWhenToolbarClosed = KeepRunning.IsOn;
@@ -252,6 +293,16 @@ public sealed partial class StartupSettingsWindow : Window
     private async void OnGitHub(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.GitHub);
 
     private async void OnBuyMeACoffee(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.BuyMeACoffee);
+
+    private void OnColourAndHdr(object sender, RoutedEventArgs e) => _app.ShowColourAndHdr();
+
+    private async void OnWebsite(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.Website);
+
+    private async void OnPrivacyPolicy(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.PrivacyPolicy);
+
+    private async void OnDonate(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.BuyMeACoffee);
+
+    private async void OnLicense(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.License);
 
     private void OnDone(object sender, RoutedEventArgs e) => Hide();
 

@@ -77,6 +77,7 @@ public partial class App : Application
         _hook.Install();
         Log.Info("Tray icon and Print Screen hook installed");
         _ = _history.LoadAsync();
+        StartUpdateChecks();
 
         _ownership = new PrintScreenOwnership();
         _ownership.Changed += owned => Dispatcher.TryEnqueue(() => OnPrintScreenOwnershipChanged(owned));
@@ -110,7 +111,95 @@ public partial class App : Application
             case HotkeyAction.ActiveWindow: StartCapture(CaptureMode.ActiveWindow); break;
             case HotkeyAction.Record: ToggleRecording(); break;
             case HotkeyAction.GrabText: StartCapture(CaptureMode.GrabText); break;
+            case HotkeyAction.RepeatRegion: RepeatLastRegion(); break;
         }
+    }
+
+    /// <summary>Captures the last Region selection again, without the overlay.</summary>
+    public async void RepeatLastRegion()
+    {
+        _card?.Hide();
+        try
+        {
+            if (!await _capture!.RepeatLastRegionAsync())
+                _tray?.ShowInfo("No region to repeat", "Capture a region first. This captures the same area again.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Repeat last region failed", ex);
+            _tray?.ShowError("Capture failed", ex.Message);
+        }
+    }
+
+    // ---- Updates (website build only; the Store updates Store builds) ----
+
+    private UpdateCardWindow? _updateCard;
+    private DispatcherQueueTimer? _updateTimer;
+
+    /// <summary>
+    /// Starts the background check: shortly after start-up, then every few hours while Capta runs. The
+    /// check itself runs at most once a day and not at all when it's switched off.
+    /// </summary>
+    private void StartUpdateChecks()
+    {
+        if (AboutInfo.IsStoreBuild) return;
+        _updateTimer = Dispatcher.CreateTimer();
+        _updateTimer.Interval = TimeSpan.FromSeconds(45);
+        _updateTimer.Tick += async (timer, _) =>
+        {
+            timer.Interval = TimeSpan.FromHours(6);
+            await CheckForUpdatesInBackgroundAsync();
+        };
+        _updateTimer.Start();
+    }
+
+    private async Task CheckForUpdatesInBackgroundAsync()
+    {
+        var now = DateTimeOffset.UtcNow;
+        if (AboutInfo.IsStoreBuild || !Settings.CheckForUpdates || !UpdateSchedule.IsDue(Settings.LastUpdateCheck, now))
+            return;
+        Settings.LastUpdateCheck = now; // an attempt counts, so a failure isn't retried until tomorrow
+        try
+        {
+            var release = await UpdateChecker.GetLatestAsync();
+            if (release is not null && release.IsNewerThan(AboutInfo.CurrentVersion) && release.Tag != Settings.LastNotifiedUpdate)
+            {
+                Settings.LastNotifiedUpdate = release.Tag;
+                ShowUpdateCard(release);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Info($"Update check skipped: {ex.Message}");
+        }
+    }
+
+    /// <summary>Check for updates (tray menu, Settings): now, whether or not the daily check is on.</summary>
+    public async void CheckForUpdates()
+    {
+        if (AboutInfo.IsStoreBuild) return;
+        try
+        {
+            Settings.LastUpdateCheck = DateTimeOffset.UtcNow;
+            var release = await UpdateChecker.GetLatestAsync();
+            if (release is null)
+                _tray?.ShowInfo("No release found", "There's no published release to compare with yet.");
+            else if (release.IsNewerThan(AboutInfo.CurrentVersion))
+                ShowUpdateCard(release);
+            else
+                _tray?.ShowInfo("Capta is up to date", $"You have the latest version ({AboutInfo.Version}).");
+        }
+        catch (Exception ex)
+        {
+            Log.Info($"Update check failed: {ex.Message}");
+            _tray?.ShowError("Couldn't check for updates", "Check your internet connection and try again.");
+        }
+    }
+
+    private void ShowUpdateCard(ReleaseInfo release)
+    {
+        _updateCard ??= new UpdateCardWindow();
+        _updateCard.Show(release, AboutInfo.CurrentVersion);
     }
 
     public void ShowToolbar()
@@ -119,6 +208,7 @@ public partial class App : Application
         {
             _toolbar = new ToolbarWindow();
             _toolbar.CaptureRequested += StartCapture;
+            _toolbar.RepeatRegionRequested += RepeatLastRegion;
             _toolbar.SettingsRequested += ShowSettings;
             _toolbar.ColourRequested += ShowColourAndHdr;
             _toolbar.CloseRequested += OnToolbarCloseRequested;
@@ -159,12 +249,19 @@ public partial class App : Application
             return;
         }
 
+        // Before anything is copied, saved or sent: the clipboard gets the redacted image.
+        await AutoRedact.ApplyAsync(result);
+
         var copied = false;
+        string? status = null;
         try
         {
             if (Settings.AutoCopy)
             {
-                await ImageExport.CopyToClipboardAsync(result.Image);
+                if (Settings.CopyForChat)
+                    status = (await ImageExport.CopyForChatAsync(result.Image)).Describe();
+                else
+                    await ImageExport.CopyToClipboardAsync(result.Image);
                 copied = true;
             }
             Log.Info($"Captured {result.Image.Width}x{result.Image.Height}, copied: {copied}");
@@ -176,7 +273,7 @@ public partial class App : Application
         }
 
         _history.Add(result);
-        ShowCard(result, copied);
+        ShowCard(result, copied, status);
         await SendToOculaIfEnabledAsync(result);
     }
 
@@ -404,10 +501,15 @@ public partial class App : Application
     }
 
     /// <summary>Startup &amp; shortcuts, which also explains the Print Screen conflict.</summary>
-    public void ShowSettings()
+    public void ShowSettings() => ShowSettings(toAbout: false);
+
+    /// <summary>The same window scrolled to its About section.</summary>
+    public void ShowAbout() => ShowSettings(toAbout: true);
+
+    private void ShowSettings(bool toAbout)
     {
         _settings ??= new StartupSettingsWindow(this);
-        _settings.ShowCentered(_ownership?.WindowsOwnsKey ?? false);
+        _settings.ShowCentered(_ownership?.WindowsOwnsKey ?? false, toAbout);
     }
 
     /// <summary>Captures the next key chord for changing a shortcut (null = cancelled with Esc).</summary>

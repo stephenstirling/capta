@@ -54,4 +54,7 @@ public sealed class CaptureOptions
     /// already colour-managed by Windows and are left alone.
     /// </summary>
     public bool CorrectMonitorProfiles { get; init; }
+
+    /// <summary>Draw the mouse cursor in window captures (Window and Active window). Off by default.</summary>
+    public bool IncludeCursor { get; init; }
 }

@@ -10,6 +10,8 @@ public static class Shortcuts
         [HotkeyAction.ActiveWindow] = new(false, false, true, Chord.PrintScreen),
         [HotkeyAction.Record] = new(true, false, false, Chord.PrintScreen),
         [HotkeyAction.GrabText] = new(true, true, false, Chord.PrintScreen),
+        // Alt+Shift+PrtSc is Windows' high contrast toggle, so this one uses Ctrl+Alt.
+        [HotkeyAction.RepeatRegion] = new(true, false, true, Chord.PrintScreen),
     };
 
     private static readonly Dictionary<HotkeyAction, Chord> s_current = new(Defaults);

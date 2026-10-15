@@ -51,7 +51,7 @@ public sealed class CaptureHistory
                 try
                 {
                     if (e.VideoPath is not null && !File.Exists(e.VideoPath)) continue; // recording deleted
-                    var image = await DecodeAsync(Path.Combine(_folder, e.File), transparent: e.Mode == CaptureMode.Freeform);
+                    var image = await DecodeAsync(Path.Combine(_folder, e.File), transparent: e.Mode is CaptureMode.Freeform or CaptureMode.Window or CaptureMode.ActiveWindow);
                     var bounds = new RectInt32(e.X, e.Y, e.Width, e.Height);
                     var monitor = Monitors.AtPoint(new PointInt32(e.X + e.Width / 2, e.Y + e.Height / 2));
                     var result = new CaptureResult(image, monitor, bounds, e.Mode, e.WasHdr)

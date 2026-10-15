@@ -50,10 +50,56 @@ public sealed class CaptureCoordinator
         }
     }
 
+    /// <summary>
+    /// Captures the last Region selection again, straight from the screen with no overlay. False if
+    /// there isn't one, or it no longer fits on a monitor (a display was unplugged or changed).
+    /// </summary>
+    public async Task<bool> RepeatLastRegionAsync()
+    {
+        if (Settings.LastRegion is not { } screen) return false;
+        var monitor = Monitors.AtPoint(new PointInt32(screen.X + screen.Width / 2, screen.Y + screen.Height / 2));
+        var b = monitor.Bounds;
+        if (screen.Width <= 0 || screen.Height <= 0
+            || screen.X < b.X || screen.Y < b.Y
+            || screen.X + screen.Width > b.X + b.Width || screen.Y + screen.Height > b.Y + b.Height)
+            return false;
+
+        if (_busy)
+        {
+            Log.Info("Capture ignored: one is already running");
+            return true;
+        }
+        _busy = true;
+        try
+        {
+            var frame = await _source.CaptureMonitorAsync(monitor);
+            Captured?.Invoke(RegionResult(monitor, frame, new RectInt32(screen.X - b.X, screen.Y - b.Y, screen.Width, screen.Height), CaptureMode.Region));
+            return true;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    /// <summary>A region of a monitor's frame, attributed to the window under its centre.</summary>
+    private static CaptureResult RegionResult(MonitorInfo monitor, CapturedImage frame, RectInt32 rect, CaptureMode mode)
+    {
+        var b = monitor.Bounds;
+        var screen = new RectInt32(b.X + rect.X, b.Y + rect.Y, rect.Width, rect.Height);
+        var under = WindowFinder.At(new PointInt32(screen.X + screen.Width / 2, screen.Y + screen.Height / 2));
+        var (app, title) = under is null ? (null, null) : WindowFinder.Describe(under.Handle);
+        return new CaptureResult(frame.Crop(rect), monitor, screen, mode, GraphicsCaptureSource.IsHdr(monitor.Handle))
+        {
+            SourceApp = app,
+            WindowTitle = title,
+        };
+    }
+
     private async Task<CaptureResult> CaptureFullScreenAsync()
     {
         var monitor = Monitors.AtPoint(WindowHelper.CursorPosition());
-        return new CaptureResult(await _source.CaptureMonitorAsync(monitor), monitor, monitor.Bounds,
+        return new CaptureResult(await _source.CaptureMonitorAsync(monitor, CaptureOptions.Current.IncludeCursor), monitor, monitor.Bounds,
             CaptureMode.FullScreen, GraphicsCaptureSource.IsHdr(monitor.Handle));
     }
 
@@ -85,7 +131,7 @@ public sealed class CaptureCoordinator
         {
             monitors = Monitors.All();
             // Freeze every monitor first; the overlay draws on top of these frames.
-            frames = await Task.WhenAll(monitors.Select(_source.CaptureMonitorAsync));
+            frames = await Task.WhenAll(monitors.Select(m => _source.CaptureMonitorAsync(m)));
 
             Log.Info($"Froze {frames.Length} monitor(s); showing overlay");
             selection = await OverlaySession.RunAsync(mode, monitors, frames);
@@ -121,17 +167,10 @@ public sealed class CaptureCoordinator
             }
             case OverlayResult.RegionSelected r:
             {
-                var b = r.Monitor.Bounds;
-                var screen = new RectInt32(b.X + r.Rect.X, b.Y + r.Rect.Y, r.Rect.Width, r.Rect.Height);
-                // Attribute the region to the window under its centre (the overlay has closed).
-                var under = WindowFinder.At(new PointInt32(screen.X + screen.Width / 2, screen.Y + screen.Height / 2));
-                var (app, title) = under is null ? (null, null) : WindowFinder.Describe(under.Handle);
-                return new CaptureResult(r.Frame.Crop(r.Rect), r.Monitor, screen,
-                    r.Mode, GraphicsCaptureSource.IsHdr(r.Monitor.Handle))
-                {
-                    SourceApp = app,
-                    WindowTitle = title,
-                };
+                var result = RegionResult(r.Monitor, r.Frame, r.Rect, r.Mode);
+                if (r.Mode == CaptureMode.Region)
+                    Settings.LastRegion = result.ScreenBounds;
+                return result;
             }
             case OverlayResult.FreeformSelected f:
             {

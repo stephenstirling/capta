@@ -20,6 +20,10 @@ returns `Available`. Ocula must therefore declare the protocol in its package ma
 Until it does, Capta's **Edit** falls back to the default image app, and **Send to Ocula** and
 **Open in Ocula** are disabled with the tooltip "Ocula isn't installed yet".
 
+Once Ocula has a Microsoft Store listing, set `Links.OculaStore` (`src/Capta/Services/Links.cs`) to its
+`ms-windows-store://pdp/?productid=…` link. Without Ocula, those two buttons then become **Get Ocula** and open
+that page instead of being disabled.
+
 ## URIs
 
 `file` and `folder` values are absolute Windows paths, percent-encoded with `Uri.EscapeDataString`.

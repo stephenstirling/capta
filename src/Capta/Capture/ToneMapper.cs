@@ -32,8 +32,14 @@ public static class ToneMapper
     public readonly record struct FramePeaks(float Rec709, float DisplayP3);
 
     /// <param name="peaks">The frame's peaks when it's a crop of a larger frame; measured here if null.</param>
+    /// <param name="keepAlpha">
+    /// Carry the frame's alpha (a window capture's rounded corners are transparent) instead of making
+    /// every pixel opaque. The frame is premultiplied, so colours are un-premultiplied before the tone
+    /// curve and premultiplied again in the 8-bit result.
+    /// </param>
     public static CapturedImage ToSdr(ushort[] rgbaHalf, int width, int height, float sdrWhiteLevelNits,
-        HighlightRollOff rollOff = HighlightRollOff.Clip, ColourSpace target = ColourSpace.Srgb, FramePeaks? peaks = null)
+        HighlightRollOff rollOff = HighlightRollOff.Clip, ColourSpace target = ColourSpace.Srgb, FramePeaks? peaks = null,
+        bool keepAlpha = false)
     {
         var toP3 = target == ColourSpace.DisplayP3;
         var scale = ScRgbReferenceNits / MathF.Max(sdrWhiteLevelNits, 1f);
@@ -62,9 +68,15 @@ public static class ToneMapper
             for (var x = 0; x < width; x++)
             {
                 var i = x * 4;
-                var r = s_halfToFloat[src[i]] * scale;
-                var g = s_halfToFloat[src[i + 1]] * scale;
-                var b = s_halfToFloat[src[i + 2]] * scale;
+                var alpha = keepAlpha ? Math.Clamp(s_halfToFloat[src[i + 3]], 0f, 1f) : 1f;
+                if (alpha <= 0f)
+                {
+                    dst.Slice(i, 4).Clear(); // fully transparent: premultiplied zero
+                    continue;
+                }
+                var r = s_halfToFloat[src[i]] * scale / alpha;
+                var g = s_halfToFloat[src[i + 1]] * scale / alpha;
+                var b = s_halfToFloat[src[i + 2]] * scale / alpha;
                 if (toP3) ToDisplayP3(ref r, ref g, ref b);
                 r = MathF.Max(r, 0f);
                 g = MathF.Max(g, 0f);
@@ -84,14 +96,31 @@ public static class ToneMapper
                     r *= k; g *= k; b *= k;
                 }
 
-                dst[i] = Encode(b);
-                dst[i + 1] = Encode(g);
-                dst[i + 2] = Encode(r);
-                dst[i + 3] = 0xFF;
+                if (alpha < 1f)
+                {
+                    dst[i] = (byte)MathF.Round(Encode(b) * alpha);
+                    dst[i + 1] = (byte)MathF.Round(Encode(g) * alpha);
+                    dst[i + 2] = (byte)MathF.Round(Encode(r) * alpha);
+                    dst[i + 3] = (byte)MathF.Round(alpha * 255f);
+                }
+                else
+                {
+                    dst[i] = Encode(b);
+                    dst[i + 1] = Encode(g);
+                    dst[i + 2] = Encode(r);
+                    dst[i + 3] = 0xFF;
+                }
             }
         });
 
-        return new CapturedImage(width, height, output);
+        return new CapturedImage(width, height, output) { HasTransparency = keepAlpha && HasTransparentPixel(output) };
+    }
+
+    private static bool HasTransparentPixel(byte[] bgra)
+    {
+        for (var i = 3; i < bgra.Length; i += 4)
+            if (bgra[i] != 0xFF) return true;
+        return false;
     }
 
     /// <summary>The brightest channel value in the frame, before and after conversion to Display P3.</summary>

@@ -225,6 +225,9 @@
                                         <!-- The windows close the overlay first: it's topmost and would cover them. -->
                                         <MenuFlyout Placement="BottomEdgeAlignedRight" Opening="OnSettingsOpening" Closed="OnSettingsClosed">
                                             <ToggleMenuFlyoutItem x:Name="AutoCopyItem" Text="Copy automatically after capture" Click="OnAutoCopy" />
+                                            <ToggleMenuFlyoutItem x:Name="CopyForChatItem" Text="Copy for chat (smaller image)" Click="OnCopyForChat" />
+                                            <ToggleMenuFlyoutItem x:Name="AutoRedactItem" Text="Redact personal info" Click="OnAutoRedact" />
+                                            <ToggleMenuFlyoutItem x:Name="IncludeCursorItem" Text="Include cursor in screenshots" Click="OnIncludeCursor" />
                                             <ToggleMenuFlyoutItem x:Name="SendToOculaItem" Text="Send captures to Ocula" Click="OnSendToOcula" Visibility="Collapsed" />
                                             <MenuFlyoutSeparator />
                                             <MenuFlyoutItem Text="Colour &amp; HDR…" Tag="ColourAndHdr" Click="OnOpenSettings" />

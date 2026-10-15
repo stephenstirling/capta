@@ -48,7 +48,7 @@ public sealed partial class RecordingBarWindow : Window
         TransparentBackdrop.PrepareWindow(this);
         CaptureExclusion.Apply(this);
 
-        Interop.Shadow.Attach(ShadowHost, cornerRadius: 16, offsetY: 18, blur: 44, opacity: 0.5);
+        Interop.Shadow.Attach(ShadowHost, cornerRadius: 16, offsetY: 2, blur: 8, opacity: 0.22);
         Interop.ClickThroughMargins.Attach(this, Panel);
 
         _timer = DispatcherQueue.CreateTimer();

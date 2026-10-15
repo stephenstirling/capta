@@ -12,13 +12,36 @@ takes over the Print Screen key and copies captures to the clipboard as PNG.
 | Alt+PrtSc | Active window |
 | Ctrl+PrtSc | Record video: choose an area, then Ctrl+PrtSc or Stop to finish |
 | Ctrl+Shift+PrtSc | Grab text from screen: select a region and its text is copied |
+| Ctrl+Alt+PrtSc | Repeat last region: captures the last Region selection again, without the overlay (also in the tray menu and on the toolbar) |
 
 In the region overlay, letting go of the mouse captures the area you drew (and copies it, with Auto-copy on);
 **Esc** cancels. Scrolling and Record keep the selection adjustable until you press Enter. Press **C** to pick the colour under the cursor: its hex code is copied and
 pinned as a small chip (click the code to copy again, double-click or Esc to unpin). The settings button at
-the end of the overlay's bar switches Auto-copy and opens the settings windows.
+the end of the overlay's bar switches Auto-copy, Copy for chat and Redact personal info, and opens the settings windows.
 
-**Colour & HDR** (tray menu → Settings) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
+**Redact personal info** (off by default; in Settings or the overlay's Capture settings) reads each capture's text
+on the device and covers email addresses, phone numbers and long digit runs (13 or more digits, such as card
+numbers) with a solid fill before the capture is copied, saved or sent to Ocula. The card that follows says what
+was covered, with **Review** (a switch for each item) and **Undo**. It only sees what OCR reads, so check anything
+sensitive, and it will cover some numbers that aren't personal: that's what Review and Undo are for.
+
+**Copy for chat** (the card's Copy menu, or a switch in the overlay's Capture settings that makes Auto-copy use
+it) puts a smaller copy on the clipboard for AI chats and messaging apps: sRGB, no metadata, long edge at most
+1568 px (never scaled up), as a PNG, or a JPEG (quality 85) if the PNG would be over 1 MB. The card shows the
+size, for example "Copied for chat · 1568 × 980 · 412 KB".
+
+Window captures (Window mode and Alt+PrtSc) keep the window's rounded corners, with a transparent background
+outside them. The mouse cursor is left out of screenshots unless you switch on **Include cursor in screenshots**
+(Settings, or the overlay's Capture settings); it then appears in window and full-screen captures. Region
+captures never include it, since the cursor is the selection tool there.
+
+**Updates.** The Microsoft Store updates the Store build. The website build can check for a newer release: once a
+day in the background (switch it off in Settings), or on demand from the tray menu's **Check for updates**. It
+reads the latest release from GitHub Releases and shows a card, "Version 1.1.x is available · What's new ·
+Download", which opens the release page in your browser. Capta never downloads or installs an update itself,
+sends nothing about you, and makes no other network calls.
+
+**Colour & HDR** (tray menu → Settings…, then the Colour & HDR link) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
 Display P3 (which keeps wide-gamut colours and embeds its profile; the clipboard always gets sRGB). It can also
 correct captures of an SDR monitor for its colour profile, so they look as they did on a calibrated or
 wide-gamut screen.

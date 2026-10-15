@@ -10,6 +10,15 @@ namespace Capta.Capture;
 /// <param name="WasHdr">The source display was in HDR, so the image was tone-mapped.</param>
 public sealed record CaptureResult(CapturedImage Image, MonitorInfo Monitor, RectInt32 ScreenBounds, CaptureMode Mode, bool WasHdr)
 {
+    /// <summary>
+    /// The SDR capture. Settable because redacting personal info (or undoing it) replaces the image
+    /// the card, clipboard, saves and pins use.
+    /// </summary>
+    public CapturedImage Image { get; set; } = Image;
+
+    /// <summary>Personal info found in the capture and what's redacted; null when none was found or looked for.</summary>
+    public Redaction? Redaction { get; set; }
+
     /// <summary>App the captured window belongs to (process name), when known.</summary>
     public string? SourceApp { get; init; }
 

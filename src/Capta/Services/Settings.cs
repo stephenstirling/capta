@@ -1,5 +1,6 @@
 using Capta.Capture;
 using Windows.Foundation.Collections;
+using Windows.Graphics;
 using Windows.Storage;
 
 namespace Capta.Services;
@@ -14,6 +15,39 @@ public static class Settings
     {
         get => Get(nameof(AutoCopy), true);
         set => Values[nameof(AutoCopy)] = value;
+    }
+
+    /// <summary>Cover emails, phone numbers and long digit runs in a capture before it's copied. Off by default.</summary>
+    public static bool AutoRedact
+    {
+        get => Get(nameof(AutoRedact), false);
+        set => Values[nameof(AutoRedact)] = value;
+    }
+
+    /// <summary>The last Region selection on the virtual desktop, for "Repeat last region". Null until one is made.</summary>
+    public static RectInt32? LastRegion
+    {
+        get
+        {
+            var parts = Get<string?>(nameof(LastRegion), null)?.Split(',');
+            if (parts is { Length: 4 }
+                && int.TryParse(parts[0], out var x) && int.TryParse(parts[1], out var y)
+                && int.TryParse(parts[2], out var width) && int.TryParse(parts[3], out var height))
+                return new RectInt32(x, y, width, height);
+            return null;
+        }
+        set
+        {
+            if (value is { } r) Values[nameof(LastRegion)] = $"{r.X},{r.Y},{r.Width},{r.Height}";
+            else Values.Remove(nameof(LastRegion));
+        }
+    }
+
+    /// <summary>Auto-copy puts the smaller "Copy for chat" image on the clipboard instead of the full one.</summary>
+    public static bool CopyForChat
+    {
+        get => Get(nameof(CopyForChat), false);
+        set => Values[nameof(CopyForChat)] = value;
     }
 
     /// <summary>Delay before a toolbar capture starts, in seconds (0 = off).</summary>
@@ -124,6 +158,36 @@ public static class Settings
         set => Values[nameof(CorrectMonitorProfiles)] = value;
     }
 
+    /// <summary>Ask GitHub Releases once a day for a newer Capta (website build only). On by default.</summary>
+    public static bool CheckForUpdates
+    {
+        get => Get(nameof(CheckForUpdates), true);
+        set => Values[nameof(CheckForUpdates)] = value;
+    }
+
+    /// <summary>When the last background update check ran.</summary>
+    public static DateTimeOffset? LastUpdateCheck
+    {
+        get => Get<string?>(nameof(LastUpdateCheck), null) is { } s && long.TryParse(s, out var ticks)
+            ? new DateTimeOffset(ticks, TimeSpan.Zero)
+            : null;
+        set => Values[nameof(LastUpdateCheck)] = value?.UtcTicks.ToString();
+    }
+
+    /// <summary>The release tag the update card was last shown for, so a background check shows it once.</summary>
+    public static string? LastNotifiedUpdate
+    {
+        get => Get<string?>(nameof(LastNotifiedUpdate), null);
+        set => Values[nameof(LastNotifiedUpdate)] = value;
+    }
+
+    /// <summary>Show the mouse cursor in window captures. Off by default.</summary>
+    public static bool IncludeCursor
+    {
+        get => Get(nameof(IncludeCursor), false);
+        set => Values[nameof(IncludeCursor)] = value;
+    }
+
     public static bool RecordSystemAudio
     {
         get => Get(nameof(RecordSystemAudio), true);
@@ -151,6 +215,7 @@ public static class Settings
         EmbedColourProfile = EmbedColourProfile,
         ColourSpace = ColourSpace,
         CorrectMonitorProfiles = CorrectMonitorProfiles,
+        IncludeCursor = IncludeCursor,
     };
 
     // ---- Shortcuts (see Shortcuts) ----

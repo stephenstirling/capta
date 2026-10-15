@@ -23,4 +23,5 @@ public enum HotkeyAction
     ActiveWindow, // Alt+PrtSc
     Record,       // Ctrl+PrtSc: start recording video; again to stop
     GrabText,     // Ctrl+Shift+PrtSc
+    RepeatRegion, // Ctrl+Alt+PrtSc: capture the last Region selection again, without the overlay
 }

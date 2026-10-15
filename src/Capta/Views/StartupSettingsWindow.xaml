@@ -137,7 +137,7 @@
                         </Button>
                     </Grid>
 
-                    <ScrollViewer Grid.Row="1" Padding="24,0,24,16" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer x:Name="Scroller" Grid.Row="1" Padding="24,0,24,16" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
                         <StackPanel Spacing="20">
 
                             <!-- Startup -->
@@ -161,6 +161,37 @@
                                 <Grid MinHeight="48">
                                     <TextBlock VerticalAlignment="Center" Text="Keep running in the tray when the toolbar is closed" />
                                     <ToggleSwitch x:Name="KeepRunning" Style="{StaticResource Switch}" Toggled="OnKeepRunning" />
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Capture -->
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="CAPTURE" />
+                                <Grid MinHeight="48">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Redact personal info" />
+                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Cover emails, phone numbers and card-like numbers before a capture is copied" />
+                                    </StackPanel>
+                                    <ToggleSwitch x:Name="AutoRedactSwitch" Style="{StaticResource Switch}" Toggled="OnAutoRedact" />
+                                </Grid>
+                                <Grid MinHeight="48">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Include cursor in screenshots" />
+                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Full screen and window captures. Region captures never include it" />
+                                    </StackPanel>
+                                    <ToggleSwitch x:Name="IncludeCursorSwitch" Style="{StaticResource Switch}" Toggled="OnIncludeCursor" />
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Colour & HDR lives in its own window. -->
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="COLOUR" />
+                                <Grid MinHeight="48">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Colour &amp; HDR" />
+                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="HDR tone-mapping, sRGB or Display P3, monitor profiles" />
+                                    </StackPanel>
+                                    <HyperlinkButton HorizontalAlignment="Right" Padding="8,4" Click="OnColourAndHdr" Content="Open…" />
                                 </Grid>
                             </StackPanel>
 
@@ -271,6 +302,47 @@
                                     LineHeight="18"
                                     Text="Win + Shift + S is reserved by Windows and will still open the Snipping Tool."
                                     TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <!-- Updates: the website build asks GitHub Releases; Store builds are updated by the Store. -->
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="UPDATES" />
+                                <TextBlock x:Name="StoreUpdatesText" MinHeight="48" VerticalAlignment="Center" Visibility="Collapsed" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Updates come from the Microsoft Store" />
+                                <StackPanel x:Name="WebsiteUpdates">
+                                    <Grid MinHeight="48">
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Check for updates automatically" />
+                                            <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Once a day, from GitHub Releases. Nothing is downloaded or installed" />
+                                        </StackPanel>
+                                        <ToggleSwitch x:Name="CheckForUpdatesSwitch" Style="{StaticResource Switch}" Toggled="OnCheckForUpdatesToggled" />
+                                    </Grid>
+                                    <Grid MinHeight="48">
+                                        <TextBlock VerticalAlignment="Center" Text="Check now" />
+                                        <HyperlinkButton HorizontalAlignment="Right" Padding="8,4" Click="OnCheckNow" Content="Check for updates" />
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- About -->
+                            <StackPanel x:Name="AboutSection">
+                                <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="ABOUT" />
+                                <Grid MinHeight="48">
+                                    <TextBlock VerticalAlignment="Center" Text="Version" />
+                                    <TextBlock x:Name="VersionText" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="12.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" />
+                                </Grid>
+                                <Grid MinHeight="48">
+                                    <TextBlock VerticalAlignment="Center" Text="Copyright" />
+                                    <TextBlock x:Name="CopyrightText" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="12.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" />
+                                </Grid>
+                                <Grid MinHeight="48">
+                                    <TextBlock VerticalAlignment="Center" Text="Licence" />
+                                    <HyperlinkButton x:Name="LicenseLink" HorizontalAlignment="Right" Padding="8,4" Click="OnLicense" ToolTipService.ToolTip="Read the licence" />
+                                </Grid>
+                                <StackPanel Margin="0,4,0,0" Orientation="Horizontal" Spacing="4">
+                                    <HyperlinkButton Padding="8,4" Click="OnWebsite" Content="Website" />
+                                    <HyperlinkButton Padding="8,4" Click="OnPrivacyPolicy" Content="Privacy policy" />
+                                    <HyperlinkButton Padding="8,4" Click="OnDonate" Content="Donate" />
+                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
