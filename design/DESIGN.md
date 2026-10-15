@@ -20,7 +20,7 @@ Colours, shapes and fonts are **not** here. They live in one place only: `src/St
 | Capture overlay | `03-capture-overlay.png` | `Main.html` | `Overlay/OverlayWindow.xaml` | Built (settings button opens a Capture settings menu) |
 | Pin to screen | `04-pin-to-screen.png` | `Pinned.html` | `Views/PinWindow.xaml` | Built |
 | Tray flyout | `05-tray-flyout.png` | `Tray.html` | `Views/TrayFlyoutWindow.xaml` (left click); `Services/TrayIconService.cs` (right-click menu) | Built |
-| Startup & shortcuts | `06-startup-and-shortcuts.png` | `Startup.html` | `Views/StartupSettingsWindow.xaml` | Built |
+| Startup & shortcuts | `06-startup-and-shortcuts.png` | `Startup.html` | `Views/StartupSettingsWindow.xaml` | Built (plus an About section at the bottom: version, © Stephen Stirling, licence link) |
 | Colour & HDR settings | `07-colour-and-hdr.png` | `Hdr.html` | `Views/ColourHdrWindow.xaml` | Built (monitor correction off by default) |
 | First-run setup | `08-first-run.png` | `FirstRun.html` | `Views/FirstRunWindow.xaml` | Built |
 | App icon | `09-app-icon.png` | `Icon.html` | `Stirling.Shared/Assets/Capta` | Done (concept A) |

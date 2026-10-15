@@ -64,6 +64,10 @@ public sealed partial class StartupSettingsWindow : Window
         };
         Shortcuts.Changed += BuildShortcutRows;
         BuildShortcutRows();
+
+        VersionText.Text = AboutInfo.Version;
+        CopyrightText.Text = AboutInfo.Copyright;
+        LicenseLink.Content = AboutInfo.License;
     }
 
     private void Hide()
@@ -253,6 +257,8 @@ public sealed partial class StartupSettingsWindow : Window
     private async void OnGitHub(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.GitHub);
 
     private async void OnBuyMeACoffee(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.BuyMeACoffee);
+
+    private async void OnLicense(object sender, RoutedEventArgs e) => await Links.OpenAsync(Links.License);
 
     private void OnDone(object sender, RoutedEventArgs e) => Hide();
 

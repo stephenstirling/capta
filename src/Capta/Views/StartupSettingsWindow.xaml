@@ -272,6 +272,23 @@
                                     Text="Win + Shift + S is reserved by Windows and will still open the Snipping Tool."
                                     TextWrapping="Wrap" />
                             </StackPanel>
+
+                            <!-- About -->
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="ABOUT" />
+                                <Grid MinHeight="48">
+                                    <TextBlock VerticalAlignment="Center" Text="Version" />
+                                    <TextBlock x:Name="VersionText" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="12.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" />
+                                </Grid>
+                                <Grid MinHeight="48">
+                                    <TextBlock VerticalAlignment="Center" Text="Copyright" />
+                                    <TextBlock x:Name="CopyrightText" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="12.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" />
+                                </Grid>
+                                <Grid MinHeight="48">
+                                    <TextBlock VerticalAlignment="Center" Text="Licence" />
+                                    <HyperlinkButton x:Name="LicenseLink" HorizontalAlignment="Right" Padding="8,4" Click="OnLicense" ToolTipService.ToolTip="Read the licence" />
+                                </Grid>
+                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
 
