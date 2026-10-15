@@ -16,7 +16,8 @@ public class RedactionTests
         {
             var i = (y * w + x) * 4;
             var on = (x + y) % 2 == 0;
-            pixels[i + 2] = (byte)(on ? 255 : 0);
+            // Premultiplied BGRA, as CapturedImage stores it: a transparent pixel is all zeros.
+            pixels[i + 2] = (byte)(on && !transparent ? 255 : 0);
             pixels[i + 3] = (byte)(transparent ? 0 : 255);
             if (hdr is not null)
             {
