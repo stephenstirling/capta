@@ -16,7 +16,13 @@ takes over the Print Screen key and copies captures to the clipboard as PNG.
 In the region overlay, letting go of the mouse captures the area you drew (and copies it, with Auto-copy on);
 **Esc** cancels. Scrolling and Record keep the selection adjustable until you press Enter. Press **C** to pick the colour under the cursor: its hex code is copied and
 pinned as a small chip (click the code to copy again, double-click or Esc to unpin). The settings button at
-the end of the overlay's bar switches Auto-copy and opens the settings windows.
+the end of the overlay's bar switches Auto-copy and Blur personal info, and opens the settings windows.
+
+**Blur personal info** (on by default) reads each capture's text on the device and blurs email addresses,
+phone numbers and long digit runs (12 or more digits, such as card numbers) before the capture is copied,
+saved or sent to Ocula. The card that follows says what was blurred, with **Review** (a switch for each
+item) and **Undo**. It only sees what OCR reads, so check anything sensitive, and it will blur some numbers
+that aren't personal: that's what Review and Undo are for.
 
 **Colour & HDR** (tray menu → Settings) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
 Display P3 (which keeps wide-gamut colours and embeds its profile; the clipboard always gets sRGB). It can also

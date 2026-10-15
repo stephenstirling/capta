@@ -50,6 +50,13 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    `ToolbarWindow`). This overrides the mockup's `0 18px 44px` shadow. The transparent window margin around the
    panel is sized to match (8 px left and right, 4 px top, 8 px bottom, which covers the 4 px blur plus the offset),
    so the toolbar window is no larger than its shadow needs.
+6. **Personal info is blurred before the copy.** The "Personal info found" card from `Editor.html` appears in
+   Capta's after-capture card, not in an editor (Capta has none, see Decision 3). On-device OCR finds email
+   addresses, phone numbers and long digit runs (12 or more digits); they are blurred as a mosaic (a plain blur
+   of small text can be reversed) before the clipboard, saves, Edit and Ocula see the capture. The card says
+   what was blurred ("1 email address · blurred automatically") with **Review** (a switch per item) and
+   **Undo** (which becomes "Blur again"). On by default, with a "Blur personal info" switch in the overlay's
+   Capture settings. Grab text and recordings are not touched.
 
 ## Visual rules
 
@@ -69,6 +76,7 @@ drag grip · amber **New** button (Aperture glyph + "New") · dark inset group o
 **After-capture card** (bottom right, 400 px wide, 14 px padding, 16 px corners)
 Row 1: 96 × 60 thumbnail · green dot + "Copied to clipboard" (bold 14 px) with a muted line under it ("Region · 680 × 430 · tone-mapped from HDR") · dismiss ×.
 Row 2: **Copy** split button (Copy + chevron opening the menu) · **Edit**, wide amber primary · Save, Pin, Send to Ocula as 44 × 40 icon buttons.
+When personal info was blurred, a "Personal info found" block sits between row 1 and row 2 (`Editor.html`'s card: shield icon, "1 email address · blurred automatically", Review and Undo buttons; Decision 6).
 Copy menu: Copy image (Ctrl+C, checked default) · Copy image as HDR · Copy text in image (Ctrl+Shift+C) · Copy as file · Copy file path · separator · "Copy automatically after capture" toggle.
 
 **Capture overlay**

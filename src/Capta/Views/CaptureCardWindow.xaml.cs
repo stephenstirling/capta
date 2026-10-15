@@ -26,6 +26,7 @@ public sealed partial class CaptureCardWindow : Window
     private CaptureResult? _current;
     private bool _busy;
     private bool _hovered;
+    private bool _reviewOpen;
 
     public event Action<CaptureResult>? PinRequested;
 
@@ -100,6 +101,7 @@ public sealed partial class CaptureCardWindow : Window
             ? $"Recording · {FormatLength(result.VideoLength)} · {result.ScreenBounds.Width} × {result.ScreenBounds.Height}"
             : $"{result.ModeName} · {image.Width} × {image.Height}" + (result.WasHdr ? " · tone-mapped from HDR" : "");
         ApplyKind(video);
+        ShowRedaction(result);
         if (status is not null)
             SetStatus(status, success);
         else
@@ -109,14 +111,116 @@ public sealed partial class CaptureCardWindow : Window
         OculaButton.IsEnabled = oculaInstalled;
         ToolTipService.SetToolTip(OculaButton, oculaInstalled ? "Send to Ocula" : "Send to Ocula (Ocula isn't installed)");
 
-        var source = new SoftwareBitmapSource();
-        await source.SetBitmapAsync(image.ToSoftwareBitmap());
+        await SetThumbnailAsync(result);
         if (_current != result) return; // superseded by a newer capture
-        Thumbnail.Source = source;
 
         PlaceOn(result.Monitor);
         this.BringToFront();
         RestartTimer();
+    }
+
+    private async Task SetThumbnailAsync(CaptureResult result)
+    {
+        var source = new SoftwareBitmapSource();
+        await source.SetBitmapAsync(result.Image.ToSoftwareBitmap());
+        if (_current == result) Thumbnail.Source = source; // not superseded by a newer capture
+    }
+
+    // ---- Personal info (blurred before the copy) ----
+
+    private void ShowRedaction(CaptureResult result)
+    {
+        var redaction = result.Redaction;
+        RedactionCard.Visibility = redaction is null ? Visibility.Collapsed : Visibility.Visible;
+        if (redaction is not null) UpdateRedactionText(redaction);
+    }
+
+    private void UpdateRedactionText(Redaction redaction)
+    {
+        var summary = PersonalInfo.Describe(redaction.Matches);
+        var blurred = redaction.BlurredCount;
+        RedactionDetail.Text = blurred == redaction.Matches.Count ? $"{summary} · blurred automatically"
+            : blurred == 0 ? $"{summary} · not blurred"
+            : $"{blurred} of {redaction.Matches.Count} blurred";
+        UndoRedactionButton.Content = blurred == 0 ? "Blur again" : "Undo";
+    }
+
+    /// <summary>Review: one switch per thing found.</summary>
+    private void OnReviewOpening(object? sender, object e)
+    {
+        _reviewOpen = true;
+        _timer.Stop();
+        ReviewList.Children.Clear();
+        if (_current?.Redaction is not { } redaction) return;
+        var mono = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["CaptaMonoFont"];
+        for (var i = 0; i < redaction.Matches.Count; i++)
+        {
+            var index = i;
+            var match = redaction.Matches[i];
+            var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+            text.Children.Add(new TextBlock { Text = match.Label, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
+            text.Children.Add(new TextBlock
+            {
+                Text = match.Text,
+                FontFamily = mono,
+                FontSize = 11.5,
+                Opacity = 0.65,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+            });
+            var toggle = new ToggleSwitch
+            {
+                IsOn = redaction.IsBlurred(index),
+                OnContent = "",
+                OffContent = "",
+                MinWidth = 0,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            toggle.Toggled += async (_, _) => await ChangeRedactionAsync(() => redaction.Set(index, toggle.IsOn));
+            var row = new Grid { MinHeight = 48, Padding = new Thickness(8, 4, 8, 4), ColumnSpacing = 10 };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            row.Children.Add(text);
+            Grid.SetColumn(toggle, 1);
+            row.Children.Add(toggle);
+            ReviewList.Children.Add(row);
+        }
+    }
+
+    private void OnReviewClosed(object? sender, object e)
+    {
+        _reviewOpen = false;
+        if (!_hovered && !_busy) RestartTimer();
+    }
+
+    private async void OnUndoRedaction(object sender, RoutedEventArgs e)
+    {
+        if (_current?.Redaction is not { } redaction) return;
+        _timer.Stop();
+        await ChangeRedactionAsync(() => redaction.SetAll(redaction.BlurredCount == 0));
+        if (!_hovered && !_busy && !_reviewOpen) RestartTimer();
+    }
+
+    /// <summary>Applies a change to what's blurred: new image on the card, and on the clipboard if it was auto-copied.</summary>
+    private async Task ChangeRedactionAsync(Action change)
+    {
+        if (_current is not { Redaction: { } redaction } result) return;
+        try
+        {
+            change();
+            result.Image = await Task.Run(redaction.Render);
+            UpdateRedactionText(redaction);
+            await SetThumbnailAsync(result);
+            if (Settings.AutoCopy)
+            {
+                await ImageExport.CopyToClipboardAsync(result.Image);
+                SetStatus("Copied to clipboard");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Changing the blurred areas failed", ex);
+            SetStatus(ex.Message, success: false);
+        }
     }
 
     /// <summary>Recordings: Play instead of Edit, file copies instead of image copies, GIF export, no pin.</summary>

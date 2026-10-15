@@ -123,6 +123,10 @@ public sealed class CapturedImage
         return Derive(Width, Height, sdr, hdr, transparent: true);
     }
 
+    /// <summary>A copy of this image with other pixels (same size), keeping how its colours are to be output.</summary>
+    public CapturedImage WithPixels(byte[] pixels, ushort[]? hdrPixels) =>
+        Derive(Width, Height, pixels, hdrPixels, HasTransparency);
+
     /// <summary>A new image from this one's pixels, keeping how its colours are to be output.</summary>
     private CapturedImage Derive(int width, int height, byte[] pixels, ushort[]? hdr, bool transparent) =>
         new(width, height, pixels)

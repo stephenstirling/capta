@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
     Unit tests for the parts of Capta that need no screen, WinUI or package identity: colour
-    maths, PNG and ICC handling, cropping and masking, scroll stitching and shortcut chords.
+    maths, PNG and ICC handling, cropping and masking, blurring personal info, scroll stitching and
+    shortcut chords.
     The app's source files are compiled in directly rather than referencing the WinUI app.
   -->
   <PropertyGroup>
@@ -28,12 +29,15 @@
     <Compile Include="..\..\src\Capta\Capture\ColourOutput.cs" Link="App\ColourOutput.cs" />
     <Compile Include="..\..\src\Capta\Capture\IccProfile.cs" Link="App\IccProfile.cs" />
     <Compile Include="..\..\src\Capta\Capture\PngChunks.cs" Link="App\PngChunks.cs" />
+    <Compile Include="..\..\src\Capta\Capture\Redactor.cs" Link="App\Redactor.cs" />
     <Compile Include="..\..\src\Capta\Capture\ScrollStitcher.cs" Link="App\ScrollStitcher.cs" />
     <Compile Include="..\..\src\Capta\Capture\ToneMapper.cs" Link="App\ToneMapper.cs" />
     <Compile Include="..\..\src\Capta\Capture\WicColour.cs" Link="App\WicColour.cs" />
     <Compile Include="..\..\src\Capta\Interop\NativeMethods.cs" Link="App\NativeMethods.cs" />
     <Compile Include="..\..\src\Capta\Services\Chord.cs" Link="App\Chord.cs" />
     <Compile Include="..\..\src\Capta\Services\Log.cs" Link="App\Log.cs" />
+    <Compile Include="..\..\src\Capta\Services\PersonalInfo.cs" Link="App\PersonalInfo.cs" />
+    <Compile Include="..\..\src\Capta\Services\Redaction.cs" Link="App\Redaction.cs" />
     <EmbeddedResource Include="..\..\src\Capta\Capture\DisplayP3.icc" LogicalName="DisplayP3.icc" />
   </ItemGroup>
 </Project>
