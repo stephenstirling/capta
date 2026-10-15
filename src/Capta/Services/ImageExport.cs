@@ -89,6 +89,55 @@ public static class ImageExport
         Clipboard.Flush();
     }
 
+    /// <summary>
+    /// "Copy for chat": a smaller copy for pasting into AI chats and messaging apps. sRGB (an HDR
+    /// capture is already tone-mapped), no metadata, long edge at most <see cref="ChatImage.MaxEdge"/>
+    /// and never scaled up. A PNG, or a JPEG when the PNG is over 1 MB. Must be called on the UI thread.
+    /// </summary>
+    public static async Task<ChatCopy> CopyForChatAsync(CapturedImage image)
+    {
+        var (pixels, _) = await ColourOutput.ConvertAsync(image, ColourSpace.Srgb);
+        var (width, height) = ChatImage.ScaledSize(image.Width, image.Height);
+        var scaled = await Task.Run(() => ChatImage.Downscale(pixels, image.Width, image.Height, width, height));
+
+        var stream = await EncodeBareAsync(BitmapEncoder.PngEncoderId, scaled, width, height, image.HasTransparency, null);
+        var format = "PNG";
+        var jpeg = ChatImage.UseJpeg((long)stream.Size);
+        if (jpeg)
+        {
+            stream.Dispose();
+            var flat = image.HasTransparency ? ChatImage.FlattenOnWhite(scaled) : scaled;
+            var quality = new BitmapPropertySet
+            {
+                ["ImageQuality"] = new BitmapTypedValue(ChatImage.JpegQuality / 100f, Windows.Foundation.PropertyType.Single),
+            };
+            stream = await EncodeBareAsync(BitmapEncoder.JpegEncoderId, flat, width, height, false, quality);
+            format = "JFIF"; // the clipboard format browsers, Office and chat apps read for JPEG
+        }
+
+        var package = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
+        package.SetData(format, stream.CloneStream());
+        package.SetBitmap(RandomAccessStreamReference.CreateFromStream(stream));
+        Clipboard.SetContent(package);
+        Clipboard.Flush();
+        return new ChatCopy(width, height, (long)stream.Size, jpeg);
+    }
+
+    /// <summary>An encoded image with nothing but pixels in it: no colour profile, no text chunks.</summary>
+    private static async Task<InMemoryRandomAccessStream> EncodeBareAsync(Guid encoderId, byte[] bgra, int width, int height,
+        bool transparent, BitmapPropertySet? options)
+    {
+        var stream = new InMemoryRandomAccessStream();
+        var encoder = options is null
+            ? await BitmapEncoder.CreateAsync(encoderId, stream)
+            : await BitmapEncoder.CreateAsync(encoderId, stream, options);
+        encoder.SetPixelData(BitmapPixelFormat.Bgra8, transparent ? BitmapAlphaMode.Premultiplied : BitmapAlphaMode.Ignore,
+            (uint)width, (uint)height, 96, 96, bgra);
+        await encoder.FlushAsync();
+        stream.Seek(0);
+        return stream;
+    }
+
     /// <summary>Saves a PNG, by default in the colour space chosen in Colour &amp; HDR.</summary>
     public static async Task SaveAsync(CapturedImage image, StorageFile file, string? captaJson = null, ColourSpace? space = null)
     {

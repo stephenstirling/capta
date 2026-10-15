@@ -180,11 +180,15 @@ public partial class App : Application
         await AutoRedact.ApplyAsync(result);
 
         var copied = false;
+        string? status = null;
         try
         {
             if (Settings.AutoCopy)
             {
-                await ImageExport.CopyToClipboardAsync(result.Image);
+                if (Settings.CopyForChat)
+                    status = (await ImageExport.CopyForChatAsync(result.Image)).Describe();
+                else
+                    await ImageExport.CopyToClipboardAsync(result.Image);
                 copied = true;
             }
             Log.Info($"Captured {result.Image.Width}x{result.Image.Height}, copied: {copied}");
@@ -196,7 +200,7 @@ public partial class App : Application
         }
 
         _history.Add(result);
-        ShowCard(result, copied);
+        ShowCard(result, copied, status);
         await SendToOculaIfEnabledAsync(result);
     }
 

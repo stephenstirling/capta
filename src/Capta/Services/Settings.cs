@@ -43,6 +43,13 @@ public static class Settings
         }
     }
 
+    /// <summary>Auto-copy puts the smaller "Copy for chat" image on the clipboard instead of the full one.</summary>
+    public static bool CopyForChat
+    {
+        get => Get(nameof(CopyForChat), false);
+        set => Values[nameof(CopyForChat)] = value;
+    }
+
     /// <summary>Delay before a toolbar capture starts, in seconds (0 = off).</summary>
     public static int CaptureDelaySeconds
     {

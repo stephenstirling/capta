@@ -239,7 +239,7 @@ public sealed partial class CaptureCardWindow : Window
     private void ApplyKind(bool video)
     {
         var image = video ? Visibility.Collapsed : Visibility.Visible;
-        CopyImageRow.Visibility = CopyHdrRow.Visibility = CopyTextRow.Visibility = image;
+        CopyImageRow.Visibility = CopyChatRow.Visibility = CopyHdrRow.Visibility = CopyTextRow.Visibility = image;
         GifRow.Visibility = video ? Visibility.Visible : Visibility.Collapsed;
         CopyAsFileText.Text = video ? "Copy video file" : "Copy as file";
         EditText.Text = video ? "Play" : "Edit";
@@ -334,6 +334,17 @@ public sealed partial class CaptureCardWindow : Window
         {
             await ImageExport.CopyToClipboardAsync(_current.Image);
             SetStatus("Copied to clipboard");
+        });
+    }
+
+    private async void OnCopyForChat(object sender, RoutedEventArgs e)
+    {
+        CopyMenu.Hide();
+        if (_current is null || _current.IsVideo) return;
+        await RunAsync(async () =>
+        {
+            var copy = await ImageExport.CopyForChatAsync(_current.Image);
+            SetStatus(copy.Describe());
         });
     }
 

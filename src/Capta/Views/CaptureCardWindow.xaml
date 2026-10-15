@@ -254,6 +254,12 @@
                                                         <TextBlock Grid.Column="2" VerticalAlignment="Center" FontFamily="{StaticResource CaptaMonoFont}" FontSize="11" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Ctrl+C" />
                                                     </Grid>
                                                 </Button>
+                                                <Button x:Name="CopyChatRow" Style="{StaticResource MenuRow}" Click="OnCopyForChat">
+                                                    <StackPanel>
+                                                        <TextBlock FontWeight="SemiBold" Text="Copy for chat" />
+                                                        <TextBlock FontSize="11.5" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Smaller · for AI chats and messaging apps" />
+                                                    </StackPanel>
+                                                </Button>
                                                 <Button x:Name="CopyHdrRow" Style="{StaticResource MenuRow}" Click="OnCopyHdr">
                                                     <StackPanel>
                                                         <TextBlock FontWeight="SemiBold" Text="Copy image as HDR" />

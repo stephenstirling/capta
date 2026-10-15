@@ -25,6 +25,11 @@ saved or sent to Ocula. The card that follows says what was blurred, with **Revi
 item) and **Undo**. It only sees what OCR reads, so check anything sensitive, and it will blur some numbers
 that aren't personal: that's what Review and Undo are for.
 
+**Copy for chat** (the card's Copy menu, or a switch in the overlay's Capture settings that makes Auto-copy use
+it) puts a smaller copy on the clipboard for AI chats and messaging apps: sRGB, no metadata, long edge at most
+1568 px (never scaled up), as a PNG, or a JPEG (quality 85) if the PNG would be over 1 MB. The card shows the
+size, for example "Copied for chat · 1568 × 980 · 412 KB".
+
 Window captures (Window mode and Alt+PrtSc) keep the window's rounded corners, with a transparent
 background outside them. The mouse cursor is left out unless you switch on **Include cursor in window
 captures** in the overlay's Capture settings.

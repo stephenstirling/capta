@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\src\Capta\Capture\ChatImage.cs" Link="App\ChatImage.cs" />
     <Compile Include="..\..\src\Capta\Capture\CaptureOptions.cs" Link="App\CaptureOptions.cs" />
     <Compile Include="..\..\src\Capta\Capture\CapturedImage.cs" Link="App\CapturedImage.cs" />
     <Compile Include="..\..\src\Capta\Capture\ColourOutput.cs" Link="App\ColourOutput.cs" />

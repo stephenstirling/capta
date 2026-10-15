@@ -83,7 +83,7 @@ drag grip · amber **New** button (Aperture glyph + "New") · dark inset group o
 Row 1: 96 × 60 thumbnail · green dot + "Copied to clipboard" (bold 14 px) with a muted line under it ("Region · 680 × 430 · tone-mapped from HDR") · dismiss ×.
 Row 2: **Copy** split button (Copy + chevron opening the menu) · **Edit**, wide amber primary · Save, Pin, Send to Ocula as 44 × 40 icon buttons.
 When personal info was blurred, a "Personal info found" block sits between row 1 and row 2 (`Editor.html`'s card: shield icon, "1 email address · blurred automatically", Review and Undo buttons; Decision 6).
-Copy menu: Copy image (Ctrl+C, checked default) · Copy image as HDR · Copy text in image (Ctrl+Shift+C) · Copy as file · Copy file path · separator · "Copy automatically after capture" toggle.
+Copy menu: Copy image (Ctrl+C, checked default) · Copy for chat (a smaller sRGB copy: long edge at most 1568 px, never scaled up, no metadata; a PNG, or a JPEG at quality 85 if the PNG is over 1 MB; status line "Copied for chat · 1568 × 980 · 412 KB") · Copy image as HDR · Copy text in image (Ctrl+Shift+C) · Copy as file · Copy file path · separator · "Copy automatically after capture" toggle.
 
 **Capture overlay**
 Dim `CaptaScrimBrush` outside the selection · 2 px amber frame · 8 white square handles with amber borders · thirds guides at 22% white · amber size badge with dark mono text above the top-left corner · circular 132 px loupe with white border, magnified pixels, amber crosshair and a centre-pixel box · readout pill below the loupe (coordinates · colour swatch · hex) · mode bar at the top matching the toolbar's modes · key hints under it (Space move, Shift square, Enter capture, Esc cancel).
