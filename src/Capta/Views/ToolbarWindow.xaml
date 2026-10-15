@@ -7,10 +7,10 @@
     xmlns:c="using:Capta.Controls"
     Title="Capta">
 
-    <!-- Transparent window; the padding leaves room for the panel's shadow. -->
+    <!-- Transparent window; the padding leaves room for the panel's shadow (see DESIGN.md decision 5). -->
     <Grid
         x:Name="Root"
-        Padding="40,16,40,56">
+        Padding="8,4,8,8">
         <Grid.KeyboardAccelerators>
             <KeyboardAccelerator Key="Escape" Invoked="OnEscape" />
         </Grid.KeyboardAccelerators>
