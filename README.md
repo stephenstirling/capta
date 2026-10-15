@@ -18,7 +18,7 @@ In the region overlay, letting go of the mouse captures the area you drew (and c
 pinned as a small chip (click the code to copy again, double-click or Esc to unpin). The settings button at
 the end of the overlay's bar switches Auto-copy and opens the settings windows.
 
-**Colour & HDR** (tray menu) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
+**Colour & HDR** (tray menu → Settings) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
 Display P3 (which keeps wide-gamut colours and embeds its profile; the clipboard always gets sRGB). It can also
 correct captures of an SDR monitor for its colour profile, so they look as they did on a calibrated or
 wide-gamut screen.

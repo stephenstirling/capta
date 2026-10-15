@@ -39,11 +39,12 @@ public sealed class TrayIconService : IDisposable
 
         _printScreenWarning = new MenuFlyoutItem
         {
-            Text = "Print Screen opens Snipping Tool: fix…",
+            Text = "Fix Print Screen shortcut…",
             Icon = new FontIcon { Glyph = "" },
             Visibility = Visibility.Collapsed,
         };
         _printScreenWarning.Click += (_, _) => _app.ShowSettings();
+        ToolTipService.SetToolTip(_printScreenWarning, "Windows is using Print Screen for the Snipping Tool");
 
         var settings = new MenuFlyoutItem { Text = "Startup & shortcuts…", Icon = new FontIcon { Glyph = "" } };
         settings.Click += (_, _) => _app.ShowSettings();
@@ -54,6 +55,12 @@ public sealed class TrayIconService : IDisposable
         var setup = new MenuFlyoutItem { Text = "Set up Capta…" };
         setup.Click += (_, _) => _app.ShowFirstRun();
         _printScreenWarningSeparator = new MenuFlyoutSeparator { Visibility = Visibility.Collapsed };
+
+        // The three windows live under one entry, which keeps the menu short.
+        var settingsMenu = new MenuFlyoutSubItem { Text = "Settings", Icon = new FontIcon { Glyph = "\uE713" } };
+        settingsMenu.Items.Add(settings);
+        settingsMenu.Items.Add(colour);
+        settingsMenu.Items.Add(setup);
 
         _clickThroughItem = new MenuFlyoutItem
         {
@@ -75,7 +82,7 @@ public sealed class TrayIconService : IDisposable
                 toolbar,
                 _clickThroughItem,
                 new MenuFlyoutSeparator(),
-                _startupItem, settings, colour, setup, new MenuFlyoutSeparator(), exit,
+                _startupItem, settingsMenu, new MenuFlyoutSeparator(), exit,
             },
         };
         menu.Opening += async (_, _) => await RefreshStartupStateAsync();
