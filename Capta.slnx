@@ -17,7 +17,15 @@
       <Platform Solution="*|ARM64" Project="ARM64" />
     </Project>
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Capta.Tests/Capta.Tests.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+      <Platform Solution="*|ARM64" Project="ARM64" />
+    </Project>
+  </Folder>
   <Folder Name="/tools/">
+    <File Path="tools/generate_display_p3_icc.py" />
     <File Path="tools/generate_icons.py" />
   </Folder>
   <Folder Name="/Solution Items/">

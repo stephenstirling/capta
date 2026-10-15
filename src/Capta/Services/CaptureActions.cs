@@ -69,10 +69,13 @@ public static partial class CaptureActions
 
     private static Uri OculaUri(string verb, string path) => new($"ocula:{verb}?file={Uri.EscapeDataString(path)}");
 
-    /// <summary>Copies the capture as a PNG file (pastes into Explorer, email and chat apps).</summary>
+    /// <summary>
+    /// Copies the capture as a PNG file (pastes into Explorer, email and chat apps). Always sRGB,
+    /// like the rest of the clipboard: many of those apps ignore colour profiles.
+    /// </summary>
     public static async Task CopyAsFileAsync(CaptureResult capture)
     {
-        var file = await SaveTempAsync(capture, "Clipboard");
+        var file = await SaveTempAsync(capture, "Clipboard", ColourSpace.Srgb);
         var package = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
         package.SetStorageItems([file]);
         Clipboard.SetContent(package);
@@ -95,19 +98,20 @@ public static partial class CaptureActions
         return text;
     }
 
-    private static async Task<StorageFile> SaveTempAsync(CaptureResult capture, string folderName)
+    private static async Task<StorageFile> SaveTempAsync(CaptureResult capture, string folderName, ColourSpace? space = null)
     {
         var folder = await ApplicationData.Current.TemporaryFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
         var file = await folder.CreateFileAsync(ImageExport.DefaultFileName() + ".png", CreationCollisionOption.GenerateUniqueName);
-        await SaveWithMetadataAsync(capture, file);
+        await SaveWithMetadataAsync(capture, file, space);
         return file;
     }
 
     /// <summary>Saves a PNG carrying the capture's metadata (source, title, mode, OCR text).</summary>
-    public static async Task SaveWithMetadataAsync(CaptureResult capture, StorageFile file)
+    /// <param name="space">Null: the colour space chosen in Colour &amp; HDR.</param>
+    public static async Task SaveWithMetadataAsync(CaptureResult capture, StorageFile file, ColourSpace? space = null)
     {
         var metadata = await CaptureMetadata.ForAsync(capture);
-        await ImageExport.SaveAsync(capture.Image, file, metadata.ToJson());
+        await ImageExport.SaveAsync(capture.Image, file, metadata.ToJson(), space);
     }
 
     /// <summary>

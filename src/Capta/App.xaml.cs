@@ -62,6 +62,11 @@ public partial class App : Application
         _capture.Captured += OnCaptured;
         _capture.ColourPicked += PinColour;
         _capture.RecordRequested += StartRecording;
+        _capture.SettingsRequested += page =>
+        {
+            if (page == SettingsPage.ColourAndHdr) ShowColourAndHdr();
+            else ShowSettings();
+        };
 
         _tray = new TrayIconService(this);
         _tray.Create();

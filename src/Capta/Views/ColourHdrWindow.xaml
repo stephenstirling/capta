@@ -271,7 +271,13 @@
                                 <TextBlock Margin="0,0,0,6" Style="{StaticResource SectionLabel}" Text="COLOUR OUTPUT" />
                                 <Grid MinHeight="44">
                                     <TextBlock VerticalAlignment="Center" Text="Colour space" />
-                                    <Button HorizontalAlignment="Right" Height="36" Padding="12,0" CornerRadius="8" BorderThickness="0">
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        Height="36"
+                                        Padding="12,0"
+                                        CornerRadius="8"
+                                        BorderThickness="0"
+                                        ToolTipService.ToolTip="Display P3 keeps colours sRGB can't show (HDR and wide-gamut screens). It applies to saved files, which carry the profile; the clipboard always gets sRGB.">
                                         <Button.Resources>
                                             <ResourceDictionary>
                                                 <ResourceDictionary.ThemeDictionaries>
@@ -292,27 +298,42 @@
                                             </ResourceDictionary>
                                         </Button.Resources>
                                         <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <TextBlock Text="sRGB" />
+                                            <TextBlock x:Name="ColourSpaceText" Text="sRGB" />
                                             <c:LineIcon Size="13" StrokeWidth="2" Data="M6 9l6 6 6-6" />
                                         </StackPanel>
                                         <Button.Flyout>
                                             <MenuFlyout Placement="BottomEdgeAlignedRight">
-                                                <ToggleMenuFlyoutItem Text="sRGB" IsChecked="True" />
-                                                <MenuFlyoutItem Text="Display P3 (coming soon)" IsEnabled="False" />
+                                                <ToggleMenuFlyoutItem x:Name="SpaceSrgb" Text="sRGB" Tag="Srgb" Click="OnColourSpace" />
+                                                <ToggleMenuFlyoutItem x:Name="SpaceP3" Text="Display P3" Tag="DisplayP3" Click="OnColourSpace" />
                                             </MenuFlyout>
                                         </Button.Flyout>
                                     </Button>
                                 </Grid>
                                 <Grid MinHeight="44">
-                                    <TextBlock VerticalAlignment="Center" Text="Embed colour profile in saved files" />
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Embed colour profile in saved files" />
+                                        <TextBlock
+                                            x:Name="EmbedProfileNote"
+                                            Margin="0,2,72,0"
+                                            FontSize="12"
+                                            Foreground="{ThemeResource CaptaFloatingMutedBrush}"
+                                            Text="Always on for Display P3: without the profile, apps would show the colours wrong."
+                                            TextWrapping="Wrap"
+                                            Visibility="Collapsed" />
+                                    </StackPanel>
                                     <ToggleSwitch x:Name="EmbedProfile" Style="{StaticResource Switch}" Toggled="OnEmbedProfile" />
                                 </Grid>
                                 <Grid MinHeight="44">
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock Text="Correct for each monitor's colour profile" />
-                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Coming soon. Windows already colour-manages HDR and Auto Color Management displays." TextWrapping="Wrap" />
+                                        <TextBlock
+                                            Margin="0,2,72,0"
+                                            FontSize="12"
+                                            Foreground="{ThemeResource CaptaFloatingMutedBrush}"
+                                            Text="Saves what you saw on a calibrated or wide-gamut screen. Windows already colour-manages HDR and Auto Color Management displays."
+                                            TextWrapping="Wrap" />
                                     </StackPanel>
-                                    <ToggleSwitch Style="{StaticResource Switch}" IsEnabled="False" />
+                                    <ToggleSwitch x:Name="CorrectProfiles" Style="{StaticResource Switch}" Toggled="OnCorrectProfiles" />
                                 </Grid>
                             </StackPanel>
                         </StackPanel>

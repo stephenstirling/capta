@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Unit tests for the parts of Capta that need no screen, WinUI or package identity: colour
+    maths, PNG and ICC handling, cropping and masking, scroll stitching and shortcut chords.
+    The app's source files are compiled in directly rather than referencing the WinUI app.
+  -->
+  <PropertyGroup>
+    <UseWinUI>false</UseWinUI>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>Capta.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\Capta\Capture\CaptureOptions.cs" Link="App\CaptureOptions.cs" />
+    <Compile Include="..\..\src\Capta\Capture\CapturedImage.cs" Link="App\CapturedImage.cs" />
+    <Compile Include="..\..\src\Capta\Capture\ColourOutput.cs" Link="App\ColourOutput.cs" />
+    <Compile Include="..\..\src\Capta\Capture\IccProfile.cs" Link="App\IccProfile.cs" />
+    <Compile Include="..\..\src\Capta\Capture\PngChunks.cs" Link="App\PngChunks.cs" />
+    <Compile Include="..\..\src\Capta\Capture\ScrollStitcher.cs" Link="App\ScrollStitcher.cs" />
+    <Compile Include="..\..\src\Capta\Capture\ToneMapper.cs" Link="App\ToneMapper.cs" />
+    <Compile Include="..\..\src\Capta\Capture\WicColour.cs" Link="App\WicColour.cs" />
+    <Compile Include="..\..\src\Capta\Interop\NativeMethods.cs" Link="App\NativeMethods.cs" />
+    <Compile Include="..\..\src\Capta\Services\Chord.cs" Link="App\Chord.cs" />
+    <Compile Include="..\..\src\Capta\Services\Log.cs" Link="App\Log.cs" />
+    <EmbeddedResource Include="..\..\src\Capta\Capture\DisplayP3.icc" LogicalName="DisplayP3.icc" />
+  </ItemGroup>
+</Project>

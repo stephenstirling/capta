@@ -1,6 +1,6 @@
 # Capta design reference
 
-This folder is the source of truth for how Capta looks and behaves. When building or changing UI, match these screens, not default WinUI styling. Updated 2026-10-07.
+This folder is the source of truth for how Capta looks and behaves. When building or changing UI, match these screens, not default WinUI styling. Updated 2026-10-10.
 
 ## What's here
 
@@ -14,15 +14,15 @@ Colours, shapes and fonts are **not** here. They live in one place only: `src/St
 
 | Screen | Screenshot | Mockup | Code | Status |
 |---|---|---|---|---|
-| Floating toolbar | `02-toolbar-and-card.png` (top) | `Toolbar.html` | `Views/ToolbarWindow.xaml` | Needs rework |
-| After-capture card | `02-toolbar-and-card.png` (bottom right) | `Toolbar.html` | `Views/CaptureCardWindow.xaml` | Needs rework |
-| Copy menu (open) | `01-toolbar-with-copy-menu.png` | `Toolbar.html` | `CaptureCardWindow` flyout | Needs building |
-| Capture overlay | `03-capture-overlay.png` | `Main.html` | `Overlay/OverlayWindow.xaml` | Needs rework |
-| Pin to screen | `04-pin-to-screen.png` | `Pinned.html` | `Views/PinWindow.xaml` | Needs rework |
-| Tray flyout | `05-tray-flyout.png` | `Tray.html` | `Services/TrayIconService.cs` | Not built (menu only) |
-| Startup & shortcuts | `06-startup-and-shortcuts.png` | `Startup.html` | none yet | Not built |
-| Colour & HDR settings | `07-colour-and-hdr.png` | `Hdr.html` | none yet | Not built |
-| First-run setup | `08-first-run.png` | `FirstRun.html` | none yet | Not built |
+| Floating toolbar | `02-toolbar-and-card.png` (top) | `Toolbar.html` | `Views/ToolbarWindow.xaml` | Built |
+| After-capture card | `02-toolbar-and-card.png` (bottom right) | `Toolbar.html` | `Views/CaptureCardWindow.xaml` | Built (plus a video mode for recordings) |
+| Copy menu (open) | `01-toolbar-with-copy-menu.png` | `Toolbar.html` | `CaptureCardWindow` flyout | Built |
+| Capture overlay | `03-capture-overlay.png` | `Main.html` | `Overlay/OverlayWindow.xaml` | Built (settings button opens a Capture settings menu) |
+| Pin to screen | `04-pin-to-screen.png` | `Pinned.html` | `Views/PinWindow.xaml` | Built |
+| Tray flyout | `05-tray-flyout.png` | `Tray.html` | `Views/TrayFlyoutWindow.xaml` (left click); `Services/TrayIconService.cs` (right-click menu) | Built |
+| Startup & shortcuts | `06-startup-and-shortcuts.png` | `Startup.html` | `Views/StartupSettingsWindow.xaml` | Built |
+| Colour & HDR settings | `07-colour-and-hdr.png` | `Hdr.html` | `Views/ColourHdrWindow.xaml` | Built (monitor correction off by default) |
+| First-run setup | `08-first-run.png` | `FirstRun.html` | `Views/FirstRunWindow.xaml` | Built |
 | App icon | `09-app-icon.png` | `Icon.html` | `Stirling.Shared/Assets/Capta` | Done (concept A) |
 | Editor, dark / light | `10-…`, `11-…` | `Editor.html`, `EditorLight.html` | **not in Capta** | Future Ocula editing view |
 | Ocula captures folder | `12-ocula-captures-folder.png` | `Ocula.html` | **not in Capta** | For Ocula |
@@ -38,11 +38,14 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    | PrtSc | Region capture |
    | Shift+PrtSc | Full screen, straight to the clipboard |
    | Alt+PrtSc | Active window |
-   | Ctrl+PrtSc | Show the floating toolbar (becomes Record video once video exists; the mockup shows that future state) |
-   | Ctrl+Shift+PrtSc | Grab text from screen (later) |
+   | Ctrl+PrtSc | Record video: choose an area, then Ctrl+PrtSc or Stop to finish. The floating toolbar is in the tray menu. |
+   | Ctrl+Shift+PrtSc | Grab text from screen |
 
-2. **Edit** opens `ocula:edit?file=…` if Ocula is registered, otherwise the default image app. Button label and tooltip say just "Edit". Capta does not get its own editor; `Editor.html` is reference for Ocula.
-3. **One theme file:** `src/Stirling.Shared/Themes/Colors.xaml`. There is no theme file in `design/`.
+2. **Region and Grab text capture when the drag ends**, like Snipping Tool, and copy with Auto-copy on. Only
+   Scrolling and Record keep an adjustable selection with handles, confirmed with Enter, since finishing starts
+   something long-running. The overlay's Enter hint shows only in those modes.
+3. **Edit** opens `ocula:edit?file=…` if Ocula is registered, otherwise the default image app. Button label and tooltip say just "Edit". Capta does not get its own editor; `Editor.html` is reference for Ocula.
+4. **One theme file:** `src/Stirling.Shared/Themes/Colors.xaml`. There is no theme file in `design/`.
 
 ## Visual rules
 
@@ -57,12 +60,12 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
 ## Per-screen checklist
 
 **Floating toolbar** (one row, 6 px padding, 16 px corners)
-drag grip · amber **New** button (Aperture glyph + "New") · dark inset group of icon-only mode buttons (Region active: soft-amber fill, amber icon; Window, Full screen, Freeform, Scrolling, Record) · divider · Delay dropdown ("Off") · Auto-copy toggle · "HDR → SDR" badge (shown only when a display is in HDR) · divider · keep-on-top (amber when on) · settings · hide to tray · close. Freeform, Scrolling, Record and Delay can be disabled placeholders until built.
+drag grip · amber **New** button (Aperture glyph + "New") · dark inset group of icon-only mode buttons (Region active: soft-amber fill, amber icon; Window, Full screen, Freeform, Scrolling, Record) · divider · Delay dropdown ("Off") · Auto-copy toggle · "HDR → SDR" badge (shown only when a display is in HDR) · divider · keep-on-top (amber when on) · settings · hide to tray · close.
 
 **After-capture card** (bottom right, 400 px wide, 14 px padding, 16 px corners)
 Row 1: 96 × 60 thumbnail · green dot + "Copied to clipboard" (bold 14 px) with a muted line under it ("Region · 680 × 430 · tone-mapped from HDR") · dismiss ×.
 Row 2: **Copy** split button (Copy + chevron opening the menu) · **Edit**, wide amber primary · Save, Pin, Send to Ocula as 44 × 40 icon buttons.
-Copy menu: Copy image (Ctrl+C, checked default) · Copy image as HDR · Copy text in image (Ctrl+Shift+C) · Copy as file · Copy file path · separator · "Copy automatically after capture" toggle. Items not yet supported can be disabled.
+Copy menu: Copy image (Ctrl+C, checked default) · Copy image as HDR · Copy text in image (Ctrl+Shift+C) · Copy as file · Copy file path · separator · "Copy automatically after capture" toggle.
 
 **Capture overlay**
 Dim `CaptaScrimBrush` outside the selection · 2 px amber frame · 8 white square handles with amber borders · thirds guides at 22% white · amber size badge with dark mono text above the top-left corner · circular 132 px loupe with white border, magnified pixels, amber crosshair and a centre-pixel box · readout pill below the loupe (coordinates · colour swatch · hex) · mode bar at the top matching the toolbar's modes · key hints under it (Space move, Shift square, Enter capture, Esc cancel).

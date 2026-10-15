@@ -23,6 +23,16 @@ public abstract record OverlayResult
 
     /// <summary>C was pressed: the colour under the cursor, and where it is on the virtual desktop.</summary>
     public sealed record ColourPicked(Windows.UI.Color Colour, PointInt32 ScreenPoint) : OverlayResult;
+
+    /// <summary>A settings window was chosen from Capture settings; the capture is abandoned.</summary>
+    public sealed record OpenSettings(SettingsPage Page) : OverlayResult;
+}
+
+/// <summary>The settings windows Capture settings can open.</summary>
+public enum SettingsPage
+{
+    StartupAndShortcuts,
+    ColourAndHdr,
 }
 
 /// <summary>Shows one overlay per monitor and resolves when any of them produces a result.</summary>

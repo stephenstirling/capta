@@ -21,6 +21,15 @@ public enum HdrHandling
     SaveBoth,
 }
 
+/// <summary>The colour space saved files are written in (Colour &amp; HDR → Colour output).</summary>
+public enum ColourSpace
+{
+    /// <summary>What every app assumes for untagged images. Always used for the clipboard.</summary>
+    Srgb,
+    /// <summary>Wider gamut (DCI-P3 primaries, D65, sRGB curve); files carry the profile so apps show them right.</summary>
+    DisplayP3,
+}
+
 /// <summary>Colour settings the capture engine reads. The app keeps these in sync with Settings.</summary>
 public sealed class CaptureOptions
 {
@@ -34,6 +43,15 @@ public sealed class CaptureOptions
 
     public HighlightRollOff RollOff { get; init; } = HighlightRollOff.Clip;
 
-    /// <summary>Tag saved PNGs as sRGB.</summary>
+    /// <summary>Tag saved PNGs as sRGB. Display P3 files always carry their profile.</summary>
     public bool EmbedColourProfile { get; init; } = true;
+
+    public ColourSpace ColourSpace { get; init; } = ColourSpace.Srgb;
+
+    /// <summary>
+    /// Treat captures of an SDR display as being in that display's ICC profile and convert them on
+    /// the way out, so they look as they did on screen. HDR and Auto Color Management displays are
+    /// already colour-managed by Windows and are left alone.
+    /// </summary>
+    public bool CorrectMonitorProfiles { get; init; }
 }
