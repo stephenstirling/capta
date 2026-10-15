@@ -3,37 +3,37 @@ using Capta.Capture;
 namespace Capta.Services;
 
 /// <summary>
-/// The personal info found in a capture and which of it is blurred. Keeps the original capture so
-/// each area can be turned off again (Review, Undo) without re-capturing.
+/// The personal info found in a capture and which of it is covered. Keeps the original capture so
+/// each area can be uncovered again (Review, Undo) without re-capturing.
 /// </summary>
 public sealed class Redaction
 {
-    private readonly bool[] _blurred;
+    private readonly bool[] _redacted;
 
     public Redaction(CapturedImage original, IReadOnlyList<PersonalInfoMatch> matches)
     {
         Original = original;
         Matches = matches;
-        _blurred = new bool[matches.Count];
-        Array.Fill(_blurred, true);
+        _redacted = new bool[matches.Count];
+        Array.Fill(_redacted, true);
     }
 
-    /// <summary>The capture before anything was blurred.</summary>
+    /// <summary>The capture before anything was covered.</summary>
     public CapturedImage Original { get; }
 
     public IReadOnlyList<PersonalInfoMatch> Matches { get; }
 
-    public bool IsBlurred(int index) => _blurred[index];
+    public bool IsRedacted(int index) => _redacted[index];
 
-    public void Set(int index, bool blurred) => _blurred[index] = blurred;
+    public void Set(int index, bool redacted) => _redacted[index] = redacted;
 
-    public void SetAll(bool blurred) => Array.Fill(_blurred, blurred);
+    public void SetAll(bool redacted) => Array.Fill(_redacted, redacted);
 
-    public int BlurredCount => _blurred.Count(b => b);
+    public int RedactedCount => _redacted.Count(r => r);
 
-    /// <summary>The capture with the blurred areas applied (the original itself when none are).</summary>
+    /// <summary>The capture with the covered areas filled in (the original itself when none are).</summary>
     public CapturedImage Render() =>
-        BlurredCount == 0
+        RedactedCount == 0
             ? Original
-            : Redactor.Blur(Original, Matches.Where((_, i) => _blurred[i]).Select(m => m.Bounds));
+            : Redactor.Fill(Original, Matches.Where((_, i) => _redacted[i]).Select(m => m.Bounds));
 }

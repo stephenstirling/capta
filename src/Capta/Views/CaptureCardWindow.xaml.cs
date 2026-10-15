@@ -138,7 +138,7 @@ public sealed partial class CaptureCardWindow : Window
         if (_current == result) Thumbnail.Source = source; // not superseded by a newer capture
     }
 
-    // ---- Personal info (blurred before the copy) ----
+    // ---- Personal info (redacted before the copy) ----
 
     private void ShowRedaction(CaptureResult result)
     {
@@ -150,11 +150,11 @@ public sealed partial class CaptureCardWindow : Window
     private void UpdateRedactionText(Redaction redaction)
     {
         var summary = PersonalInfo.Describe(redaction.Matches);
-        var blurred = redaction.BlurredCount;
-        RedactionDetail.Text = blurred == redaction.Matches.Count ? $"{summary} · blurred automatically"
-            : blurred == 0 ? $"{summary} · not blurred"
-            : $"{blurred} of {redaction.Matches.Count} blurred";
-        UndoRedactionButton.Content = blurred == 0 ? "Blur again" : "Undo";
+        var covered = redaction.RedactedCount;
+        RedactionDetail.Text = covered == redaction.Matches.Count ? $"{summary} · redacted automatically"
+            : covered == 0 ? $"{summary} · not redacted"
+            : $"{covered} of {redaction.Matches.Count} redacted";
+        UndoRedactionButton.Content = covered == 0 ? "Redact again" : "Undo";
     }
 
     /// <summary>Review: one switch per thing found.</summary>
@@ -181,7 +181,7 @@ public sealed partial class CaptureCardWindow : Window
             });
             var toggle = new ToggleSwitch
             {
-                IsOn = redaction.IsBlurred(index),
+                IsOn = redaction.IsRedacted(index),
                 OnContent = "",
                 OffContent = "",
                 MinWidth = 0,
@@ -208,11 +208,11 @@ public sealed partial class CaptureCardWindow : Window
     {
         if (_current?.Redaction is not { } redaction) return;
         _timer.Stop();
-        await ChangeRedactionAsync(() => redaction.SetAll(redaction.BlurredCount == 0));
+        await ChangeRedactionAsync(() => redaction.SetAll(redaction.RedactedCount == 0));
         if (!_hovered && !_busy && !_reviewOpen) RestartTimer();
     }
 
-    /// <summary>Applies a change to what's blurred: new image on the card, and on the clipboard if it was auto-copied.</summary>
+    /// <summary>Applies a change to what's redacted: new image on the card, and on the clipboard if it was auto-copied.</summary>
     private async Task ChangeRedactionAsync(Action change)
     {
         if (_current is not { Redaction: { } redaction } result) return;
@@ -230,7 +230,7 @@ public sealed partial class CaptureCardWindow : Window
         }
         catch (Exception ex)
         {
-            Log.Error("Changing the blurred areas failed", ex);
+            Log.Error("Changing the redacted areas failed", ex);
             SetStatus(ex.Message, success: false);
         }
     }

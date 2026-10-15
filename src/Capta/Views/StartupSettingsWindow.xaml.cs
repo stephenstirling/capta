@@ -206,6 +206,7 @@ public sealed partial class StartupSettingsWindow : Window
             StartQuietly.IsOn = Settings.StartQuietly;
             ShowToolbarAtStartup.IsOn = Settings.ShowToolbarAtStartup;
             KeepRunning.IsOn = Settings.KeepRunningWhenToolbarClosed;
+            AutoRedactSwitch.IsOn = Settings.AutoRedact;
             SetPrintScreenOwnership(windowsOwnsPrintScreen);
         }
         finally
@@ -251,6 +252,11 @@ public sealed partial class StartupSettingsWindow : Window
     private void OnShowToolbarAtStartup(object sender, RoutedEventArgs e)
     {
         if (!_loading) Settings.ShowToolbarAtStartup = ShowToolbarAtStartup.IsOn;
+    }
+
+    private void OnAutoRedact(object sender, RoutedEventArgs e)
+    {
+        if (!_loading) Settings.AutoRedact = AutoRedactSwitch.IsOn;
     }
 
     private void OnKeepRunning(object sender, RoutedEventArgs e)

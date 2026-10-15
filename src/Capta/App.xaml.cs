@@ -179,7 +179,7 @@ public partial class App : Application
             return;
         }
 
-        // Before anything is copied, saved or sent: the clipboard gets the blurred image.
+        // Before anything is copied, saved or sent: the clipboard gets the redacted image.
         await AutoRedact.ApplyAsync(result);
 
         var copied = false;

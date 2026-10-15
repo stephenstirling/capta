@@ -3,15 +3,15 @@ using Capta.Capture;
 namespace Capta.Services;
 
 /// <summary>
-/// "Blur personal info": reads the capture's text on the device and blurs emails, phone numbers and
-/// long digit runs before the capture is copied, saved or sent anywhere. The card then offers Review
+/// "Redact personal info": reads the capture's text on the device and covers emails, phone numbers
+/// and long digit runs with a solid fill before the capture is copied, saved or sent anywhere. The card then offers Review
 /// and Undo (see <see cref="Redaction"/>).
 /// </summary>
 public static class AutoRedact
 {
     /// <summary>
-    /// Blurs what's found in the capture's image and records it on <see cref="CaptureResult.Redaction"/>.
-    /// Returns whether anything was blurred. Never throws: if OCR isn't available the capture is
+    /// Covers what's found in the capture's image and records it on <see cref="CaptureResult.Redaction"/>.
+    /// Returns whether anything was redacted. Never throws: if OCR isn't available the capture is
     /// left as it was.
     /// </summary>
     public static async Task<bool> ApplyAsync(CaptureResult result)
@@ -27,7 +27,7 @@ public static class AutoRedact
             var redaction = new Redaction(result.Image, matches);
             result.Redaction = redaction;
             result.Image = await Task.Run(redaction.Render);
-            Log.Info($"Blurred {PersonalInfo.Describe(matches)}");
+            Log.Info($"Redacted {PersonalInfo.Describe(matches)}");
             return true;
         }
         catch (Exception ex)

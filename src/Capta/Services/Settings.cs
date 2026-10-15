@@ -17,10 +17,10 @@ public static class Settings
         set => Values[nameof(AutoCopy)] = value;
     }
 
-    /// <summary>Blur emails, phone numbers and long digit runs in a capture before it's copied. On by default.</summary>
+    /// <summary>Cover emails, phone numbers and long digit runs in a capture before it's copied. Off by default.</summary>
     public static bool AutoRedact
     {
-        get => Get(nameof(AutoRedact), true);
+        get => Get(nameof(AutoRedact), false);
         set => Values[nameof(AutoRedact)] = value;
     }
 

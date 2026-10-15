@@ -11,12 +11,12 @@ namespace Capta.Capture;
 public sealed record CaptureResult(CapturedImage Image, MonitorInfo Monitor, RectInt32 ScreenBounds, CaptureMode Mode, bool WasHdr)
 {
     /// <summary>
-    /// The SDR capture. Settable because blurring personal info (or undoing it) replaces the image
+    /// The SDR capture. Settable because redacting personal info (or undoing it) replaces the image
     /// the card, clipboard, saves and pins use.
     /// </summary>
     public CapturedImage Image { get; set; } = Image;
 
-    /// <summary>Personal info found in the capture and what's blurred; null when none was found or looked for.</summary>
+    /// <summary>Personal info found in the capture and what's redacted; null when none was found or looked for.</summary>
     public Redaction? Redaction { get; set; }
 
     /// <summary>App the captured window belongs to (process name), when known.</summary>

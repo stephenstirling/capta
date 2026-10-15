@@ -30,14 +30,14 @@ public sealed record PersonalInfoMatch(PersonalInfoKind Kind, string Text, RectI
 }
 
 /// <summary>
-/// Finds email addresses, phone numbers and long digit runs (card, account and ID numbers) in
-/// recognised text, so they can be blurred before a capture leaves Capta. It only looks at the
-/// text OCR found, so it can miss what OCR misreads, and it will blur some numbers that aren't
+/// Finds email addresses, phone numbers and long digit runs (13 or more digits: card, account and ID
+/// numbers) in recognised text, so they can be covered before a capture leaves Capta. It only looks at the
+/// text OCR found, so it can miss what OCR misreads, and it will cover some numbers that aren't
 /// personal: that's why the card offers Review and Undo.
 /// </summary>
 public static partial class PersonalInfo
 {
-    /// <summary>Space around the words, so the blur covers the glyphs' edges.</summary>
+    /// <summary>Space around the words, so the fill covers the glyphs' edges.</summary>
     private const int Padding = 3;
 
     private const int MinPhoneDigits = 10;
@@ -46,8 +46,9 @@ public static partial class PersonalInfo
     [GeneratedRegex(@"[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}")]
     private static partial Regex EmailPattern();
 
-    // 12 or more digits, which may be grouped with single spaces or hyphens (4111 1111 1111 1111).
-    [GeneratedRegex(@"(?<!\d)\d(?:[ \-]?\d){11,}(?!\d)")]
+    // 13 or more digits, which may be grouped with single spaces or hyphens (4111 1111 1111 1111): card-like
+    // numbers. A bare run of 10 to 12 digits is read as a phone number instead.
+    [GeneratedRegex(@"(?<!\d)\d(?:[ \-]?\d){12,}(?!\d)")]
     private static partial Regex LongNumberPattern();
 
     // 555-123-4567, (555) 123-4567, +1 555 123 4567, +44 20 7946 0958. The digit count and a few

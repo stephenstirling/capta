@@ -164,6 +164,18 @@
                                 </Grid>
                             </StackPanel>
 
+                            <!-- Capture -->
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="CAPTURE" />
+                                <Grid MinHeight="48">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Redact personal info" />
+                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Cover emails, phone numbers and card-like numbers before a capture is copied" />
+                                    </StackPanel>
+                                    <ToggleSwitch x:Name="AutoRedactSwitch" Style="{StaticResource Switch}" Toggled="OnAutoRedact" />
+                                </Grid>
+                            </StackPanel>
+
                             <!-- Colour & HDR lives in its own window. -->
                             <StackPanel>
                                 <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="COLOUR" />

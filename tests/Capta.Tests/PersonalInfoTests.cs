@@ -52,13 +52,46 @@ public class PersonalInfoTests
     [Theory]
     [InlineData("4111 1111 1111 1111")]
     [InlineData("4111-1111-1111-1111")]
-    [InlineData("123456789012")]
+    [InlineData("1234567890123")]       // 13 digits is the shortest long run
     [InlineData("1234567890123456789")]
     public void FindsLongDigitRuns(string number)
     {
         var match = Assert.Single(Find($"Card {number} exp"));
         Assert.Equal(PersonalInfoKind.Number, match.Kind);
         Assert.Equal(number, match.Text);
+    }
+
+    [Fact]
+    public void TwelveDigitsIsNotALongRun()
+    {
+        // 10 to 12 bare digits read as a phone number; 13 and up are the long-run rule.
+        var match = Assert.Single(Find("Ref 123456789012 ok"));
+        Assert.Equal(PersonalInfoKind.Phone, match.Kind);
+    }
+
+    [Theory]
+    [InlineData("Mail me@example.com.", "me@example.com")]
+    [InlineData("Mail <ME.Smith@Example.COM> now", "ME.Smith@Example.COM")]
+    [InlineData("a_b-c+tag@sub.domain.example.org", "a_b-c+tag@sub.domain.example.org")]
+    public void FindsEmailVariants(string text, string expected) =>
+        Assert.Equal(expected, Assert.Single(Find(text)).Text);
+
+    [Theory]
+    [InlineData("Follow @mention on social")]
+    [InlineData("user@ is incomplete")]
+    [InlineData("see example.com for more")]
+    [InlineData("a@b is not an address")]
+    public void IgnoresTextThatIsNotAnEmail(string text) => Assert.Empty(Find(text));
+
+    [Theory]
+    [InlineData("+44 20 7946 0958")]   // international (12 digits, grouped: found as a long number is not required)
+    [InlineData("(020) 7946 0958")]
+    [InlineData("020.7946.0958")]
+    public void FindsInternationalPhoneFormats(string number)
+    {
+        var match = Assert.Single(Find($"Tel {number} now"));
+        Assert.Contains(match.Kind, new[] { PersonalInfoKind.Phone, PersonalInfoKind.Number });
+        Assert.Equal(number.TrimStart('+'), match.Text.TrimStart('+'));
     }
 
     [Theory]
