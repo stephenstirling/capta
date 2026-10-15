@@ -49,7 +49,7 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
 4. **One theme file:** `src/Stirling.Shared/Themes/Colors.xaml`. There is no theme file in `design/`.
 5. **Floating windows use a minimal shadow:** 2 px y-offset, 8 px blur, 22% black (`Interop.Shadow.Attach`). This
    overrides the mockups' `0 18px 44px` shadows. It applies to the toolbar, the after-capture card, the recording
-   bar and the tray menu. The transparent window margin around each panel is sized to match: 8 px left and right,
+   bar, the tray flyout and the tray menu. The transparent window margin around each panel is sized to match: 8 px left and right,
    4 px top, 8 px bottom (the 4 px blur plus the offset), so a window is no larger than its shadow needs. Pin
    windows and the capture overlay keep their deeper shadows.
 6. **Personal info is redacted before the copy.** The "Personal info found" card from `Editor.html` appears in
