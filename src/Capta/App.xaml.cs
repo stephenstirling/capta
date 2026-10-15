@@ -110,6 +110,23 @@ public partial class App : Application
             case HotkeyAction.ActiveWindow: StartCapture(CaptureMode.ActiveWindow); break;
             case HotkeyAction.Record: ToggleRecording(); break;
             case HotkeyAction.GrabText: StartCapture(CaptureMode.GrabText); break;
+            case HotkeyAction.RepeatRegion: RepeatLastRegion(); break;
+        }
+    }
+
+    /// <summary>Captures the last Region selection again, without the overlay.</summary>
+    public async void RepeatLastRegion()
+    {
+        _card?.Hide();
+        try
+        {
+            if (!await _capture!.RepeatLastRegionAsync())
+                _tray?.ShowInfo("No region to repeat", "Capture a region first. This captures the same area again.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Repeat last region failed", ex);
+            _tray?.ShowError("Capture failed", ex.Message);
         }
     }
 

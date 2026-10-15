@@ -1,5 +1,6 @@
 using Capta.Capture;
 using Windows.Foundation.Collections;
+using Windows.Graphics;
 using Windows.Storage;
 
 namespace Capta.Services;
@@ -21,6 +22,25 @@ public static class Settings
     {
         get => Get(nameof(AutoRedact), true);
         set => Values[nameof(AutoRedact)] = value;
+    }
+
+    /// <summary>The last Region selection on the virtual desktop, for "Repeat last region". Null until one is made.</summary>
+    public static RectInt32? LastRegion
+    {
+        get
+        {
+            var parts = Get<string?>(nameof(LastRegion), null)?.Split(',');
+            if (parts is { Length: 4 }
+                && int.TryParse(parts[0], out var x) && int.TryParse(parts[1], out var y)
+                && int.TryParse(parts[2], out var width) && int.TryParse(parts[3], out var height))
+                return new RectInt32(x, y, width, height);
+            return null;
+        }
+        set
+        {
+            if (value is { } r) Values[nameof(LastRegion)] = $"{r.X},{r.Y},{r.Width},{r.Height}";
+            else Values.Remove(nameof(LastRegion));
+        }
     }
 
     /// <summary>Delay before a toolbar capture starts, in seconds (0 = off).</summary>

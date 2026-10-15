@@ -65,6 +65,10 @@ public sealed class TrayIconService : IDisposable
         settingsMenu.Items.Add(colour);
         settingsMenu.Items.Add(setup);
 
+        var repeatRegion = new MenuFlyoutItem { Text = "Repeat last region", Icon = new FontIcon { Glyph = "\uE72C" } };
+        _shortcutItems.Add((repeatRegion, HotkeyAction.RepeatRegion));
+        repeatRegion.Click += (_, _) => _app.Dispatcher.TryEnqueue(DispatcherQueuePriority.Low, _app.RepeatLastRegion);
+
         _clickThroughItem = new MenuFlyoutItem
         {
             Text = "Make pinned captures clickable",
@@ -79,6 +83,7 @@ public sealed class TrayIconService : IDisposable
             {
                 _printScreenWarning, _printScreenWarningSeparator,
                 CaptureItem("Region", "", HotkeyAction.Region, CaptureMode.Region),
+                repeatRegion,
                 CaptureItem("Window", "", null, CaptureMode.Window),
                 CaptureItem("Full screen", "", HotkeyAction.FullScreen, CaptureMode.FullScreen),
                 CaptureItem("Record video", "", HotkeyAction.Record, CaptureMode.Recording),
@@ -88,7 +93,11 @@ public sealed class TrayIconService : IDisposable
                 _startupItem, settingsMenu, new MenuFlyoutSeparator(), exit,
             },
         };
-        menu.Opening += async (_, _) => await RefreshStartupStateAsync();
+        menu.Opening += async (_, _) =>
+        {
+            repeatRegion.IsEnabled = Settings.LastRegion is not null;
+            await RefreshStartupStateAsync();
+        };
         UpdateShortcutLabels();
         Shortcuts.Changed += UpdateShortcutLabels;
 
@@ -168,6 +177,9 @@ public sealed class TrayIconService : IDisposable
         if (_clickThroughItem is not null)
             _clickThroughItem.Visibility = any ? Visibility.Visible : Visibility.Collapsed;
     }
+
+    public void ShowInfo(string title, string message) =>
+        _icon?.ShowNotification(title, message, NotificationIcon.Info);
 
     public void ShowError(string title, string message) =>
         _icon?.ShowNotification(title, message, NotificationIcon.Error);

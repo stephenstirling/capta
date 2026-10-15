@@ -40,6 +40,7 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    | Alt+PrtSc | Active window |
    | Ctrl+PrtSc | Record video: choose an area, then Ctrl+PrtSc or Stop to finish. The floating toolbar is in the tray menu. |
    | Ctrl+Shift+PrtSc | Grab text from screen |
+   | Ctrl+Alt+PrtSc | Repeat last region: captures the last Region selection again (same screen position), without the overlay. Also in the tray menu, which greys it out until a region has been captured. Alt+Shift+PrtSc is Windows' high contrast toggle, so it isn't used. |
 
 2. **Region and Grab text capture when the drag ends**, like Snipping Tool, and copy with Auto-copy on. Only
    Scrolling and Record keep an adjustable selection with handles, confirmed with Enter, since finishing starts

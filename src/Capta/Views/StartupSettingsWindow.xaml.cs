@@ -28,6 +28,7 @@ public sealed partial class StartupSettingsWindow : Window
         (HotkeyAction.ActiveWindow, "Active window", null),
         (HotkeyAction.Record, "Record video", "Press again to stop. The toolbar is in the tray menu"),
         (HotkeyAction.GrabText, "Grab text from screen", null),
+        (HotkeyAction.RepeatRegion, "Repeat last region", "Captures the same area again, without the overlay"),
     ];
 
     public StartupSettingsWindow(App app)
