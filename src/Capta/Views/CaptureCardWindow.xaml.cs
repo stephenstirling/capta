@@ -61,7 +61,7 @@ public sealed partial class CaptureCardWindow : Window
         };
         ShadowHost.HorizontalAlignment = Panel.HorizontalAlignment = HorizontalAlignment.Left;
         ShadowHost.VerticalAlignment = Panel.VerticalAlignment = VerticalAlignment.Top;
-        Interop.Shadow.Attach(ShadowHost, cornerRadius: 16, offsetY: 20, blur: 50, opacity: 0.55);
+        Interop.Shadow.Attach(ShadowHost, cornerRadius: 16, offsetY: 2, blur: 8, opacity: 0.22);
         Interop.ClickThroughMargins.Attach(this, Panel);
 
         AppWindow.Closing += (_, e) =>

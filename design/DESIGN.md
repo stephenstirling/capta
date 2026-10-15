@@ -47,10 +47,11 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    something long-running. The overlay's Enter hint shows only in those modes.
 3. **Edit** opens `ocula:edit?file=…` if Ocula is registered, otherwise the default image app. Button label and tooltip say just "Edit". Capta does not get its own editor; `Editor.html` is reference for Ocula.
 4. **One theme file:** `src/Stirling.Shared/Themes/Colors.xaml`. There is no theme file in `design/`.
-5. **The floating toolbar's shadow is minimal:** 2 px y-offset, 8 px blur, 22% black (`Interop.Shadow.Attach` in
-   `ToolbarWindow`). This overrides the mockup's `0 18px 44px` shadow. The transparent window margin around the
-   panel is sized to match (8 px left and right, 4 px top, 8 px bottom, which covers the 4 px blur plus the offset),
-   so the toolbar window is no larger than its shadow needs.
+5. **Floating windows use a minimal shadow:** 2 px y-offset, 8 px blur, 22% black (`Interop.Shadow.Attach`). This
+   overrides the mockups' `0 18px 44px` shadows. It applies to the toolbar, the after-capture card, the recording
+   bar and the tray menu. The transparent window margin around each panel is sized to match: 8 px left and right,
+   4 px top, 8 px bottom (the 4 px blur plus the offset), so a window is no larger than its shadow needs. Pin
+   windows and the capture overlay keep their deeper shadows.
 6. **Personal info is blurred before the copy.** The "Personal info found" card from `Editor.html` appears in
    Capta's after-capture card, not in an editor (Capta has none, see Decision 3). On-device OCR finds email
    addresses, phone numbers and long digit runs (12 or more digits); they are blurred as a mosaic (a plain blur
@@ -82,7 +83,7 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
 - **Fonts:** Segoe UI Variable Text for UI; Cascadia Mono for sizes, coordinates, hex values and shortcut keys.
 - **Type:** section labels 11 px bold uppercase, letter spacing 0.08em, muted colour. Body 12.5–13.5 px. Dialog titles 20 px bold. First-run headings 26–30 px extra bold.
 - **Accent:** amber `#FFB547` with `#1A1206` on top. Used for the primary action, the active tool, toggles that are on, and selection outlines. In the light theme, accent-coloured text and icons use `CaptaAccentTextBrush`.
-- **Surfaces:** solid colours, not Mica. The floating toolbar and after-capture card use a near-opaque dark surface (`rgba(24,27,32,0.96)`) with a 1 px `#343A44` border and a soft shadow (the toolbar's is minimal, see Decision 5); Acrylic is acceptable if it looks the same.
+- **Surfaces:** solid colours, not Mica. The floating toolbar and after-capture card use a near-opaque dark surface (`rgba(24,27,32,0.96)`) with a 1 px `#343A44` border and a soft shadow (minimal, see Decision 5); Acrylic is acceptable if it looks the same.
 - **Corners:** windows 14 px, cards 12, buttons 10–11, floating toolbar and after-capture card 16, pills fully round.
 - **Hit targets:** icon buttons 40–44 px square. Regular buttons 40 px tall.
 - **Icons:** 1.8 px stroke line icons at about 18 px, matching the inline SVGs. Segoe Fluent Icons are fine where a close match exists.
