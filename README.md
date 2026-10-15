@@ -30,9 +30,16 @@ it) puts a smaller copy on the clipboard for AI chats and messaging apps: sRGB, 
 1568 px (never scaled up), as a PNG, or a JPEG (quality 85) if the PNG would be over 1 MB. The card shows the
 size, for example "Copied for chat · 1568 × 980 · 412 KB".
 
-Window captures (Window mode and Alt+PrtSc) keep the window's rounded corners, with a transparent
-background outside them. The mouse cursor is left out unless you switch on **Include cursor in window
-captures** in the overlay's Capture settings.
+Window captures (Window mode and Alt+PrtSc) keep the window's rounded corners, with a transparent background
+outside them. The mouse cursor is left out of screenshots unless you switch on **Include cursor in screenshots**
+(Settings, or the overlay's Capture settings); it then appears in window and full-screen captures. Region
+captures never include it, since the cursor is the selection tool there.
+
+**Updates.** The Microsoft Store updates the Store build. The website build can check for a newer release: once a
+day in the background (switch it off in Settings), or on demand from the tray menu's **Check for updates**. It
+reads the latest release from GitHub Releases and shows a card, "Version 1.1.x is available · What's new ·
+Download", which opens the release page in your browser. Capta never downloads or installs an update itself,
+sends nothing about you, and makes no other network calls.
 
 **Colour & HDR** (tray menu → Settings…, then the Colour & HDR link) sets how HDR screens are tone-mapped, and whether saved files are sRGB or
 Display P3 (which keeps wide-gamut colours and embeds its profile; the clipboard always gets sRGB). It can also

@@ -158,6 +158,29 @@ public static class Settings
         set => Values[nameof(CorrectMonitorProfiles)] = value;
     }
 
+    /// <summary>Ask GitHub Releases once a day for a newer Capta (website build only). On by default.</summary>
+    public static bool CheckForUpdates
+    {
+        get => Get(nameof(CheckForUpdates), true);
+        set => Values[nameof(CheckForUpdates)] = value;
+    }
+
+    /// <summary>When the last background update check ran.</summary>
+    public static DateTimeOffset? LastUpdateCheck
+    {
+        get => Get<string?>(nameof(LastUpdateCheck), null) is { } s && long.TryParse(s, out var ticks)
+            ? new DateTimeOffset(ticks, TimeSpan.Zero)
+            : null;
+        set => Values[nameof(LastUpdateCheck)] = value?.UtcTicks.ToString();
+    }
+
+    /// <summary>The release tag the update card was last shown for, so a background check shows it once.</summary>
+    public static string? LastNotifiedUpdate
+    {
+        get => Get<string?>(nameof(LastNotifiedUpdate), null);
+        set => Values[nameof(LastNotifiedUpdate)] = value;
+    }
+
     /// <summary>Show the mouse cursor in window captures. Off by default.</summary>
     public static bool IncludeCursor
     {

@@ -77,6 +77,7 @@ public partial class App : Application
         _hook.Install();
         Log.Info("Tray icon and Print Screen hook installed");
         _ = _history.LoadAsync();
+        StartUpdateChecks();
 
         _ownership = new PrintScreenOwnership();
         _ownership.Changed += owned => Dispatcher.TryEnqueue(() => OnPrintScreenOwnershipChanged(owned));
@@ -130,8 +131,76 @@ public partial class App : Application
         }
     }
 
-    /// <summary>Check for updates: opens the releases page in the browser.</summary>
-    public async void CheckForUpdates() => await Links.OpenAsync(Links.Releases);
+    // ---- Updates (website build only; the Store updates Store builds) ----
+
+    private UpdateCardWindow? _updateCard;
+    private DispatcherQueueTimer? _updateTimer;
+
+    /// <summary>
+    /// Starts the background check: shortly after start-up, then every few hours while Capta runs. The
+    /// check itself runs at most once a day and not at all when it's switched off.
+    /// </summary>
+    private void StartUpdateChecks()
+    {
+        if (AboutInfo.IsStoreBuild) return;
+        _updateTimer = Dispatcher.CreateTimer();
+        _updateTimer.Interval = TimeSpan.FromSeconds(45);
+        _updateTimer.Tick += async (timer, _) =>
+        {
+            timer.Interval = TimeSpan.FromHours(6);
+            await CheckForUpdatesInBackgroundAsync();
+        };
+        _updateTimer.Start();
+    }
+
+    private async Task CheckForUpdatesInBackgroundAsync()
+    {
+        var now = DateTimeOffset.UtcNow;
+        if (AboutInfo.IsStoreBuild || !Settings.CheckForUpdates || !UpdateSchedule.IsDue(Settings.LastUpdateCheck, now))
+            return;
+        Settings.LastUpdateCheck = now; // an attempt counts, so a failure isn't retried until tomorrow
+        try
+        {
+            var release = await UpdateChecker.GetLatestAsync();
+            if (release is not null && release.IsNewerThan(AboutInfo.CurrentVersion) && release.Tag != Settings.LastNotifiedUpdate)
+            {
+                Settings.LastNotifiedUpdate = release.Tag;
+                ShowUpdateCard(release);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Info($"Update check skipped: {ex.Message}");
+        }
+    }
+
+    /// <summary>Check for updates (tray menu, Settings): now, whether or not the daily check is on.</summary>
+    public async void CheckForUpdates()
+    {
+        if (AboutInfo.IsStoreBuild) return;
+        try
+        {
+            Settings.LastUpdateCheck = DateTimeOffset.UtcNow;
+            var release = await UpdateChecker.GetLatestAsync();
+            if (release is null)
+                _tray?.ShowInfo("No release found", "There's no published release to compare with yet.");
+            else if (release.IsNewerThan(AboutInfo.CurrentVersion))
+                ShowUpdateCard(release);
+            else
+                _tray?.ShowInfo("Capta is up to date", $"You have the latest version ({AboutInfo.Version}).");
+        }
+        catch (Exception ex)
+        {
+            Log.Info($"Update check failed: {ex.Message}");
+            _tray?.ShowError("Couldn't check for updates", "Check your internet connection and try again.");
+        }
+    }
+
+    private void ShowUpdateCard(ReleaseInfo release)
+    {
+        _updateCard ??= new UpdateCardWindow();
+        _updateCard.Show(release, AboutInfo.CurrentVersion);
+    }
 
     public void ShowToolbar()
     {

@@ -61,8 +61,8 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    shortcuts and in the overlay's Capture settings. Grab text and recordings are not touched.
 7. **Window captures keep their shape.** Windows 11 windows are rounded, so a Window or Active window capture is
    transparent outside the corners (a PNG with alpha), not a rectangle with black corners. The cursor is not
-   drawn unless "Include cursor in window captures" is on in the overlay's Capture settings (off by default).
-   Full screen and region captures never include it.
+   drawn unless "Include cursor in screenshots" is on (Startup & shortcuts, or the overlay's Capture settings; off by
+   default). It then appears in window and full-screen captures; region captures never include it.
 8. **The tray menu is compact and consistent** (`Views/TrayMenuWindow`, Capta's own window, not a MenuFlyout):
    - 32 px rows, 8 px padding above and below, 220–280 px wide, 10 px corners, `CaptaMenuSurfaceBrush`.
      Hover and pressed use `CaptaHoverOverlayBrush` / `CaptaPressedOverlayBrush`, so dark and light match.
@@ -76,6 +76,13 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    - Settings… opens Startup & shortcuts, which has a link to Colour & HDR. "Set up Capta…" shows under
      Settings… only until first-run setup is done. "Check for updates" is hidden in Store builds. "Make
      pinned captures clickable" appears under Show toolbar while a pin is click-through.
+9. **Updates are opt-out, local and passive** (website build only). Once a day in the background, and from the tray
+   menu's "Check for updates", Capta reads the latest release from GitHub Releases (the public API: one GET, no
+   account, no telemetry, its only network call). If it's newer than the running version a card says "Version 1.1.x
+   is available" with **What's new** and **Download**, which open the release page in the browser. Capta never
+   downloads or installs anything itself. Startup & shortcuts has an off switch. When running from the Microsoft
+   Store (`Package.Current.SignatureKind == Store`) the check, the tray row and the switch are hidden and Settings
+   says "Updates come from the Microsoft Store".
 
 ## Visual rules
 

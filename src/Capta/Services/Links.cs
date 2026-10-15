@@ -6,6 +6,8 @@ namespace Capta.Services;
 public static class Links
 {
     public static readonly Uri GitHub = new("https://github.com/stephenstirling");
+    public static readonly Uri Website = new("https://github.com/stephenstirling/capta");
+    public static readonly Uri PrivacyPolicy = new("https://github.com/stephenstirling/capta/blob/main/docs/privacy.md");
     public static readonly Uri BuyMeACoffee = new("https://buymeacoffee.com/stephenstirling");
     /// <summary>
     /// Ocula's Microsoft Store page, e.g. <c>ms-windows-store://pdp/?productid=9XXXXXXXXXXX</c>. Null until

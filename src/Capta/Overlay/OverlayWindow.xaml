@@ -227,7 +227,7 @@
                                             <ToggleMenuFlyoutItem x:Name="AutoCopyItem" Text="Copy automatically after capture" Click="OnAutoCopy" />
                                             <ToggleMenuFlyoutItem x:Name="CopyForChatItem" Text="Copy for chat (smaller image)" Click="OnCopyForChat" />
                                             <ToggleMenuFlyoutItem x:Name="AutoRedactItem" Text="Redact personal info" Click="OnAutoRedact" />
-                                            <ToggleMenuFlyoutItem x:Name="IncludeCursorItem" Text="Include cursor in window captures" Click="OnIncludeCursor" />
+                                            <ToggleMenuFlyoutItem x:Name="IncludeCursorItem" Text="Include cursor in screenshots" Click="OnIncludeCursor" />
                                             <ToggleMenuFlyoutItem x:Name="SendToOculaItem" Text="Send captures to Ocula" Click="OnSendToOcula" Visibility="Collapsed" />
                                             <MenuFlyoutSeparator />
                                             <MenuFlyoutItem Text="Colour &amp; HDR…" Tag="ColourAndHdr" Click="OnOpenSettings" />

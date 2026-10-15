@@ -1,13 +1,20 @@
 # Capta privacy policy
 
-_Effective 8 October 2026_
+_Effective 15 October 2026_
 
 Capta is a screen-capture app for Windows made by Stephen Stirling. It works entirely on your PC.
 
 ## What Capta collects
 
-**Nothing.** Capta has no accounts, analytics, telemetry, advertising or crash reporting. It makes no
-network connections. The GitHub and Buy Me a Coffee links open in your browser only when you click them.
+**Nothing.** Capta has no accounts, analytics, telemetry, advertising or crash reporting. The GitHub, privacy
+policy and Buy Me a Coffee links open in your browser only when you click them.
+
+**Network connections.** The version of Capta from the Microsoft Store makes none. The version downloaded
+from the website has one optional feature that does: it asks GitHub for the latest Capta release, once a day
+and when you choose **Check for updates**. That is a single request to `api.github.com`, which sees your IP
+address and the name of the app ("Capta") and its version, as any web request would. Nothing about you or your
+captures is sent. Switch it off in Settings (Startup & shortcuts → Updates). Capta never downloads or installs
+an update itself: it only opens the release page in your browser.
 
 ## What stays on your PC
 
@@ -53,7 +60,8 @@ Capta doesn't collect personal information from anyone, including children.
 
 ## Changes
 
-Changes to this policy will be published at this address with a new effective date.
+Changes to this policy will be published at this address with a new effective date. The 15 October 2026
+version describes the optional update check added in Capta 1.1.
 
 ## Contact
 

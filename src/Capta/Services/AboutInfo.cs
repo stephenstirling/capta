@@ -24,20 +24,23 @@ public static class AboutInfo
         }
     }
 
-    /// <summary>The package version (Package.appxmanifest), e.g. "1.0.0".</summary>
-    public static string Version
+    /// <summary>The running version: the package version (Package.appxmanifest), or the assembly's without one.</summary>
+    public static Version CurrentVersion
     {
         get
         {
             try
             {
                 var v = Package.Current.Id.Version;
-                return $"{v.Major}.{v.Minor}.{v.Build}";
+                return new Version(v.Major, v.Minor, v.Build, v.Revision);
             }
             catch (InvalidOperationException)
             {
-                return typeof(AboutInfo).Assembly.GetName().Version?.ToString(3) ?? "unknown";
+                return typeof(AboutInfo).Assembly.GetName().Version ?? new Version(0, 0, 0, 0);
             }
         }
     }
+
+    /// <summary>The running version as shown to people, e.g. "1.1.0".</summary>
+    public static string Version => CurrentVersion.ToString(3);
 }

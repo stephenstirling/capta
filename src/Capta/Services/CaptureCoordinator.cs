@@ -99,7 +99,7 @@ public sealed class CaptureCoordinator
     private async Task<CaptureResult> CaptureFullScreenAsync()
     {
         var monitor = Monitors.AtPoint(WindowHelper.CursorPosition());
-        return new CaptureResult(await _source.CaptureMonitorAsync(monitor), monitor, monitor.Bounds,
+        return new CaptureResult(await _source.CaptureMonitorAsync(monitor, CaptureOptions.Current.IncludeCursor), monitor, monitor.Bounds,
             CaptureMode.FullScreen, GraphicsCaptureSource.IsHdr(monitor.Handle));
     }
 
@@ -131,7 +131,7 @@ public sealed class CaptureCoordinator
         {
             monitors = Monitors.All();
             // Freeze every monitor first; the overlay draws on top of these frames.
-            frames = await Task.WhenAll(monitors.Select(_source.CaptureMonitorAsync));
+            frames = await Task.WhenAll(monitors.Select(m => _source.CaptureMonitorAsync(m)));
 
             Log.Info($"Froze {frames.Length} monitor(s); showing overlay");
             selection = await OverlaySession.RunAsync(mode, monitors, frames);

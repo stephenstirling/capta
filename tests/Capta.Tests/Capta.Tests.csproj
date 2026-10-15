@@ -39,6 +39,7 @@
     <Compile Include="..\..\src\Capta\Services\Log.cs" Link="App\Log.cs" />
     <Compile Include="..\..\src\Capta\Services\PersonalInfo.cs" Link="App\PersonalInfo.cs" />
     <Compile Include="..\..\src\Capta\Services\Redaction.cs" Link="App\Redaction.cs" />
+    <Compile Include="..\..\src\Capta\Services\ReleaseInfo.cs" Link="App\ReleaseInfo.cs" />
     <EmbeddedResource Include="..\..\src\Capta\Capture\DisplayP3.icc" LogicalName="DisplayP3.icc" />
   </ItemGroup>
 </Project>

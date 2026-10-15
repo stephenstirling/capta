@@ -15,10 +15,12 @@ public sealed class GraphicsCaptureSource : IScreenSource, IDisposable
     private Direct3D? _d3d;
     private bool _borderlessRequested;
 
-    public async Task<CapturedImage> CaptureMonitorAsync(MonitorInfo monitor)
+    public Task<CapturedImage> CaptureMonitorAsync(MonitorInfo monitor) => CaptureMonitorAsync(monitor, includeCursor: false);
+
+    public async Task<CapturedImage> CaptureMonitorAsync(MonitorInfo monitor, bool includeCursor)
     {
         var item = WinRTInterop.CreateItemForMonitor(monitor.Handle);
-        var (pixels, w, h) = await GrabAsync(item);
+        var (pixels, w, h) = await GrabAsync(item, includeCursor);
         return await ToImageAsync(pixels, w, h, monitor.Handle);
     }
 
