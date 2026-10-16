@@ -104,4 +104,28 @@ public class CapturedImageTests
         Assert.Equal(0u, masked.GetPixel(8, 8));
         Assert.Equal(0u, masked.GetPixel(5, 5)); // centre (5.5, 5.5) is past the diagonal
     }
+
+    [Fact]
+    public void Upscale2xDoublesTheSizeAndKeepsFlatColours()
+    {
+        var pixels = new byte[3 * 2 * 4];
+        for (var i = 0; i < pixels.Length; i += 4) (pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]) = (10, 20, 30, 255);
+        var big = new CapturedImage(3, 2, pixels).Upscale2x();
+        Assert.Equal((6, 4), (big.Width, big.Height));
+        for (var y = 0; y < 4; y++)
+        for (var x = 0; x < 6; x++)
+            Assert.Equal(0xFF1E140Au, big.GetPixel(x, y));
+    }
+
+    [Fact]
+    public void Upscale2xInterpolatesBetweenPixels()
+    {
+        // Black then white: the new pixels in between are blends, the outer ones stay pure.
+        var pixels = new byte[] { 0, 0, 0, 255, 255, 255, 255, 255 };
+        var big = new CapturedImage(2, 1, pixels).Upscale2x();
+        Assert.Equal(0xFF000000u, big.GetPixel(0, 0));
+        Assert.Equal(0xFFFFFFFFu, big.GetPixel(3, 0));
+        var mid = big.GetPixel(1, 0) & 0xFF;
+        Assert.InRange(mid, 50u, 80u); // 0.25 of the way to white
+    }
 }
