@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **Save text found in captures (optional):** a switch in Settings, in the Capture section, to stop Capta saving the
+  text it reads from a capture inside the PNG. It's on by default, as before. With it off Capta doesn't run OCR for
+  saved files and the PNG carries no recognised text, so Ocula has nothing to search. Grab text, Copy text and Redact
+  personal info are unaffected.
+
 ## 1.1.0
 
 - **Copy for chat:** put a smaller copy of a capture on the clipboard (long edge at most 1568 px, a JPEG if
