@@ -23,18 +23,13 @@ public sealed record CaptureMetadata(
 {
     public const string PngKeyword = "Capta";
 
-    /// <summary>Builds the metadata for a capture, running on-device OCR for its text.</summary>
+    /// <summary>
+    /// Builds the metadata for a capture. Its text is found with on-device OCR, unless "Save text found in captures" is off
+    /// (Settings.SaveTextInCaptures), in which case there is no OCR and no <c>ocrText</c> in the file.
+    /// </summary>
     public static async Task<CaptureMetadata> ForAsync(CaptureResult result)
     {
-        string? text = null;
-        try
-        {
-            text = await Ocr.RecognizeAsync(result.Image);
-        }
-        catch (Exception ex)
-        {
-            Log.Info($"OCR for metadata skipped: {ex.Message}");
-        }
+        var text = await CaptureText.ForMetadataAsync(Settings.SaveTextInCaptures, () => Ocr.RecognizeAsync(result.Image));
 
         return new CaptureMetadata(
             Version: 1,
