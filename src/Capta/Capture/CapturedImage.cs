@@ -123,6 +123,38 @@ public sealed class CapturedImage
         return Derive(Width, Height, sdr, hdr, transparent: true);
     }
 
+    /// <summary>
+    /// The SDR pixels at twice the size, bilinear (pixel centres aligned). Only for analysis such as OCR,
+    /// which reads small screen text better when it's bigger; the result carries no HDR or colour info.
+    /// </summary>
+    public CapturedImage Upscale2x()
+    {
+        int w = Width * 2, h = Height * 2;
+        var dst = new byte[w * h * 4];
+        for (var y = 0; y < h; y++)
+        {
+            // Source position of this pixel's centre, clamped to the edge pixels.
+            var sy = Math.Clamp((y + 0.5) / 2 - 0.5, 0, Height - 1);
+            int y0 = (int)sy, y1 = Math.Min(y0 + 1, Height - 1);
+            var fy = sy - y0;
+            for (var x = 0; x < w; x++)
+            {
+                var sx = Math.Clamp((x + 0.5) / 2 - 0.5, 0, Width - 1);
+                int x0 = (int)sx, x1 = Math.Min(x0 + 1, Width - 1);
+                var fx = sx - x0;
+                int a = (y0 * Width + x0) * 4, b = (y0 * Width + x1) * 4, c = (y1 * Width + x0) * 4, d = (y1 * Width + x1) * 4;
+                var o = (y * w + x) * 4;
+                for (var ch = 0; ch < 4; ch++)
+                {
+                    var top = Pixels[a + ch] + (Pixels[b + ch] - Pixels[a + ch]) * fx;
+                    var bottom = Pixels[c + ch] + (Pixels[d + ch] - Pixels[c + ch]) * fx;
+                    dst[o + ch] = (byte)Math.Round(top + (bottom - top) * fy);
+                }
+            }
+        }
+        return new CapturedImage(w, h, dst);
+    }
+
     /// <summary>A copy of this image with other pixels (same size), keeping how its colours are to be output.</summary>
     public CapturedImage WithPixels(byte[] pixels, ushort[]? hdrPixels) =>
         Derive(Width, Height, pixels, hdrPixels, HasTransparency);

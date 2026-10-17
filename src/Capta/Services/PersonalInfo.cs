@@ -75,17 +75,27 @@ public static partial class PersonalInfo
     {
         // The line as one string, with where each word sits in it.
         var text = new StringBuilder();
+        var digits = new StringBuilder(); // the same text, with zeros in number-like words read as 0
         var words = new List<(RecognizedWord Word, int Start, int End)>();
+        string? previous = null;
         foreach (var word in line.Words)
         {
             if (string.IsNullOrWhiteSpace(word.Text)) continue;
-            if (text.Length > 0) text.Append(' ');
+            var value = word.Text.Trim();
+            if (text.Length > 0 && !ContinuesEmail(previous!, value))
+            {
+                text.Append(' ');
+                digits.Append(' ');
+            }
             var start = text.Length;
-            text.Append(word.Text.Trim());
+            text.Append(value);
+            digits.Append(LooksNumeric(value) ? ReadZeros(value) : value);
             words.Add((word, start, text.Length));
+            previous = value;
         }
         if (words.Count == 0) return;
         var s = text.ToString();
+        var n = digits.ToString(); // same length as s, so match positions are shared
 
         // Earlier kinds win where matches overlap: a card number is also phone-shaped.
         var taken = new List<(int Start, int End, PersonalInfoKind Kind)>();
@@ -101,8 +111,9 @@ public static partial class PersonalInfo
             }
         }
         Take(PersonalInfoKind.Email, EmailPattern().Matches(s));
-        Take(PersonalInfoKind.Number, LongNumberPattern().Matches(s));
-        Take(PersonalInfoKind.Phone, PhonePattern().Matches(s), IsPhone);
+        Take(PersonalInfoKind.Number, LongNumberPattern().Matches(n));
+        Take(PersonalInfoKind.Phone, PhonePattern().Matches(n), IsPhone);
+        s = n; // report numbers as digits
 
         foreach (var (start, end, kind) in taken.OrderBy(t => t.Start))
         {
@@ -111,6 +122,38 @@ public static partial class PersonalInfo
             found.Add(new PersonalInfoMatch(kind, s[start..end].Trim(), Union(covered)));
         }
     }
+
+    /// <summary>
+    /// OCR sometimes splits an email address at a dot or the @ ("jane.doe@example." "com"): such words are
+    /// joined without the space.
+    /// </summary>
+    private static bool ContinuesEmail(string previous, string next) =>
+        (previous.Contains('@') || next.Contains('@'))
+        && (previous.EndsWith('.') || previous.EndsWith('@') || next.StartsWith('.') || next.StartsWith('@'));
+
+    /// <summary>
+    /// Code and monospace fonts draw zero with a slash or dot, which OCR reads as Ø, ø, O or o. In a word
+    /// that's mostly digits, those are read as 0.
+    /// </summary>
+    private static bool LooksNumeric(string word)
+    {
+        int digits = 0, zeros = 0, other = 0;
+        foreach (var c in word)
+        {
+            if (char.IsDigit(c)) digits++;
+            else if (IsZeroLookalike(c)) zeros++;
+            else if (c is not ('-' or '.' or ',' or '(' or ')' or '+' or ':')) other++;
+        }
+        return digits >= 2 && zeros > 0 && other == 0;
+    }
+
+    private static bool IsZeroLookalike(char c) => c is 'Ø' or 'ø' or 'O' or 'o';
+
+    private static string ReadZeros(string word) =>
+        string.Create(word.Length, word, (span, w) =>
+        {
+            for (var i = 0; i < w.Length; i++) span[i] = IsZeroLookalike(w[i]) ? '0' : w[i];
+        });
 
     private static bool IsPhone(string value)
     {

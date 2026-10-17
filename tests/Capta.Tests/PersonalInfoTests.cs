@@ -152,4 +152,39 @@ public class PersonalInfoTests
         Assert.Equal("1 email address, 2 phone numbers, 1 long number", PersonalInfo.Describe(matches));
         Assert.Equal("2 email addresses", PersonalInfo.Describe(Find("a@b.org", "c@d.org")));
     }
+
+    [Theory]
+    [InlineData("Contact: jane.doe@example. com")]   // Windows OCR on 100% screen text
+    [InlineData("Contact: jane.doe @example.com")]
+    [InlineData("Contact: jane.doe@ example.com")]
+    public void AnEmailSplitByOcrIsJoined(string line)
+    {
+        var match = Assert.Single(Find(line));
+        Assert.Equal(PersonalInfoKind.Email, match.Kind);
+        Assert.Equal("jane.doe@example.com", match.Text);
+    }
+
+    [Fact]
+    public void WordsAreNotJoinedWithoutAnAt()
+    {
+        Assert.Empty(Find("End of line. com Next"));
+    }
+
+    [Theory]
+    [InlineData("Account: 550ØØØØØØØØØØØØ4")] // slashed zeros (Cascadia, Consolas)
+    [InlineData("Account: 55oooooooooooo04")]
+    [InlineData("Account: 55OOOOOOOOOOOO04")]
+    public void ZerosDrawnWithASlashAreReadAsZero(string line)
+    {
+        var match = Assert.Single(Find(line));
+        Assert.Equal(PersonalInfoKind.Number, match.Kind);
+        Assert.Equal("5500000000000004", match.Text);
+    }
+
+    [Fact]
+    public void WordsWithLettersKeepTheirOs()
+    {
+        // "Room" and "Oslo" aren't numbers, and a lone O isn't a digit run.
+        Assert.Empty(Find("Room 12 in Oslo O 2024"));
+    }
 }

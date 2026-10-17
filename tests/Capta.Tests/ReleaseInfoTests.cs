@@ -72,6 +72,8 @@ public class ReleaseInfoTests
     [InlineData("v1.1", "1.1.0.0", false)]
     [InlineData("v1.0.9", "1.1.0.0", false)]   // older
     [InlineData("v1.10.0", "1.9.0.0", true)]   // numeric, not alphabetical
+    [InlineData("v1.1.0", "1.0.0.0", true)]    // 1.0 sees the 1.1 release
+    [InlineData("v1.1.0", "1.0.288.36167", true)] // a dev build stamped 1.0.<day>.<n>
     public void ComparesAgainstTheRunningVersion(string tag, string current, bool newer)
     {
         var release = ReleaseInfo.Parse(Json(tag: tag, url: $"https://github.com/stephenstirling/capta/releases/tag/{tag}"));
