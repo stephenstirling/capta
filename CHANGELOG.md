@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Print Screen from keyboard software:** Capta now acts on Print Screen sent by keyboard utilities, such as a
+  Logitech MX Keys screenshot key set to "Print screen" in Logi Options+, and by the on-screen keyboard. It still
+  ignores every other key sent by software.
+
 ## 1.1.0
 
 - **Copy for chat:** put a smaller copy of a capture on the clipboard (long edge at most 1568 px, a JPEG if

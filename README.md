@@ -53,6 +53,11 @@ the microphone. The card after a recording can play it, copy the file or save a 
 Win+PrtSc and Win+Shift+S stay with Windows. If Windows is set to open Snipping Tool on Print Screen,
 Capta shows how to turn that off in Settings.
 
+**Keyboards without a Print Screen key** (for example the Logitech MX Keys, whose camera key is handled by
+Logi Options+): set that key's action in the keyboard's software to send **Print Screen**, not its own
+"Screen capture". Capta accepts Print Screen sent by such software, so Shift, Alt and Ctrl+Alt with the key
+work as in the table above. It ignores every other key sent by software, so scripts can't start a capture.
+
 ## Requirements
 
 - Windows 11 22H2 (10.0.22621) or later
