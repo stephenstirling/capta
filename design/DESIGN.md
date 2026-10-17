@@ -83,6 +83,11 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    downloads or installs anything itself. Startup & shortcuts has an off switch. When running from the Microsoft
    Store (`Package.Current.SignatureKind == Store`) the check, the tray row and the switch are hidden and Settings
    says "Updates come from the Microsoft Store".
+10. **The theme can be changed after setup.** Startup & shortcuts has an **Appearance** section (between Startup and
+    Capture) with a "Theme" row: a System / Light / Dark segmented control, the same control and brushes as Colour &
+    HDR's highlight roll-off. System (the default) follows the Windows light or dark mode. Choosing one applies to every
+    open Capta window at once (`ThemeService.SetTheme`). The first-run picker sets the same value. The capture overlay
+    stays dark.
 
 ## Visual rules
 
