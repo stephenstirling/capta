@@ -3,6 +3,20 @@
 Fast, HDR-correct screen capture for Windows 11. Capta lives in the notification area,
 takes over the Print Screen key and copies captures to the clipboard as PNG.
 
+## Install
+
+Capta needs Windows 11 22H2 or later.
+
+- **Microsoft Store:** the easiest way, with automatic updates. *The Store listing isn't live yet.* This page will
+  link to it, and `winget install` will find it, as soon as it is.
+- **Build it yourself:** follow [Build](#build) below. It deploys the package for your own account and needs
+  Visual Studio (or the .NET 10 SDK) and Windows' Developer Mode.
+
+There's no installer to download from GitHub yet. Windows only installs packages that are signed with a certificate
+it trusts, and Capta's GitHub releases will be signed through SignPath Foundation's free programme for open-source
+projects (see [Code signing policy](#code-signing-policy)). Until that's in place, the Store and building from
+source are the two options.
+
 ## Shortcuts
 
 | Keys | Action |
