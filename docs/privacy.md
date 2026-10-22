@@ -40,6 +40,10 @@ Uninstalling Capta removes all of this.
   title of the app window that was captured, the image size, and any text recognised in the image.
   This lets image apps such as Ocula search your captures. If you share a saved PNG, this metadata
   goes with it. Images copied to the clipboard as pictures have no metadata.
+- **You can stop the text being saved.** Turn off **Settings > Capture > Save text found in captures** (in Startup & shortcuts)
+  and Capta no longer reads the text for saved files, so new PNGs carry no recognised text (the app
+  name, window title and size are still included). Files saved earlier keep what they have; Capta never
+  edits a file after saving it.
 
 ## Video recordings and the microphone
 

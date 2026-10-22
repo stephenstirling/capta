@@ -85,6 +85,9 @@ Images Capta puts on the clipboard as bitmaps carry no metadata.
 | `windowTitle` | string? | That window's title. Absent when unknown. |
 | `width`, `height` | int | Pixels. |
 | `toneMappedFromHdr` | bool | The source display was in HDR. |
-| `ocrText` | string? | On-device OCR (Windows.Media.Ocr, the user's languages), lines joined by CRLF. Absent when no text was found. |
+| `ocrText` | string? | On-device OCR (Windows.Media.Ocr, the user's languages), lines joined by CRLF. Absent when no text was found, **and always absent when the user has turned off "Save text found in captures"** in Capta's Startup & shortcuts (on by default). With it off Capta doesn't run OCR for the file at all. |
 
-Ocula should ignore unknown fields and treat every optional field as possibly absent.
+Ocula should ignore unknown fields and treat every optional field as possibly absent. Capta's switch has no
+other channel: Ocula can't read Capta's settings, so a capture saved with the switch off simply has no `ocrText`,
+and files saved earlier keep theirs (Capta never edits a saved file). Ocula's own "Search the text in screenshots"
+setting is separate and covers what Ocula has stored.

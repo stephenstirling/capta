@@ -24,6 +24,17 @@ public static class Settings
         set => Values[nameof(AutoRedact)] = value;
     }
 
+    /// <summary>
+    /// Read the text in a capture (on-device OCR) and save it in the PNG's metadata, so image apps such as Ocula can
+    /// search it. On by default. Off: no OCR is run for the file and no text is written. This doesn't affect Grab text,
+    /// Copy text or Redact personal info, which read the screen's text for their own purposes.
+    /// </summary>
+    public static bool SaveTextInCaptures
+    {
+        get => Get(nameof(SaveTextInCaptures), true);
+        set => Values[nameof(SaveTextInCaptures)] = value;
+    }
+
     /// <summary>The last Region selection on the virtual desktop, for "Repeat last region". Null until one is made.</summary>
     public static RectInt32? LastRegion
     {

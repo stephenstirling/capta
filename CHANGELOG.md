@@ -22,6 +22,10 @@
 - **Print Screen from keyboard software:** Capta now acts on Print Screen sent by keyboard utilities, such as a
   Logitech MX Keys screenshot key set to "Print screen" in Logi Options+, and by the on-screen keyboard. It still
   ignores every other key sent by software.
+- **Save text found in captures (optional):** a switch in Settings, in the Capture section, to stop Capta saving the
+  text it reads from a capture inside the PNG. It's on by default, as before. With it off Capta doesn't run OCR for
+  saved files and the PNG carries no recognised text, so Ocula has nothing to search. Grab text, Copy text and Redact
+  personal info are unaffected.
 
 ## 1.0.0
 

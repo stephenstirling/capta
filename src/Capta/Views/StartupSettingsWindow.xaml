@@ -227,6 +227,13 @@
                                 </Grid>
                                 <Grid MinHeight="48">
                                     <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Save text found in captures" />
+                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Saves the text in each PNG so Ocula can search it; shared files carry it too" />
+                                    </StackPanel>
+                                    <ToggleSwitch x:Name="SaveTextSwitch" Style="{StaticResource Switch}" Toggled="OnSaveText" />
+                                </Grid>
+                                <Grid MinHeight="48">
+                                    <StackPanel VerticalAlignment="Center">
                                         <TextBlock Text="Include cursor in screenshots" />
                                         <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="Full screen and window captures. Region captures never include it" />
                                     </StackPanel>

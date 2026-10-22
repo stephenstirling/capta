@@ -214,6 +214,7 @@ public sealed partial class StartupSettingsWindow : Window
             KeepRunning.IsOn = Settings.KeepRunningWhenToolbarClosed;
             ApplyTheme(Settings.Theme);
             AutoRedactSwitch.IsOn = Settings.AutoRedact;
+            SaveTextSwitch.IsOn = Settings.SaveTextInCaptures;
             IncludeCursorSwitch.IsOn = Settings.IncludeCursor;
             CheckForUpdatesSwitch.IsOn = Settings.CheckForUpdates;
             SetPrintScreenOwnership(windowsOwnsPrintScreen);
@@ -286,6 +287,11 @@ public sealed partial class StartupSettingsWindow : Window
     private void OnAutoRedact(object sender, RoutedEventArgs e)
     {
         if (!_loading) Settings.AutoRedact = AutoRedactSwitch.IsOn;
+    }
+
+    private void OnSaveText(object sender, RoutedEventArgs e)
+    {
+        if (!_loading) Settings.SaveTextInCaptures = SaveTextSwitch.IsOn;
     }
 
     private void OnIncludeCursor(object sender, RoutedEventArgs e)

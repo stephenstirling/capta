@@ -89,6 +89,13 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
     open Capta window at once (`ThemeService.SetTheme`). The first-run picker sets the same value. The capture overlay
     stays dark.
 
+10. **"Save text found in captures" is a switch** (added 2026-10-16; not in the mockups). A row in Startup & shortcuts,
+    in the Capture section beside "Redact personal info", with a one-line description in the same muted 12 px style. On by
+    default, which is what Capta always did. Off: no OCR runs when a PNG is saved and the `Capta` metadata chunk has no
+    `ocrText`, so Ocula has nothing to index. It does not touch Grab text, Copy text or Redact personal info, which read the
+    screen's text for their own purposes, and it is not in the overlay's Capture settings menu (it isn't a per-capture
+    choice). Files already saved keep their text; Capta never edits a saved file.
+
 ## Visual rules
 
 - **Fonts:** Segoe UI Variable Text for UI; Cascadia Mono for sizes, coordinates, hex values and shortcut keys.
@@ -123,4 +130,5 @@ Amber 2 px outline with offset and a deep shadow · resize corner mark · on hov
 - After capture, copy an SDR PNG to the clipboard automatically (on by default), then show the card.
 - HDR: capture FP16 via Windows.Graphics.Capture, scale by `AdvancedColorInfo.SdrWhiteLevelInNits`, tone-map highlights, convert to sRGB.
 - Pins are separate borderless always-on-top windows; click-through uses `WS_EX_LAYERED | WS_EX_TRANSPARENT`.
-- Saved PNGs carry source app, window title, capture mode and OCR text in metadata for Ocula.
+- Saved PNGs carry source app, window title, capture mode and OCR text in metadata for Ocula. The OCR text is
+  written only while "Save text found in captures" is on (Decision 10); the rest is always written.
