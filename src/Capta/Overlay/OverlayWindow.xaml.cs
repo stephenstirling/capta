@@ -54,7 +54,21 @@ public sealed partial class OverlayWindow : Window
     private RectInt32 _selection;
     private WindowTarget? _hoverWindow;
 
-    private Drag _drag;
+    private Drag _dragState;
+
+    /// <summary>What the pointer is dragging. The mode bar and key hints step aside while one is active.</summary>
+    private Drag _drag
+    {
+        get => _dragState;
+        set
+        {
+            _dragState = value;
+            var dragging = value != Drag.None;
+            TopBar.Opacity = dragging ? 0 : 1;
+            TopBar.IsHitTestVisible = !dragging; // faded out, so it mustn't catch the pointer either
+        }
+    }
+
     private int _resizeHandle;
     private PointInt32 _dragStart;
     private PointInt32 _lastPoint;
