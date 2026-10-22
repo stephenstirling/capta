@@ -65,9 +65,13 @@ public sealed class PrintScreenHook : IDisposable
             return true;
         }
 
-        // Synthetic input never triggers a capture, but it can set a shortcut while recording
+        // Software-generated input doesn't trigger a capture, so scripts can't start one, with one
+        // exception: Print Screen itself. Keyboards without that key (Logitech MX Keys) send it from
+        // their software (Logi Options+ "Print screen"), as do the on-screen keyboard and remote tools.
+        // Any chord with another key still has to be physical. While recording a shortcut, all input counts
         // (e.g. from the on-screen keyboard).
-        if ((info.flags & LLKHF_INJECTED) != 0 && _recorder is null)
+        var injected = (info.flags & LLKHF_INJECTED) != 0;
+        if (injected && _recorder is null && vk != VK_SNAPSHOT)
             return false;
 
         if (message is not (WM_KEYDOWN or WM_SYSKEYDOWN) || IsModifier(vk))
@@ -94,6 +98,7 @@ public sealed class PrintScreenHook : IDisposable
             return false;
 
         _swallowingKeyUp = vk;
+        if (injected) Log.Info($"Print Screen from software (keyboard utility or on-screen keyboard): {action}");
         _dispatcher.TryEnqueue(() => Pressed?.Invoke(action));
         return true;
     }

@@ -23,6 +23,12 @@
 - **Get Ocula:** when Ocula isn't installed, Capta offers its Store page instead of a disabled button.
 - A tidier tray menu: compact rows, shortcuts next to their names, and one Settings entry.
 - Lighter shadows on the toolbar, capture card, recording bar and tray windows.
+- The capture overlay's mode bar and key hints fade out while you drag a selection, so they can't cover it.
+- **Theme setting:** Startup & shortcuts has an Appearance section to switch between System (follows Windows),
+  Light and Dark at any time. Until now the theme could only be chosen during first-run setup.
+- **Print Screen from keyboard software:** Capta now acts on Print Screen sent by keyboard utilities, such as a
+  Logitech MX Keys screenshot key set to "Print screen" in Logi Options+, and by the on-screen keyboard. It still
+  ignores every other key sent by software.
 
 ## 1.0.0
 

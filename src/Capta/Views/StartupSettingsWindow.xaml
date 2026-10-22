@@ -54,6 +54,13 @@
                     <Setter Property="VerticalAlignment" Value="Center" />
                     <Setter Property="Margin" Value="0,0,-12,0" />
                 </Style>
+                <Style x:Key="Segment" TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
+                    <Setter Property="Height" Value="32" />
+                    <Setter Property="Padding" Value="12,0" />
+                    <Setter Property="CornerRadius" Value="8" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="FontSize" Value="12" />
+                </Style>
                 <Style x:Key="KeyCombo" TargetType="Border">
                     <Setter Property="Padding" Value="8,4" />
                     <Setter Property="VerticalAlignment" Value="Center" />
@@ -161,6 +168,50 @@
                                 <Grid MinHeight="48">
                                     <TextBlock VerticalAlignment="Center" Text="Keep running in the tray when the toolbar is closed" />
                                     <ToggleSwitch x:Name="KeepRunning" Style="{StaticResource Switch}" Toggled="OnKeepRunning" />
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Appearance: follows Windows unless a theme is chosen. -->
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,4" Style="{StaticResource SectionLabel}" Text="APPEARANCE" />
+                                <Grid MinHeight="48">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Theme" />
+                                        <TextBlock FontSize="12" Foreground="{ThemeResource CaptaFloatingMutedBrush}" Text="System follows the Windows light or dark mode" />
+                                    </StackPanel>
+                                    <Border HorizontalAlignment="Right" VerticalAlignment="Center" Padding="3" Background="{ThemeResource CaptaInsetBrush}" CornerRadius="10">
+                                        <Border.Resources>
+                                            <ResourceDictionary>
+                                                <ResourceDictionary.ThemeDictionaries>
+                                                    <ResourceDictionary x:Key="Default">
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="{ThemeResource CaptaTextColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="{ThemeResource CaptaTextColor}" />
+                                                    </ResourceDictionary>
+                                                    <ResourceDictionary x:Key="Light">
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="{ThemeResource CaptaSegmentSelectedColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="{ThemeResource CaptaTextColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="{ThemeResource CaptaTextColor}" />
+                                                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="{ThemeResource CaptaTextColor}" />
+                                                    </ResourceDictionary>
+                                                    <ResourceDictionary x:Key="HighContrast">
+                                                        <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="CaptaSegmentSelectedBrush" />
+                                                        <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="CaptaTextBrush" />
+                                                    </ResourceDictionary>
+                                                </ResourceDictionary.ThemeDictionaries>
+                                            </ResourceDictionary>
+                                        </Border.Resources>
+                                        <StackPanel Orientation="Horizontal" Spacing="2">
+                                            <ToggleButton x:Name="ThemeSystem" Style="{StaticResource Segment}" Tag="System" Click="OnTheme" Content="System" />
+                                            <ToggleButton x:Name="ThemeLight" Style="{StaticResource Segment}" Tag="Light" Click="OnTheme" Content="Light" />
+                                            <ToggleButton x:Name="ThemeDark" Style="{StaticResource Segment}" Tag="Dark" Click="OnTheme" Content="Dark" />
+                                        </StackPanel>
+                                    </Border>
                                 </Grid>
                             </StackPanel>
 

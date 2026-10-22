@@ -4,6 +4,7 @@ using Capta.Services;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Windows.Graphics;
 
@@ -211,6 +212,7 @@ public sealed partial class StartupSettingsWindow : Window
             StartQuietly.IsOn = Settings.StartQuietly;
             ShowToolbarAtStartup.IsOn = Settings.ShowToolbarAtStartup;
             KeepRunning.IsOn = Settings.KeepRunningWhenToolbarClosed;
+            ApplyTheme(Settings.Theme);
             AutoRedactSwitch.IsOn = Settings.AutoRedact;
             SaveTextSwitch.IsOn = Settings.SaveTextInCaptures;
             IncludeCursorSwitch.IsOn = Settings.IncludeCursor;
@@ -260,6 +262,26 @@ public sealed partial class StartupSettingsWindow : Window
     private void OnShowToolbarAtStartup(object sender, RoutedEventArgs e)
     {
         if (!_loading) Settings.ShowToolbarAtStartup = ShowToolbarAtStartup.IsOn;
+    }
+
+    // ---- Appearance ----
+
+    /// <summary>Selects the segment for a theme (the chosen one is bold, like Colour &amp; HDR's segments).</summary>
+    private void ApplyTheme(AppTheme theme)
+    {
+        foreach (var segment in new[] { ThemeSystem, ThemeLight, ThemeDark })
+        {
+            var selected = (string)segment.Tag == theme.ToString();
+            segment.IsChecked = selected;
+            segment.FontWeight = selected ? Microsoft.UI.Text.FontWeights.Bold : Microsoft.UI.Text.FontWeights.Normal;
+        }
+    }
+
+    private void OnTheme(object sender, RoutedEventArgs e)
+    {
+        var theme = Enum.Parse<AppTheme>((string)((ToggleButton)sender).Tag);
+        ThemeService.SetTheme(theme); // every open Capta window switches at once
+        ApplyTheme(theme);            // also keeps one segment selected
     }
 
     private void OnAutoRedact(object sender, RoutedEventArgs e)

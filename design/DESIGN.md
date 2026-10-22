@@ -83,6 +83,11 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
    downloads or installs anything itself. Startup & shortcuts has an off switch. When running from the Microsoft
    Store (`Package.Current.SignatureKind == Store`) the check, the tray row and the switch are hidden and Settings
    says "Updates come from the Microsoft Store".
+10. **The theme can be changed after setup.** Startup & shortcuts has an **Appearance** section (between Startup and
+    Capture) with a "Theme" row: a System / Light / Dark segmented control, the same control and brushes as Colour &
+    HDR's highlight roll-off. System (the default) follows the Windows light or dark mode. Choosing one applies to every
+    open Capta window at once (`ThemeService.SetTheme`). The first-run picker sets the same value. The capture overlay
+    stays dark.
 
 10. **"Save text found in captures" is a switch** (added 2026-10-16; not in the mockups). A row in Startup & shortcuts,
     in the Capture section beside "Redact personal info", with a one-line description in the same muted 12 px style. On by
@@ -113,7 +118,7 @@ When personal info was redacted, a "Personal info found" block sits between row 
 Copy menu: Copy image (Ctrl+C, checked default) · Copy for chat (a smaller sRGB copy: long edge at most 1568 px, never scaled up, no metadata; a PNG, or a JPEG at quality 85 if the PNG is over 1 MB; status line "Copied for chat · 1568 × 980 · 412 KB") · Copy image as HDR · Copy text in image (Ctrl+Shift+C) · Copy as file · Copy file path · separator · "Copy automatically after capture" toggle.
 
 **Capture overlay**
-Dim `CaptaScrimBrush` outside the selection · 2 px amber frame · 8 white square handles with amber borders · thirds guides at 22% white · amber size badge with dark mono text above the top-left corner · circular 132 px loupe with white border, magnified pixels, amber crosshair and a centre-pixel box · readout pill below the loupe (coordinates · colour swatch · hex) · mode bar at the top matching the toolbar's modes · key hints under it (Space move, Shift square, Enter capture, Esc cancel).
+Dim `CaptaScrimBrush` outside the selection · 2 px amber frame · 8 white square handles with amber borders · thirds guides at 22% white · amber size badge with dark mono text above the top-left corner · circular 132 px loupe with white border, magnified pixels, amber crosshair and a centre-pixel box · readout pill below the loupe (coordinates · colour swatch · hex) · mode bar at the top matching the toolbar's modes · key hints under it (Space move, Shift square, Enter capture, Esc cancel). The mode bar and hints fade out (120 ms) while a selection is being dragged, so they never cover what is being selected, and return when the drag ends.
 
 **Pin window**
 Amber 2 px outline with offset and a deep shadow · resize corner mark · on hover, a bar above the top-right with opacity slider and %, click-through, copy, edit, unpin · hint text "Scroll to zoom · drag corner to resize · double-click to unpin".
