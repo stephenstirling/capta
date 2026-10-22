@@ -33,7 +33,7 @@ copies temporary files there and adds it to its library. Ocula ignores parameter
 | URI | Sent when | Ocula should |
 | --- | --- | --- |
 | `ocula:edit?file=<path>&folder=<path>` | The card's or a pin's **Edit** button | Import the file (see below) and open it in the editor, in the foreground. |
-| `ocula:import?file=<path>&folder=<path>` | **Send to Ocula** on the card; also after every capture when "Send every capture to Ocula automatically" is on | Add the file to the library without stealing focus, without opening a window if Ocula isn't running. Many can arrive in a row. |
+| `ocula:import?file=<path>&folder=<path>` | **Send to Ocula** on the card; also after every capture when "Send every capture to Ocula automatically" is on (it is off by default) | Add the file to the library without stealing focus, without opening a window if Ocula isn't running. Many can arrive in a row. |
 | `ocula:captures?folder=<path>` | **Open all captures in Ocula** in the tray flyout | Open the "All captures" smart album (`12-ocula-captures-folder.png`). |
 
 Ocula's side is `Services/OculaLink.cs`, `Services/CaptaCapture.cs` and `MainWindow.Captures.cs` in
