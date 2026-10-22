@@ -96,6 +96,10 @@ Mockup details that are scenery, not UI to build: the grey placeholder windows a
     screen's text for their own purposes, and it is not in the overlay's Capture settings menu (it isn't a per-capture
     choice). Files already saved keep their text; Capta never edits a saved file.
 
+11. **"Send every capture to Ocula automatically" is off by default** (changed 2026-10-22). The first-run mockup
+    (`FirstRun.html`) shows the toggle on; the app shows it off. Turning it on is a choice, so Capta never copies files
+    into Ocula's library unasked. Ocula's own entry points (Edit, Send to Ocula, Open all captures) work regardless.
+
 ## Visual rules
 
 - **Fonts:** Segoe UI Variable Text for UI; Cascadia Mono for sizes, coordinates, hex values and shortcut keys.

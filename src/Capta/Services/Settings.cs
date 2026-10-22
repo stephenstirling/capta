@@ -121,10 +121,10 @@ public static class Settings
         set => Values[nameof(CaptureFolder)] = value;
     }
 
-    /// <summary>Send every capture to Ocula when it's installed.</summary>
+    /// <summary>Send every capture to Ocula when it's installed. Off by default; people opt in.</summary>
     public static bool SendToOculaAutomatically
     {
-        get => Get(nameof(SendToOculaAutomatically), true);
+        get => Get(nameof(SendToOculaAutomatically), false);
         set => Values[nameof(SendToOculaAutomatically)] = value;
     }
 
