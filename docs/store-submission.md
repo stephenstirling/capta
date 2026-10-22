@@ -71,55 +71,78 @@ why each restricted capability is needed:
 
 ## 6. Store listing (English)
 
+Limits, from [Microsoft's listing guide](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/msix/add-and-edit-store-listing-info):
+the description takes up to 10,000 characters of plain text (no HTML, code or URLs); **What's new** 1,500; up to
+20 features, each up to 200 characters, **entered one per field**; the short description 1,000, with only the first
+270 shown; at least one screenshot, four or more recommended. Every field below fits: the short description is
+150 characters, the description 1,841, and there are 18 features, the longest 76 characters.
+
 **Product name:** Capta
 
-**Short description (≤ 100 characters):**
-Fast, HDR-correct screenshots from the Print Screen key, right in your tray.
+**Short description** (keep under 270):
 
-**Description:**
+> Press Print Screen, drag, done. Capta captures regions, windows, scrolling pages and video, and keeps HDR screens
+> looking right. Free and open source.
 
-> Capta replaces the Print Screen key with a fast, precise capture tool that lives in your
-> notification area.
+**Description** (plain text, 1,841 characters):
+
+> Capta replaces the Print Screen key with a fast, precise capture tool that lives in your notification area.
 >
-> Press Print Screen and drag to capture a region. The screen freezes so menus and hover states stay
-> put. A loupe shows the exact pixel and its colour, and you can hold Shift for a square or Space to
-> move the selection. Shift+Print Screen captures the whole screen, Alt+Print Screen the active
-> window, and Ctrl+Shift+Print Screen grabs the text under a selection.
+> Press Print Screen and drag to capture a region. The screen freezes so menus and hover states stay put, a loupe
+> shows the exact pixel and its colour, and the capture is taken the moment you let go. Shift+Print Screen captures
+> the whole screen, Alt+Print Screen the active window, Ctrl+Print Screen records video, and Ctrl+Shift+Print Screen
+> grabs the text under a selection.
 >
-> Captures look right on HDR displays. Capta captures in high dynamic range and tone-maps to
-> standard range using your display's SDR white level, so screenshots aren't washed out or blown out.
+> Captures look right on HDR displays. Capta captures in high dynamic range and tone-maps to standard range using
+> your display's SDR white level, so screenshots aren't washed out or blown out.
 >
-> After each capture, a small card lets you copy, save, pin to the screen, edit, or copy the text
-> in the image. Pinned captures float above your windows. You can zoom them, make them
-> translucent, or click through them.
+> After each capture, a small card lets you copy, save, pin to the screen, edit, or copy the text in the image.
+> Pinned captures float above your windows: zoom them, make them translucent, or click through them. "Copy for
+> chat" puts a smaller copy on the clipboard for AI chats and messaging apps. An optional setting covers email
+> addresses, phone numbers and card-like numbers before a capture is copied, with Review and Undo.
 >
 > - Region, window, full-screen, active-window, freeform and scrolling capture
 > - Screen recording to MP4 with system audio and microphone, plus GIF export
-> - Frozen-screen overlay with a pixel loupe and colour picker (press C to pin a colour)
-> - HDR-aware capture with tone-mapping you can adjust
+> - Frozen-screen overlay with a pixel loupe and colour picker
+> - HDR-aware capture with tone-mapping you can adjust, and Copy as HDR (JPEG XR)
 > - Save in sRGB or Display P3, with optional correction for your monitor's colour profile
 > - Grab text: on-device text recognition, nothing uploaded
-> - Pin captures above other windows
-> - Copy as HDR (JPEG XR) for HDR-aware apps
+> - Repeat the last region from a shortcut, the tray or the toolbar
 > - Capture delay of 3, 5 or 10 seconds
 > - Rebindable shortcuts; light, dark and high-contrast themes
 > - Recent captures one click away from the tray
 >
-> Capta collects no data and makes no network connections.
+> Capta is free and open source. It collects no data and makes no network connections.
 
-**What's new in this version:** First release.
+**What's new in this version:** leave it **blank**. Microsoft says to leave it empty the first time an app is
+submitted, and this is the first Store submission (1.1.0). For later updates, paste that version's lines from
+`CHANGELOG.md` (up to 1,500 characters).
 
-**Features (up to 20, one line each):**
-Region capture with frozen screen · Window and full-screen capture · Freeform and scrolling capture ·
-Screen recording with audio · GIF export · Active-window capture ·
-HDR-correct tone-mapping · Pixel loupe and colour picker · Grab text (on-device OCR) · Pin to screen ·
-Capture delay · Rebindable Print Screen shortcuts · Recent captures in the tray
+**Features** (18 of 20; enter each as its own item, no bullets):
 
-**Search terms (up to 7):** screenshot, screen recorder, screen capture, print screen, HDR screenshot,
-OCR, scrolling screenshot
+1. Region capture on a frozen screen with a pixel loupe
+2. Window, full-screen and active-window capture
+3. Freeform and scrolling capture
+4. Screen recording to MP4 with system audio and microphone
+5. GIF export for recordings
+6. HDR-correct tone-mapping with adjustable highlights
+7. Copy as HDR (JPEG XR) for HDR-aware apps
+8. sRGB or Display P3, with optional monitor colour correction
+9. Grab text: on-device text recognition, nothing uploaded
+10. Pin captures above other windows
+11. Colour picker that pins a colour chip
+12. Copy for chat: a smaller copy for AI chats and messaging apps
+13. Optional redaction of emails, phone numbers and card-like numbers, with Undo
+14. Repeat the last region from a shortcut, the tray or the toolbar
+15. Capture delay of 3, 5 or 10 seconds
+16. Rebindable Print Screen shortcuts
+17. Light, dark and high-contrast themes
+18. Recent captures one click away from the tray
 
-**Screenshots (1920×1080 or 2560×1440 PNG, at least one, up to ten):** take them with Capta's own
-full-screen capture over a tidy desktop. Suggested set:
+**Search terms:** screenshot, screen recorder, screen capture, print screen, HDR screenshot, OCR, scrolling
+screenshot. (The page I checked doesn't state the term limits; Partner Center shows them when you enter these.)
+
+**Screenshots (1920×1080 or 2560×1440 PNG, at least one, up to ten):** take them over a tidy desktop. Suggested set:
 
 1. Region overlay mid-selection, with the loupe and size badge
 2. After-capture card
@@ -127,36 +150,21 @@ full-screen capture over a tidy desktop. Suggested set:
 4. A pinned capture with its hover bar, plus a colour chip
 5. Tray flyout with Recent
 6. Colour & HDR settings
-7. Startup & shortcuts
+7. Startup & shortcuts (including Appearance)
+8. The card with "Personal info found"
 
 **Store logos:** generated by `tools/generate_icons.py` from the Capta icon set. A 1:1 box art
 image (1080×1080 or 2160×2160) is optional; render it from the same artwork.
 
-## 7. What's new in 1.1
+## 7. Notes for the first submission (1.1.0)
 
-`Package.appxmanifest` is at version 1.1.0.0. This is the text for **What's new in this version** when 1.1 is
-submitted (the 1.0 listing above says "First release"). It isn't submitted yet.
-
-> - Copy for chat: put a smaller copy of a capture on the clipboard (long edge at most 1568 px, a JPEG if
->   the PNG is over 1 MB), ready to paste into AI chats and messaging apps.
-> - A tidier tray menu: compact rows, shortcuts next to their names, and one Settings entry.
-> - Repeat last region: capture the same area again from the keyboard (Ctrl+Alt+Print Screen), the tray
->   menu or the toolbar.
-> - Optional redaction of personal info: emails, phone numbers and card-like numbers found in a capture are
->   covered with a solid fill before it's copied, with Review and Undo. Off by default.
-> - Window captures keep their rounded corners, with a transparent background.
-> - An option to include the mouse cursor in screenshots (off by default).
-> - Settings has an About section with the version, licence and links.
-> - Lighter shadows on the toolbar, capture card and recording bar.
-
-Notes for this version:
+`Package.appxmanifest` is at version 1.1.0.0.
 
 - **Store builds make no network connections.** The update check in 1.1 is for the website build only: it's
   hidden when Capta runs from the Store (`Package.Current.SignatureKind == Store`), which says "Updates come
   from the Microsoft Store". The product declarations and privacy policy stay as they are for the Store.
-- The new screenshots to take: the tray menu, the card with "Personal info found", Settings with About.
-- Before uploading, also test: Copy for chat from the card's Copy menu, the redaction card (turn the setting
-  on first), and Repeat last region from the toolbar.
+- Before uploading, test: Copy for chat from the card's Copy menu, the redaction card (turn the setting on
+  first), and Repeat last region from the toolbar.
 
 ## 8. Pricing and availability
 
