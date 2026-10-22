@@ -1,0 +1,114 @@
+# Builds the Release package from a version tag and, once the project is approved for SignPath Foundation's
+# free code signing, signs it and attaches it to the draft release. See docs/releasing.md.
+#
+# What always runs: the unit tests, then the MSIX bundle (x64 + ARM64) the way docs/store-submission.md
+# builds it, uploaded as an unsigned artifact. What runs only after SignPath approval: the `sign` job, which
+# needs the repository settings listed in docs/releasing.md. The unsigned bundle can't be installed (Windows
+# refuses unsigned packages), so it is never attached to a release.
+name: Release package
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+  pull_request:
+    # Builds (never signs) when this file changes, so a broken release workflow shows up on its PR.
+    paths: ['.github/workflows/release.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+
+jobs:
+  package:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: microsoft/setup-msbuild@v3
+
+      - name: Test
+        run: dotnet test tests/Capta.Tests/Capta.Tests.csproj -c Release -p:Platform=x64
+
+      # A package signed by SignPath Foundation must name SignPath Foundation's certificate subject as its
+      # publisher. Set the repository variable SIGNPATH_PUBLISHER (see docs/releasing.md) and the manifest is
+      # updated for this build only; nothing is committed.
+      - name: Set the package publisher (SignPath builds)
+        if: ${{ vars.SIGNPATH_PUBLISHER != '' }}
+        shell: pwsh
+        env:
+          PUBLISHER: ${{ vars.SIGNPATH_PUBLISHER }}
+        run: |
+          $path = 'src/Capta/Package.appxmanifest'
+          $xml = Get-Content $path -Raw
+          $updated = $xml -replace '(<Identity[^>]*?Publisher=")[^"]*(")', "`${1}$env:PUBLISHER`${2}"
+          if ($updated -eq $xml) { throw 'Could not find the Publisher attribute in Package.appxmanifest.' }
+          Set-Content $path $updated -Encoding utf8
+
+      - name: Build the MSIX bundle (Release, x64 + ARM64, unsigned)
+        run: >
+          msbuild src\Capta\Capta.csproj -restore -m -p:Configuration=Release -p:Platform=x64
+          -p:GenerateAppxPackageOnBuild=true -p:UapAppxPackageBuildMode=StoreUpload
+          -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:AppxPackageSigningEnabled=false -v:minimal
+
+      - name: Collect the bundle
+        shell: pwsh
+        run: |
+          $bundle = Get-ChildItem src\Capta\bin -Recurse -Filter *.msixbundle |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $bundle) { throw 'The build produced no .msixbundle.' }
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item $bundle.FullName dist\
+          '{0}: {1:N1} MB' -f $bundle.Name, ($bundle.Length / 1MB)
+
+      - name: Upload the unsigned bundle
+        id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: capta-unsigned-msixbundle
+          path: dist/*.msixbundle
+          if-no-files-found: error
+
+  # Inactive until SignPath Foundation has approved the project and docs/releasing.md has been followed:
+  # it needs the SIGNPATH_ORGANIZATION_ID variable and the SIGNPATH_API_TOKEN secret. Every signing request
+  # then waits for the approver in SignPath before the signed package is attached to the (draft) release.
+  sign:
+    needs: package
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && vars.SIGNPATH_ORGANIZATION_ID != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write   # attach the signed package to the release
+      actions: read     # SignPath reads this run's job details to verify where the package came from
+    steps:
+      - name: Submit the signing request and wait for approval
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: capta
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ needs.package.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 14400
+          output-artifact-directory: signed
+
+      - name: Attach the signed bundle to the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --title "Capta ${TAG#v}" \
+              --notes "See CHANGELOG.md. Free code signing provided by SignPath.io, certificate by SignPath Foundation."
+          fi
+          gh release upload "$TAG" signed/*.msixbundle --repo "$GITHUB_REPOSITORY" --clobber

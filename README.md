@@ -108,11 +108,42 @@ GitHub Actions builds and tests every pull request (`.github/workflows/build.yml
 - [Privacy policy](docs/privacy.md)
 - [Ocula integration](docs/ocula-integration.md): the `ocula:` URIs and the PNG metadata
 - [Store submission](docs/store-submission.md): checklist, certification notes and the draft listing
+- [Releasing](docs/releasing.md): cutting a release and code signing with SignPath Foundation
 
 ## Store identity
 
 `Package.appxmanifest` uses a placeholder identity (`StephenStirling.Capta`, `CN=StephenStirling`).
 Before submitting, run **Project → Publish → Associate App with the Store** in Visual Studio.
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+Capta's Windows release packages on the [Releases](https://github.com/stephenstirling/capta/releases) page are signed
+this way. *Status: SignPath Foundation hasn't approved the project yet, so until it has, GitHub releases carry no
+installer and the Microsoft Store version (signed by Microsoft) is the way to install Capta.*
+
+**Team roles**
+
+| Role | Who |
+| --- | --- |
+| Authors and committers | [Stephen Stirling](https://github.com/stephenstirling) |
+| Reviewers | Stephen Stirling. Every change is built and tested by GitHub Actions on its pull request. |
+| Approvers | Stephen Stirling approves every signing request by hand. |
+
+**How a release is signed.** A version tag (for example `v1.1.0`) starts the public
+[release workflow](.github/workflows/release.yml), which tests the code, builds the package from that tag in GitHub
+Actions and submits it to SignPath. SignPath checks that the package was built from this repository, and the signing
+request waits for the approver. Nothing is signed from a developer's PC, and the signing key never leaves SignPath.
+Details are in [docs/releasing.md](docs/releasing.md).
+
+**Verifying a download.** In PowerShell, `Get-AuthenticodeSignature .\Capta_<version>_x64_arm64.msixbundle` should
+report `Valid`, with `SignPath Foundation` as the signer.
+
+**Privacy.** Capta does not collect, store or send personal information; captures stay on your PC. The only network
+request is the optional daily update check in the GitHub download (one request to `api.github.com`), which you can
+switch off, and the Microsoft Store version makes none. See the full [privacy policy](docs/privacy.md). Capta uses
+no third-party services or components that send data elsewhere; text recognition runs on-device through Windows.
 
 ## Support
 
