@@ -241,6 +241,8 @@ public partial class App : Application
         }
     }
 
+    private bool _redactFailureShown;
+
     private async void OnCaptured(CaptureResult result)
     {
         if (result.Mode == CaptureMode.GrabText)
@@ -250,7 +252,13 @@ public partial class App : Application
         }
 
         // Before anything is copied, saved or sent: the clipboard gets the redacted image.
-        await AutoRedact.ApplyAsync(result);
+        if (await AutoRedact.ApplyAsync(result) == RedactOutcome.Failed && !_redactFailureShown)
+        {
+            // Redaction is on but the text couldn't be read: say so once, rather than copy unchecked in silence.
+            _redactFailureShown = true;
+            _tray?.ShowInfo("Couldn't check for personal info",
+                "This capture wasn't scanned, so nothing was covered. Redaction needs a text-recognition language (Windows Settings > Time & language).");
+        }
 
         var copied = false;
         string? status = null;
