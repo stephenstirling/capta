@@ -16,7 +16,7 @@ anything in **[square brackets]** is something only the maintainer can fill in o
 - **Homepage:** <https://github.com/stephenstirling/capta>
 - **Releases:** <https://github.com/stephenstirling/capta/releases>
 - **Version history:** 1.0.0 (first release), 1.1.0 in preparation; see [CHANGELOG.md](../CHANGELOG.md).
-- **Maintained:** yes. **[Add recent commit activity or anything else that shows it's active.]**
+- **Maintained:** yes; see [Evidence](#evidence-that-it-is-free-public-and-maintained) below.
 - **Platform and language:** C# on .NET 10, WinUI 3 (Windows App SDK), packaged as MSIX.
 
 ## Why the project needs signing
@@ -76,10 +76,46 @@ on for the GitHub account and for SignPath, which SignPath requires of approvers
 
 Nothing is downloaded at run time. **[Check this table against the packages in `Directory.Packages.props` before sending.]**
 
+## Evidence that it is free, public and maintained
+
+Each point can be checked by SignPath without taking our word for it.
+
+**Free and open to the public**
+
+- The repository is **public**, so anyone can read, clone and build it: <https://github.com/stephenstirling/capta>.
+- The licence is **Apache-2.0**, an OSI-approved open-source licence, in [`LICENSE`](../LICENSE) at the repository root,
+  and the README states it.
+- The app is free. There's no paid tier, licence key, account or feature gate. The only money link is a voluntary
+  "Buy me a coffee" donation that unlocks nothing (the Microsoft Store listing is also free, in all markets).
+- Everything needed to build it is in the repository: `msbuild Capta.slnx -restore` (see the README's Build section),
+  and the release package is built from source by a public GitHub Actions workflow.
+
+**Actively maintained** (counts as of 23 October 2026; recheck before sending)
+
+- **93 commits** on `main` since the first commit on 2 October 2026, on 10 separate days, the latest on 22 October.
+  The history is at <https://github.com/stephenstirling/capta/commits/main>.
+- **12 pull requests**, every one built and tested by GitHub Actions before merging:
+  <https://github.com/stephenstirling/capta/pulls?q=is%3Apr>.
+- A **CI build and unit-test check** runs on every pull request and every push to `main`
+  ([build.yml](../.github/workflows/build.yml), history under the Actions tab), with about 100 unit tests.
+- A written [CHANGELOG](../CHANGELOG.md) for 1.0.0 and 1.1.0, [design notes](../design/DESIGN.md), and documentation of
+  the privacy policy, release process and code signing policy in [`docs/`](.).
+- Issues are open for support (<https://github.com/stephenstirling/capta/issues>).
+
+**Be upfront about this**
+
+- The project is **about three weeks old**, with one maintainer. As of this draft there is **no published GitHub
+  release and the Microsoft Store listing isn't live yet**; the first signed release is what this application is for.
+  SignPath Foundation asks that projects be established, so say so plainly and let them judge, rather than
+  overstating. Anything that adds to the record before applying helps: publish the Store version, keep the
+  commit history going, and add real users' issues or stars if there are any.
+- **[Add anything else that shows real use: Store ratings, issues from other people, a blog post, downloads.]**
+
 ## Anything SignPath may ask for
 
-- **Contact:** **[maintainer email]**
+- **Contact:** Stephen@stevestirling.com
 - **Why open source, and who uses it:** **[a sentence or two in your own words; link the Store listing once it's live]**
+  (Capta is a free alternative to paid screenshot tools, with HDR-correct capture that few offer. Add who it's for.)
 - **Malware and unwanted software:** Capta installs no other software, changes no settings other than its own, never
   changes Windows' Print Screen setting (it explains how to, and the user does it), and has a keyboard hook only for
   its own shortcuts. The source is public, so that can be checked.
