@@ -29,7 +29,7 @@ source are the two options.
 | Ctrl+Alt+PrtSc | Repeat last region: captures the last Region selection again, without the overlay (also in the tray menu and on the toolbar) |
 
 In the region overlay, letting go of the mouse captures the area you drew (and copies it, with Auto-copy on);
-**Esc** cancels. Scrolling and Record keep the selection adjustable until you press Enter. Press **C** to pick the colour under the cursor: its hex code is copied and
+**Esc** clears the selection you're drawing so you can start again; Esc with nothing selected cancels. Scrolling and Record keep the selection adjustable until you press Enter. Press **C** to pick the colour under the cursor: its hex code is copied and
 pinned as a small chip (click the code to copy again, double-click or Esc to unpin). The settings button at
 the end of the overlay's bar switches Auto-copy, Copy for chat and Redact personal info, and opens the settings windows.
 
