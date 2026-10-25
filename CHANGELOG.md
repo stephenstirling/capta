@@ -27,6 +27,10 @@
   saved files and the PNG carries no recognised text, so Ocula has nothing to search. Grab text, Copy text and Redact
   personal info are unaffected.
 
+- **Setup program on GitHub:** `Capta-Setup-<version>-x64.exe` on the Releases page installs the self-signed
+  package (it trusts that release's one-time certificate first). It's a stopgap until releases are signed through
+  SignPath Foundation. Windows SmartScreen will warn about it.
+
 ## 1.0.0
 
 First release.
