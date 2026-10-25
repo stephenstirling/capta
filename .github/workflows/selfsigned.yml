@@ -1,0 +1,48 @@
+# Checks tools/selfsign/Build-SelfSigned.ps1 end to end on a clean Windows runner: it creates the certificate, builds
+# the Release x64 bundle, signs it, trusts the certificate and installs the package. The signing and the build are
+# the gate; the install step is informational (a runner isn't a desktop), so a failure there doesn't fail the run.
+name: Self-signed package
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'tools/selfsign/**'
+      - '.github/workflows/selfsigned.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  selfsigned:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: microsoft/setup-msbuild@v3
+
+      - name: Build and sign
+        shell: pwsh
+        run: ./tools/selfsign/Build-SelfSigned.ps1 -SkipInstall
+
+      - name: Check the signature
+        shell: pwsh
+        run: |
+          $bundle = Get-ChildItem "$env:USERPROFILE\.stirling-build\capta-selfsigned" -Filter *.msixbundle | Select-Object -First 1
+          if (-not $bundle) { throw 'No signed bundle.' }
+          $signature = Get-AuthenticodeSignature $bundle.FullName
+          'Signer: {0}' -f $signature.SignerCertificate.Subject
+          'Status: {0}' -f $signature.Status
+          '{0}: {1:N1} MB' -f $bundle.Name, ($bundle.Length / 1MB)
+
+      - name: Trust the certificate and install (informational)
+        continue-on-error: true
+        shell: pwsh
+        env:
+          CI: 'true'
+        run: ./tools/selfsign/Build-SelfSigned.ps1 -InstallOnly

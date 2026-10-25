@@ -66,12 +66,13 @@ public sealed class PrintScreenHook : IDisposable
         }
 
         // Software-generated input doesn't trigger a capture, so scripts can't start one, with one
-        // exception: Print Screen itself. Keyboards without that key (Logitech MX Keys) send it from
-        // their software (Logi Options+ "Print screen"), as do the on-screen keyboard and remote tools.
-        // Any chord with another key still has to be physical. While recording a shortcut, all input counts
+        // exception: keys that type nothing (Print Screen, Insert, Pause, Scroll Lock, F13 to F24). Keyboards
+        // without Print Screen (Logitech MX Keys) send it from their software (Logi Options+), as do the
+        // on-screen keyboard and remote tools, and the same utilities can remap a key to Insert. A chord
+        // with an ordinary key still has to be physical. While recording a shortcut, all input counts
         // (e.g. from the on-screen keyboard).
         var injected = (info.flags & LLKHF_INJECTED) != 0;
-        if (injected && _recorder is null && vk != VK_SNAPSHOT)
+        if (injected && _recorder is null && !Chord.IsTypingFreeKey(vk))
             return false;
 
         if (message is not (WM_KEYDOWN or WM_SYSKEYDOWN) || IsModifier(vk))
@@ -95,10 +96,19 @@ public sealed class PrintScreenHook : IDisposable
         }
 
         if (Shortcuts.ActionFor(chord) is not { } action)
+        {
+            // Keys that type nothing are the only ones logged when they match no shortcut, so a bound key that
+            // does nothing shows what Windows reported (for example a Shift held by the keyboard driver).
+            if (Chord.IsTypingFreeKey(vk))
+            {
+                var seen = chord;
+                _dispatcher.TryEnqueue(() => Log.Info($"Key {seen.Compact} pressed (sent by software: {injected}) matches no shortcut"));
+            }
             return false;
+        }
 
         _swallowingKeyUp = vk;
-        if (injected) Log.Info($"Print Screen from software (keyboard utility or on-screen keyboard): {action}");
+        if (injected) Log.Info($"Shortcut key sent by software (keyboard utility or on-screen keyboard): {action}");
         _dispatcher.TryEnqueue(() => Pressed?.Invoke(action));
         return true;
     }

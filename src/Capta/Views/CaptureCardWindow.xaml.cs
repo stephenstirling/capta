@@ -224,8 +224,16 @@ public sealed partial class CaptureCardWindow : Window
             await SetThumbnailAsync(result);
             if (Settings.AutoCopy)
             {
-                await ImageExport.CopyToClipboardAsync(result.Image);
-                SetStatus("Copied to clipboard");
+                // The same kind of copy the capture got when it was taken.
+                if (Settings.CopyForChat)
+                {
+                    SetStatus((await ImageExport.CopyForChatAsync(result.Image)).Describe());
+                }
+                else
+                {
+                    await ImageExport.CopyToClipboardAsync(result.Image);
+                    SetStatus("Copied to clipboard");
+                }
             }
         }
         catch (Exception ex)

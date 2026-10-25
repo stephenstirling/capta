@@ -9,6 +9,8 @@ Capta needs Windows 11 22H2 or later.
 
 - **Microsoft Store:** the easiest way, with automatic updates. *The Store listing isn't live yet.* This page will
   link to it, and `winget install` will find it, as soon as it is.
+- **A self-signed package for your own PC:** [docs/selfsigned-install.md](docs/selfsigned-install.md). One script
+  builds the Release package, signs it with a certificate you make, and installs it, with no Developer Mode build.
 - **Build it yourself:** follow [Build](#build) below. It deploys the package for your own account and needs
   Visual Studio (or the .NET 10 SDK) and Windows' Developer Mode.
 
@@ -28,8 +30,12 @@ source are the two options.
 | Ctrl+Shift+PrtSc | Grab text from screen: select a region and its text is copied |
 | Ctrl+Alt+PrtSc | Repeat last region: captures the last Region selection again, without the overlay (also in the tray menu and on the toolbar) |
 
+Every shortcut can be changed in Settings (the pencil beside it). A shortcut needs Ctrl or Alt, or one of the keys
+that types nothing: Print Screen, Insert, Pause, Scroll Lock or F13 to F24. For example, set Region capture to
+**Insert**. (Insert on its own then stops toggling overwrite mode in other apps.)
+
 In the region overlay, letting go of the mouse captures the area you drew (and copies it, with Auto-copy on);
-**Esc** cancels. Scrolling and Record keep the selection adjustable until you press Enter. Press **C** to pick the colour under the cursor: its hex code is copied and
+**Esc** clears the selection you're drawing so you can start again; Esc with nothing selected cancels. Scrolling and Record keep the selection adjustable until you press Enter. Press **C** to pick the colour under the cursor: its hex code is copied and
 pinned as a small chip (click the code to copy again, double-click or Esc to unpin). The settings button at
 the end of the overlay's bar switches Auto-copy, Copy for chat and Redact personal info, and opens the settings windows.
 

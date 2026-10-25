@@ -32,6 +32,7 @@ public static class Shortcuts
     {
         foreach (var action in Defaults.Keys)
             s_current[action] = Chord.Parse(Settings.GetShortcut(action)) ?? Defaults[action];
+        Log.Info("Shortcuts: " + string.Join(", ", s_current.Select(p => $"{p.Key} = {p.Value.Compact}")));
     }
 
     /// <summary>
@@ -49,6 +50,7 @@ public static class Shortcuts
         }
         s_current[action] = chord;
         Settings.SetShortcut(action, chord.Serialize());
+        Log.Info($"Shortcut {action} set to {chord.Compact}");
         Changed?.Invoke();
         return other;
     }
