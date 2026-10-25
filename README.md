@@ -9,6 +9,8 @@ Capta needs Windows 11 22H2 or later.
 
 - **Microsoft Store:** the easiest way, with automatic updates. *The Store listing isn't live yet.* This page will
   link to it, and `winget install` will find it, as soon as it is.
+- **A self-signed package for your own PC:** [docs/selfsigned-install.md](docs/selfsigned-install.md). One script
+  builds the Release package, signs it with a certificate you make, and installs it, with no Developer Mode build.
 - **Build it yourself:** follow [Build](#build) below. It deploys the package for your own account and needs
   Visual Studio (or the .NET 10 SDK) and Windows' Developer Mode.
 
