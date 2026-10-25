@@ -96,7 +96,16 @@ public sealed class PrintScreenHook : IDisposable
         }
 
         if (Shortcuts.ActionFor(chord) is not { } action)
+        {
+            // Keys that type nothing are the only ones logged when they match no shortcut, so a bound key that
+            // does nothing shows what Windows reported (for example a Shift held by the keyboard driver).
+            if (Chord.IsTypingFreeKey(vk))
+            {
+                var seen = chord;
+                _dispatcher.TryEnqueue(() => Log.Info($"Key {seen.Compact} pressed (sent by software: {injected}) matches no shortcut"));
+            }
             return false;
+        }
 
         _swallowingKeyUp = vk;
         if (injected) Log.Info($"Shortcut key sent by software (keyboard utility or on-screen keyboard): {action}");
