@@ -37,6 +37,14 @@ public class ChordTests
     }
 
     [Theory]
+    [InlineData(Chord.PrintScreen, true)]
+    [InlineData(0x2D, true)]
+    [InlineData(0x7C, true)]
+    [InlineData(0x41, false)]
+    [InlineData(0x70, false)]
+    public void TypingFreeKeys(int key, bool typingFree) => Assert.Equal(typingFree, Chord.IsTypingFreeKey(key));
+
+    [Theory]
     [InlineData(false, false, false, Chord.PrintScreen, true)]
     [InlineData(false, true, false, Chord.PrintScreen, true)]
     [InlineData(true, false, false, 0x41, true)]

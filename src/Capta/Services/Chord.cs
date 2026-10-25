@@ -14,11 +14,12 @@ public readonly record struct Chord(bool Ctrl, bool Shift, bool Alt, int Key)
     /// with Windows; the hook never sees them as Capta's.) Binding Insert on its own stops it
     /// toggling overwrite mode in other apps, which is why it has to be chosen, not a default.
     /// </summary>
-    public bool IsAllowed => Ctrl || Alt || IsTypingFree(Key);
+    public bool IsAllowed => Ctrl || Alt || IsTypingFreeKey(Key);
 
     private const int Insert = 0x2D, Pause = 0x13, ScrollLock = 0x91, F13 = 0x7C, F24 = 0x87;
 
-    private static bool IsTypingFree(int key) => key is PrintScreen or Insert or Pause or ScrollLock or (>= F13 and <= F24);
+    /// <summary>Print Screen, Insert, Pause, Scroll Lock and F13 to F24: keys that type nothing.</summary>
+    public static bool IsTypingFreeKey(int key) => key is PrintScreen or Insert or Pause or ScrollLock or (>= F13 and <= F24);
 
     public override string ToString()
     {
