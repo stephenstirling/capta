@@ -168,6 +168,8 @@ jobs:
           $process = Start-Process $setup.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$env:RUNNER_TEMP\setup.log" -Wait -PassThru
           'Setup exit code: {0}' -f $process.ExitCode
           Get-Content "$env:RUNNER_TEMP\setup.log" -Tail 20 -ErrorAction SilentlyContinue
+          '--- Capta-Setup.log (what the helper script reported) ---'
+          Get-Content "$env:TEMP\Capta-Setup.log" -ErrorAction SilentlyContinue
           Get-AppxPackage StephenStirling.Capta | Format-List Name, Version, PackageFullName
           if ($process.ExitCode -ne 0 -or -not (Get-AppxPackage StephenStirling.Capta)) { throw 'The setup program did not install Capta.' }
 
