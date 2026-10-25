@@ -15,9 +15,18 @@ param(
 $ErrorActionPreference = 'Stop'
 $log = Join-Path $env:TEMP 'Capta-Setup.log'
 
+# Setup can be started from a shell that left PowerShell 7's module folders in PSModulePath, which Windows
+# PowerShell 5.1 then can't load its own modules from. Use the machine and user defaults.
+$env:PSModulePath = (@([Environment]::GetEnvironmentVariable('PSModulePath', 'Machine'),
+        [Environment]::GetEnvironmentVariable('PSModulePath', 'User')) | Where-Object { $_ }) -join ';'
+
 try {
     if ($Step -eq 'Trust') {
-        Import-Certificate -FilePath (Join-Path $Folder 'Capta.cer') -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null
+        # The certificate store directly (no Cert: drive, which isn't always available).
+        $certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 (Join-Path $Folder 'Capta.cer')
+        $store = New-Object System.Security.Cryptography.X509Certificates.X509Store('TrustedPeople', 'LocalMachine')
+        $store.Open('ReadWrite')
+        try { $store.Add($certificate) } finally { $store.Close() }
     }
     else {
         Get-Process Capta -ErrorAction SilentlyContinue | Stop-Process -Force
