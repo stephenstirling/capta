@@ -28,6 +28,7 @@ public class ChordTests
     [InlineData(false, false, true, 0x70, "Alt + F1", "Alt+F1")]
     [InlineData(true, false, false, 0x39, "Ctrl + 9", "Ctrl+9")]
     [InlineData(true, false, false, 0x22, "Ctrl + PgDn", "Ctrl+PgDn")]
+    [InlineData(false, false, false, 0x2D, "Insert", "Insert")]
     public void NamesKeys(bool ctrl, bool shift, bool alt, int key, string name, string compact)
     {
         var chord = new Chord(ctrl, shift, alt, key);
@@ -42,6 +43,14 @@ public class ChordTests
     [InlineData(false, false, true, 0x41, true)]
     [InlineData(false, false, false, 0x41, false)] // plain A would swallow typing
     [InlineData(false, true, false, 0x41, false)]
+    [InlineData(false, false, false, 0x2D, true)]  // Insert
+    [InlineData(false, false, false, 0x13, true)]  // Pause
+    [InlineData(false, false, false, 0x91, true)]  // Scroll Lock
+    [InlineData(false, false, false, 0x7C, true)]  // F13
+    [InlineData(false, false, false, 0x87, true)]  // F24
+    [InlineData(false, false, false, 0x7B, false)] // F12 is used by apps
+    [InlineData(false, false, false, 0x88, false)]
+    [InlineData(false, false, false, 0x2E, false)] // Delete
     public void OnlyChordsThatLeaveTypingAloneAreAllowed(bool ctrl, bool shift, bool alt, int key, bool allowed) =>
         Assert.Equal(allowed, new Chord(ctrl, shift, alt, key).IsAllowed);
 }

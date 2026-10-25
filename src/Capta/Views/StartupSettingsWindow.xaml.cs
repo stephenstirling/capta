@@ -136,7 +136,7 @@ public sealed partial class StartupSettingsWindow : Window
     private void StartRecording(HotkeyAction action)
     {
         _recording = action;
-        ShortcutMessage.Text = "Press the new shortcut. It needs Print Screen, Ctrl or Alt. Esc cancels.";
+        ShortcutMessage.Text = "Press the new shortcut. It needs Ctrl or Alt, or one of Print Screen, Insert, Pause, Scroll Lock or F13 to F24. Esc cancels.";
         BuildShortcutRows();
         _app.RecordShortcut(chord =>
         {
@@ -147,7 +147,7 @@ public sealed partial class StartupSettingsWindow : Window
             }
             else if (!c.IsAllowed)
             {
-                ShortcutMessage.Text = $"{c} would get in the way of typing. Use Print Screen, Ctrl or Alt.";
+                ShortcutMessage.Text = $"{c} would get in the way of typing. Use Ctrl or Alt, or Print Screen, Insert, Pause, Scroll Lock or F13 to F24.";
             }
             else
             {

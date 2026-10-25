@@ -30,6 +30,10 @@ source are the two options.
 | Ctrl+Shift+PrtSc | Grab text from screen: select a region and its text is copied |
 | Ctrl+Alt+PrtSc | Repeat last region: captures the last Region selection again, without the overlay (also in the tray menu and on the toolbar) |
 
+Every shortcut can be changed in Settings (the pencil beside it). A shortcut needs Ctrl or Alt, or one of the keys
+that types nothing: Print Screen, Insert, Pause, Scroll Lock or F13 to F24. For example, set Region capture to
+**Insert**. (Insert on its own then stops toggling overwrite mode in other apps.)
+
 In the region overlay, letting go of the mouse captures the area you drew (and copies it, with Auto-copy on);
 **Esc** clears the selection you're drawing so you can start again; Esc with nothing selected cancels. Scrolling and Record keep the selection adjustable until you press Enter. Press **C** to pick the colour under the cursor: its hex code is copied and
 pinned as a small chip (click the code to copy again, double-click or Esc to unpin). The settings button at
