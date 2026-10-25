@@ -6,6 +6,7 @@ Capta ships two ways, with different package identities:
 | --- | --- | --- | --- |
 | **Microsoft Store** | Microsoft | the Store | the Store; Capta makes no network calls |
 | **GitHub release** | SignPath Foundation (free, once approved) | the `.msixbundle` on the Releases page | Capta's optional daily check for a newer release |
+| **GitHub release, until SignPath approves** | a certificate made for that build (self-signed) | `Capta-Setup-<version>-x64.exe` on the Releases page | the same optional daily check |
 
 The Store package gets its identity from **Associate App with the Store** (see
 [store-submission.md](store-submission.md)). The GitHub package must name SignPath Foundation's certificate as its
@@ -24,6 +25,29 @@ Nothing is committed for it.
    first: the workflow creates it. Review it, add the changelog text and the attribution line
    (`Free code signing provided by SignPath.io, certificate by SignPath Foundation.`), and publish.
 6. For the Store, build the bundle from the same tag with the Store identity and upload it in Partner Center.
+
+## The self-signed setup program (until SignPath approves)
+
+The `installer` job in the release workflow builds `Capta-Setup-<version>-x64.exe` on every tag and attaches it to
+the draft release (a manual run of the workflow keeps it as the `capta-setup` artifact instead).
+
+- **What it is.** `tools/selfsign/Build-SelfSigned.ps1 -SkipInstall` builds the Release x64 bundle and signs it with a
+  certificate it creates on the runner. `installer/Capta.iss` (Inno Setup) wraps the bundle and the public `.cer` in
+  a setup program. Setup trusts the certificate in the PC's Trusted People store as an administrator, then installs
+  the bundle as the user who ran it (`installer/Install-Capta.ps1`). It doesn't install files of its own, so there's
+  no uninstaller of its own: Capta is removed from Installed apps like any package.
+- **Why the key is safe.** The certificate's private key exists only on that runner and is gone when the job ends,
+  so a trusted certificate can't be used to sign anything else, and every release has a new one. Packages from
+  different releases still update each other: Windows matches them by the publisher name in the manifest
+  (`CN=StephenStirling`), not by the certificate.
+- **What users see.** SmartScreen warns about an unrecognised publisher, because the setup program itself isn't
+  signed by a certificate Windows trusts. The release notes and README say so. Some antivirus products are also wary
+  of unsigned installers; if one flags it, report it to the vendor.
+- **The trust it leaves behind.** The certificate stays in Trusted People after Capta is removed. The commands to
+  remove it are in [selfsigned-install.md](selfsigned-install.md).
+- **When SignPath approves.** Follow the setup below, tag a release, and the `sign` job attaches the signed bundle.
+  Then drop the `installer` job (or keep it until the signed bundle has been out for a release) and update the
+  README's Install and Code signing policy sections.
 
 ## One-time SignPath setup (after approval)
 

@@ -9,15 +9,18 @@ Capta needs Windows 11 22H2 or later.
 
 - **Microsoft Store:** the easiest way, with automatic updates. *The Store listing isn't live yet.* This page will
   link to it, and `winget install` will find it, as soon as it is.
+- **Setup program from GitHub (self-signed):** download `Capta-Setup-<version>-x64.exe` from the
+  [Releases](https://github.com/stephenstirling/capta/releases) page and run it. Windows will warn that it comes
+  from an unrecognised publisher (SmartScreen: **More info**, then **Run anyway**), because it isn't signed by a
+  certificate Windows already trusts. Setup adds that release's one-time certificate to your PC's Trusted People
+  store (it asks for administrator approval) and installs Capta for your account. The certificate is made by the
+  build and its private key is discarded, so it can't sign anything else. This is a stopgap until releases are
+  signed through SignPath Foundation (see [Code signing policy](#code-signing-policy)); how to undo it is in
+  [docs/selfsigned-install.md](docs/selfsigned-install.md).
 - **A self-signed package for your own PC:** [docs/selfsigned-install.md](docs/selfsigned-install.md). One script
   builds the Release package, signs it with a certificate you make, and installs it, with no Developer Mode build.
 - **Build it yourself:** follow [Build](#build) below. It deploys the package for your own account and needs
   Visual Studio (or the .NET 10 SDK) and Windows' Developer Mode.
-
-There's no installer to download from GitHub yet. Windows only installs packages that are signed with a certificate
-it trusts, and Capta's GitHub releases will be signed through SignPath Foundation's free programme for open-source
-projects (see [Code signing policy](#code-signing-policy)). Until that's in place, the Store and building from
-source are the two options.
 
 ## Shortcuts
 
@@ -140,8 +143,9 @@ Before submitting, run **Project → Publish → Associate App with the Store** 
 Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
 
 Capta's Windows release packages on the [Releases](https://github.com/stephenstirling/capta/releases) page are signed
-this way. *Status: SignPath Foundation hasn't approved the project yet, so until it has, GitHub releases carry no
-installer and the Microsoft Store version (signed by Microsoft) is the way to install Capta.*
+this way. *Status: SignPath Foundation hasn't approved the project yet. Until it has, GitHub releases carry a
+self-signed setup program (`Capta-Setup-<version>-x64.exe`, see [Install](#install)) instead of a package signed by
+SignPath Foundation; the Microsoft Store version (signed by Microsoft) is the other way to install Capta.*
 
 **Team roles**
 

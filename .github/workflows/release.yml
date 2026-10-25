@@ -4,7 +4,8 @@
 # What always runs: the unit tests, then the MSIX bundle (x64 + ARM64) the way docs/store-submission.md
 # builds it, uploaded as an unsigned artifact. What runs only after SignPath approval: the `sign` job, which
 # needs the repository settings listed in docs/releasing.md. The unsigned bundle can't be installed (Windows
-# refuses unsigned packages), so it is never attached to a release.
+# refuses unsigned packages), so it is never attached to a release. The `installer` job builds a self-signed
+# Capta-Setup .exe for everyone else in the meantime.
 name: Release package
 
 on:
@@ -13,7 +14,7 @@ on:
   workflow_dispatch:
   pull_request:
     # Builds (never signs) when this file changes, so a broken release workflow shows up on its PR.
-    paths: ['.github/workflows/release.yml']
+    paths: ['.github/workflows/release.yml', 'installer/**', 'tools/selfsign/**']
 
 permissions:
   contents: read
@@ -112,3 +113,89 @@ jobs:
               --notes "See CHANGELOG.md. Free code signing provided by SignPath.io, certificate by SignPath Foundation."
           fi
           gh release upload "$TAG" signed/*.msixbundle --repo "$GITHUB_REPOSITORY" --clobber
+
+  # A Windows setup program (Capta-Setup-<version>-x64.exe) for people who aren't on the Store and until the
+  # SignPath-signed bundle exists. It's self-signed with a certificate made on this runner for this build only:
+  # the private key disappears with the runner, so the certificate can't sign anything later, and each release
+  # carries its own. The setup trusts that certificate on the user's PC and installs the bundle. Windows
+  # SmartScreen will warn about the (unsigned) setup program. See docs/releasing.md.
+  installer:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write   # attach the setup program to the draft release (tags only)
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: microsoft/setup-msbuild@v3
+
+      - name: Build and self-sign the bundle (x64)
+        shell: pwsh
+        run: ./tools/selfsign/Build-SelfSigned.ps1 -SkipInstall -OutputDir "$env:RUNNER_TEMP\selfsigned"
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Build the setup program
+        shell: pwsh
+        run: |
+          [xml]$manifest = Get-Content src\Capta\Package.appxmanifest -Raw
+          $version = ([version]$manifest.Package.Identity.Version).ToString(3)
+          $dir = Join-Path $env:RUNNER_TEMP 'selfsigned'
+          $bundle = Get-ChildItem $dir -Filter *.msixbundle | Select-Object -First 1
+          if (-not $bundle) { throw 'No signed bundle.' }
+          $out = (New-Item -ItemType Directory -Force dist).FullName   # absolute: ISCC reads a relative /O from the script's folder
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$version" "/DPackageName=$($manifest.Package.Identity.Name)" `
+            "/DBundlePath=$($bundle.FullName)" "/DCertPath=$dir\Capta-selfsigned.cer" "/O$out" installer\Capta.iss
+          if ($LASTEXITCODE -ne 0) { throw 'ISCC failed.' }
+          Copy-Item "$dir\Capta-selfsigned.cer" dist\
+          Get-ChildItem dist | ForEach-Object { '{0}: {1:N1} MB' -f $_.Name, ($_.Length / 1MB) }
+
+      # A runner is an elevated session, so this exercises the whole setup. It's informational: a runner
+      # isn't a desktop, so a failure here doesn't fail the run.
+      - name: Try the setup program (informational)
+        continue-on-error: true
+        shell: pwsh
+        env:
+          CI: 'true'
+        run: |
+          $setup = Get-ChildItem dist -Filter Capta-Setup-*.exe | Select-Object -First 1
+          $process = Start-Process $setup.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$env:RUNNER_TEMP\setup.log" -Wait -PassThru
+          'Setup exit code: {0}' -f $process.ExitCode
+          Get-Content "$env:RUNNER_TEMP\setup.log" -Tail 20 -ErrorAction SilentlyContinue
+          Get-AppxPackage StephenStirling.Capta | Format-List Name, Version, PackageFullName
+          if ($process.ExitCode -ne 0 -or -not (Get-AppxPackage StephenStirling.Capta)) { throw 'The setup program did not install Capta.' }
+
+      - name: Upload the setup program
+        uses: actions/upload-artifact@v7
+        with:
+          name: capta-setup
+          path: dist/*
+          if-no-files-found: error
+
+      - name: Attach to the draft release (tags only)
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $notes = @"
+          See [CHANGELOG.md](https://github.com/stephenstirling/capta/blob/main/CHANGELOG.md).
+
+          **Installing:** download ``Capta-Setup-*-x64.exe`` and run it. Windows will warn that it's from an unrecognised publisher (SmartScreen: *More info*, then *Run anyway*), because the setup program isn't signed by a certificate Windows already trusts. Setup adds this release's one-time certificate to the PC's Trusted People store and installs Capta for your account. The certificate was made by the build and its key was discarded, so it can't sign anything else. Remove it later with the commands in docs/selfsigned-install.md.
+
+          Signed releases will come through SignPath Foundation or the Microsoft Store; see the README.
+          "@
+          gh release view $env:TAG --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $env:TAG --repo $env:GITHUB_REPOSITORY --draft --title "Capta $($env:TAG.TrimStart('v'))" --notes $notes
+            if ($LASTEXITCODE -ne 0) { gh release view $env:TAG --repo $env:GITHUB_REPOSITORY *> $null; if ($LASTEXITCODE -ne 0) { throw 'Could not create the draft release.' } }
+          }
+          gh release upload $env:TAG (Get-ChildItem dist | ForEach-Object FullName) --repo $env:GITHUB_REPOSITORY --clobber
+          if ($LASTEXITCODE -ne 0) { throw 'Could not attach the files to the release.' }
