@@ -18,8 +18,13 @@ Build section.
 
    ```powershell
    cd Z:\Data\sites\capta
+   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
    .\tools\selfsign\Build-SelfSigned.ps1
    ```
+
+   The `Set-ExecutionPolicy` line is needed if Windows says "running scripts is disabled on this system". It only
+   applies to that PowerShell window and changes nothing permanent. Use it again in each new window (including the
+   `-InstallOnly` run in step 3).
 
    It creates the certificate (the first time), builds the Release x64 bundle, signs it, and then stops with one
    command to run, because trusting a certificate needs an administrator.
