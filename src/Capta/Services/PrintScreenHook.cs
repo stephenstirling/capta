@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Microsoft.UI.Dispatching;
+using Capta.Overlay;
 using static Capta.Interop.NativeMethods;
 
 namespace Capta.Services;
@@ -92,6 +93,13 @@ public sealed class PrintScreenHook : IDisposable
             _swallowingKeyUp = vk;
             Chord? recorded = vk == 0x1B && !chord.Ctrl && !chord.Shift && !chord.Alt ? null : chord; // Esc cancels
             _dispatcher.TryEnqueue(() => recorder(recorded));
+            return true;
+        }
+
+        // Esc while the overlay is open but doesn't have the keyboard focus: nothing else would see it.
+        if (vk == VK_ESCAPE && !chord.Ctrl && !chord.Shift && !chord.Alt && OverlaySession.HandleEscapeWithoutFocus())
+        {
+            _swallowingKeyUp = vk;
             return true;
         }
 
