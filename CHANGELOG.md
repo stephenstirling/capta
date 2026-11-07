@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1
+
+- **Esc cancels a capture again** when the capture overlay doesn't have the keyboard focus, which could happen
+  when a capture was started from a shortcut or a mouse button. The first Esc clears a selection and the next one
+  cancels.
+- **The floating toolbar comes back after a capture** (done or cancelled) if it was showing when the capture
+  started. It stays out of the way while you capture.
+
 ## 1.1.0
 
 - **Copy for chat:** put a smaller copy of a capture on the clipboard (long edge at most 1568 px, a JPEG if
