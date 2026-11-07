@@ -226,6 +226,8 @@ public partial class App : Application
             return;
         }
         Log.Info($"Capture requested: {mode}, delay {delaySeconds}s");
+        // The toolbar stays out of the way until the capture is done or cancelled, then comes back if it was up.
+        var restoreToolbar = _toolbar is { IsShown: true } && mode != CaptureMode.Recording;
         _toolbar?.Hide();
         _card?.Hide();
         try
@@ -238,6 +240,11 @@ public partial class App : Application
         {
             Log.Error("Capture failed", ex);
             _tray?.ShowError("Capture failed", ex.Message);
+        }
+        finally
+        {
+            if (restoreToolbar)
+                _toolbar?.Restore();
         }
     }
 

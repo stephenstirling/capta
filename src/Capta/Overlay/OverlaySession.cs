@@ -1,6 +1,7 @@
 using Capta.Capture;
 using Capta.Interop;
 using Capta.Services;
+using Microsoft.UI.Dispatching;
 using Windows.Graphics;
 
 namespace Capta.Overlay;
@@ -42,9 +43,15 @@ public sealed class OverlaySession
     private readonly List<OverlayWindow> _windows = [];
     private OverlayWindow? _pointerOwner;
 
+    private static OverlaySession? s_active;
+
+    /// <summary>True while an overlay is on screen.</summary>
+    public static bool IsActive => s_active is not null;
+
     public static async Task<OverlayResult> RunAsync(CaptureMode mode, IReadOnlyList<MonitorInfo> monitors, IReadOnlyList<CapturedImage> frames)
     {
         var session = new OverlaySession();
+        s_active = session;
         // Snapshot windows up front (before our overlays exist) so Window mode can be chosen later.
         var targets = WindowFinder.Snapshot();
         var cursor = WindowHelper.CursorPosition();
@@ -69,8 +76,30 @@ public sealed class OverlaySession
         }
         finally
         {
+            s_active = null;
             foreach (var w in session._windows) w.Close();
         }
+    }
+
+    /// <summary>
+    /// Esc for when the overlay doesn't have keyboard focus (Windows can refuse to move it to a window opened
+    /// from a shortcut or another app's input), so the key never reaches the overlay's own handler: the first Esc
+    /// clears a selection, the next cancels. False if no overlay needs it, or it already has the focus.
+    /// </summary>
+    public static bool HandleEscapeWithoutFocus()
+    {
+        if (s_active is not { } session) return false;
+        var foreground = NativeMethods.GetForegroundWindow();
+        if (session._windows.Any(w => w.GetHwnd() == foreground)) return false; // its own key handler gets Esc
+        // Posted, not run here: this is called from the keyboard hook, which must return at once.
+        DispatcherQueue.GetForCurrentThread().TryEnqueue(session.EscapePressed);
+        return true;
+    }
+
+    private void EscapePressed()
+    {
+        if (_windows.Any(w => w.TryClearSelectionForEscape())) return;
+        Cancel();
     }
 
     internal void Complete(OverlayResult result) => _result.TrySetResult(result);

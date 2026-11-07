@@ -365,12 +365,7 @@ public sealed partial class OverlayWindow : Window
         switch (e.Key)
         {
             case VirtualKey.Escape:
-                // The first Esc clears a selection that's being drawn or adjusted, so you can start again
-                // without leaving the overlay; Esc with nothing selected (or in Window mode, where the
-                // outline is only the window under the pointer) cancels the capture.
-                if (_mode != CaptureMode.Window && (_drag != Drag.None || HasSelection || _lasso.Count > 0))
-                    ClearSelection();
-                else
+                if (!TryClearSelectionForEscape())
                     _session.Cancel();
                 break;
             case VirtualKey.Enter when IsRegionLike && HasSelection:
@@ -396,6 +391,19 @@ public sealed partial class OverlayWindow : Window
                 return;
         }
         e.Handled = true;
+    }
+
+    /// <summary>
+    /// The first Esc clears a selection that's being drawn or adjusted, so you can start again without leaving
+    /// the overlay; Esc with nothing selected (or in Window mode, where the outline is only the window under the
+    /// pointer) cancels the capture. False when there's nothing to clear.
+    /// </summary>
+    internal bool TryClearSelectionForEscape()
+    {
+        if (_mode == CaptureMode.Window || (_drag == Drag.None && !HasSelection && _lasso.Count == 0))
+            return false;
+        ClearSelection();
+        return true;
     }
 
     /// <summary>Drops the selection (and a drag in progress, so letting go afterwards does nothing).</summary>

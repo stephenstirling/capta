@@ -129,6 +129,11 @@ public sealed partial class ToolbarWindow : Window
 
     public void Hide() => AppWindow.Hide();
 
+    public bool IsShown => AppWindow.IsVisible;
+
+    /// <summary>Shows the toolbar again where it was, without taking the focus (after a capture it was hidden for).</summary>
+    public void Restore() => AppWindow.Show(activateWindow: false);
+
     // ---- HDR badge ----
 
     private void UpdateHdrBadge(PointInt32 cursor)
