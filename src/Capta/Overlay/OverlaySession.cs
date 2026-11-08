@@ -82,18 +82,24 @@ public sealed class OverlaySession
     }
 
     /// <summary>
-    /// Esc for when the overlay doesn't have keyboard focus (Windows can refuse to move it to a window opened
-    /// from a shortcut or another app's input), so the key never reaches the overlay's own handler: the first Esc
-    /// clears a selection, the next cancels. False if no overlay needs it, or it already has the focus.
+    /// Esc and Enter for when the overlay doesn't have keyboard focus (Windows can refuse to move it to a window
+    /// opened from a shortcut or another app's input), so the key never reaches the overlay's own handler. Esc
+    /// clears a selection, then cancels; Enter finishes a selection (which is how Record and Scrolling start).
+    /// False if the key isn't needed, or the overlay already has the focus.
     /// </summary>
-    public static bool HandleEscapeWithoutFocus()
+    public static bool HandleKeyWithoutFocus(int vk)
     {
         if (s_active is not { } session) return false;
         var foreground = NativeMethods.GetForegroundWindow();
-        if (session._windows.Any(w => w.GetHwnd() == foreground)) return false; // its own key handler gets Esc
+        if (session._windows.Any(w => w.GetHwnd() == foreground)) return false; // its own key handler gets the key
+
         // Posted, not run here: this is called from the keyboard hook, which must return at once.
-        DispatcherQueue.GetForCurrentThread().TryEnqueue(session.EscapePressed);
-        return true;
+        var queue = DispatcherQueue.GetForCurrentThread();
+        if (vk == NativeMethods.VK_ESCAPE)
+            return queue.TryEnqueue(session.EscapePressed);
+        if (vk == NativeMethods.VK_RETURN && session._windows.FirstOrDefault(w => w.CanFinishWithEnter) is { } window)
+            return queue.TryEnqueue(window.FinishWithEnter);
+        return false;
     }
 
     private void EscapePressed()

@@ -96,8 +96,8 @@ public sealed class PrintScreenHook : IDisposable
             return true;
         }
 
-        // Esc while the overlay is open but doesn't have the keyboard focus: nothing else would see it.
-        if (vk == VK_ESCAPE && !chord.Ctrl && !chord.Shift && !chord.Alt && OverlaySession.HandleEscapeWithoutFocus())
+        // Esc or Enter while the overlay is open but doesn't have the keyboard focus: nothing else would see it.
+        if (vk is VK_ESCAPE or VK_RETURN && !chord.Ctrl && !chord.Shift && !chord.Alt && OverlaySession.HandleKeyWithoutFocus(vk))
         {
             _swallowingKeyUp = vk;
             return true;
