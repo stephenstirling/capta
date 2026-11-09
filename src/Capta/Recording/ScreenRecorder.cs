@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Capta.Capture;
 using Capta.Services;
@@ -33,7 +32,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
     private readonly Lock _audioLock = new();
     private WasapiSource? _system;
     private WasapiSource? _mic;
-    private readonly Stopwatch _clock = new();
+    private readonly RecordingTimeline _timeline = new();
     private readonly Lock _frameLock = new();
     private readonly CancellationTokenSource _stop = new();
     private readonly string _path;
@@ -43,7 +42,6 @@ public sealed class ScreenRecorder : IAsyncDisposable
     private IDirect3DSurface? _lastSent;        // repeated when the screen doesn't change
     private TaskCompletionSource _frameArrived = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private TaskCompletionSource _resume = CompletedSignal();
-    private volatile bool _paused;
     private TimeSpan _lastFrameTime = TimeSpan.FromSeconds(-1); // not MinValue: now - MinValue overflows
     private long _audioBlocks;
     private Task? _transcode;
@@ -51,18 +49,22 @@ public sealed class ScreenRecorder : IAsyncDisposable
     public string Path => _path;
     public int Width => _crop.Width;
     public int Height => _crop.Height;
-    public TimeSpan Elapsed => _clock.Elapsed;
-    public bool IsPaused => _paused;
+    public TimeSpan Elapsed => _timeline.Elapsed;
+    public bool IsPaused => _timeline.IsPaused;
 
     /// <summary>Pauses the media timeline and mutes/drains audio until resumed.</summary>
     public void Pause()
     {
-        if (_paused || _stop.IsCancellationRequested) return;
-        _resume = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        _paused = true;
-        _clock.Stop();
         lock (_audioLock)
         {
+            if (_stop.IsCancellationRequested || _timeline.IsPaused) return;
+            var resumeSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            _resume = resumeSignal;
+            if (!_timeline.Pause())
+            {
+                resumeSignal.TrySetResult();
+                return;
+            }
             if (_system is not null) _system.Muted = true;
             if (_mic is not null) _mic.Muted = true;
         }
@@ -72,14 +74,12 @@ public sealed class ScreenRecorder : IAsyncDisposable
     /// <summary>Resumes capture without including the paused interval or its audio.</summary>
     public void Resume()
     {
-        if (!_paused || _stop.IsCancellationRequested) return;
         lock (_audioLock)
         {
+            if (_stop.IsCancellationRequested || !_timeline.Resume()) return;
             if (_system is not null) _system.Muted = false;
             if (_mic is not null) _mic.Muted = false;
         }
-        _clock.Start();
-        _paused = false;
         _resume.TrySetResult();
     }
 
@@ -92,10 +92,10 @@ public sealed class ScreenRecorder : IAsyncDisposable
 
     private async Task WaitWhilePausedAsync()
     {
-        while (_paused && !_stop.IsCancellationRequested)
+        while (_timeline.IsPaused && !_stop.IsCancellationRequested)
         {
             var resume = _resume.Task;
-            if (_paused) await resume.WaitAsync(_stop.Token);
+            if (_timeline.IsPaused) await resume.WaitAsync(_stop.Token);
         }
     }
     public bool SystemAudio => _system is not null;
@@ -121,6 +121,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
             {
                 source = WasapiSource.TryOpen(loopback);
                 source?.Start();
+                if (source is not null && _timeline.IsPaused) source.Muted = true;
             }
             else if (!on && source is not null)
             {
@@ -191,7 +192,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
             throw new InvalidOperationException($"Can't record video: {prepared.FailureReason}.");
 
         _session.StartCapture();
-        _clock.Start();
+        _timeline.Start();
         _transcode = RunTranscodeAsync(prepared, output);
     }
 
@@ -231,8 +232,8 @@ public sealed class ScreenRecorder : IAsyncDisposable
     private void OnFrameArrived(Direct3D11CaptureFramePool pool, object _)
     {
         using var frame = pool.TryGetNextFrame();
-        if (frame is null || _stop.IsCancellationRequested || _paused) return;
-        var now = _clock.Elapsed;
+        if (frame is null || _stop.IsCancellationRequested || _timeline.IsPaused) return;
+        var now = _timeline.Elapsed;
         if (now - _lastFrameTime < FrameInterval * 0.9) return; // throttle to the frame rate
         _lastFrameTime = now;
         try
@@ -296,7 +297,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
             // Nothing captured yet: wait for the first frame.
             return await NextVideoSampleAsync();
         }
-        return MediaStreamSample.CreateFromDirect3D11Surface(surface, _clock.Elapsed);
+        return MediaStreamSample.CreateFromDirect3D11Surface(surface, _timeline.Elapsed);
     }
 
     /// <summary>The next 10 ms of mixed audio, paced to real time; null at the end.</summary>
@@ -306,7 +307,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
         if (_stop.IsCancellationRequested) return null;
         var timestamp = AudioBlock * _audioBlocks;
         var due = timestamp + AudioBlock;
-        var wait = due - _clock.Elapsed;
+        var wait = due - _timeline.Elapsed;
         if (wait > TimeSpan.Zero)
         {
             try { await Task.Delay(wait, _stop.Token); }
@@ -335,10 +336,10 @@ public sealed class ScreenRecorder : IAsyncDisposable
     /// <summary>Stops recording and finishes the file. Returns the length recorded.</summary>
     public async Task<TimeSpan> StopAsync()
     {
-        var length = _clock.Elapsed;
+        var length = _timeline.Elapsed;
         _stop.Cancel();
         _resume.TrySetResult();
-        _clock.Stop();
+        _timeline.Stop();
         lock (_frameLock) _frameArrived.TrySetResult();
         _session.Dispose();
         _pool.Dispose();
