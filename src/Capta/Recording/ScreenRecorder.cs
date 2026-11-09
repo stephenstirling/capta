@@ -42,6 +42,8 @@ public sealed class ScreenRecorder : IAsyncDisposable
     private IDirect3DSurface? _latest;          // newest cropped frame, not yet sent
     private IDirect3DSurface? _lastSent;        // repeated when the screen doesn't change
     private TaskCompletionSource _frameArrived = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private TaskCompletionSource _resume = CompletedSignal();
+    private volatile bool _paused;
     private TimeSpan _lastFrameTime = TimeSpan.FromSeconds(-1); // not MinValue: now - MinValue overflows
     private long _audioBlocks;
     private Task? _transcode;
@@ -50,6 +52,52 @@ public sealed class ScreenRecorder : IAsyncDisposable
     public int Width => _crop.Width;
     public int Height => _crop.Height;
     public TimeSpan Elapsed => _clock.Elapsed;
+    public bool IsPaused => _paused;
+
+    /// <summary>Pauses the media timeline and mutes/drains audio until resumed.</summary>
+    public void Pause()
+    {
+        if (_paused || _stop.IsCancellationRequested) return;
+        _resume = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        _paused = true;
+        _clock.Stop();
+        lock (_audioLock)
+        {
+            if (_system is not null) _system.Muted = true;
+            if (_mic is not null) _mic.Muted = true;
+        }
+        lock (_frameLock) _frameArrived.TrySetResult();
+    }
+
+    /// <summary>Resumes capture without including the paused interval or its audio.</summary>
+    public void Resume()
+    {
+        if (!_paused || _stop.IsCancellationRequested) return;
+        lock (_audioLock)
+        {
+            if (_system is not null) _system.Muted = false;
+            if (_mic is not null) _mic.Muted = false;
+        }
+        _clock.Start();
+        _paused = false;
+        _resume.TrySetResult();
+    }
+
+    private static TaskCompletionSource CompletedSignal()
+    {
+        var signal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        signal.SetResult();
+        return signal;
+    }
+
+    private async Task WaitWhilePausedAsync()
+    {
+        while (_paused && !_stop.IsCancellationRequested)
+        {
+            var resume = _resume.Task;
+            if (_paused) await resume.WaitAsync(_stop.Token);
+        }
+    }
     public bool SystemAudio => _system is not null;
     public bool Microphone => _mic is not null;
 
@@ -183,7 +231,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
     private void OnFrameArrived(Direct3D11CaptureFramePool pool, object _)
     {
         using var frame = pool.TryGetNextFrame();
-        if (frame is null || _stop.IsCancellationRequested) return;
+        if (frame is null || _stop.IsCancellationRequested || _paused) return;
         var now = _clock.Elapsed;
         if (now - _lastFrameTime < FrameInterval * 0.9) return; // throttle to the frame rate
         _lastFrameTime = now;
@@ -224,9 +272,12 @@ public sealed class ScreenRecorder : IAsyncDisposable
     /// <summary>The newest frame, or the last one again if the screen hasn't changed; null at the end.</summary>
     private async Task<MediaStreamSample?> NextVideoSampleAsync()
     {
+        await WaitWhilePausedAsync();
+        if (_stop.IsCancellationRequested) return null;
         Task arrived;
         lock (_frameLock) arrived = _frameArrived.Task;
         await Task.WhenAny(arrived, Task.Delay(FrameInterval * 3, _stop.Token).ContinueWith(_ => { }));
+        await WaitWhilePausedAsync();
         if (_stop.IsCancellationRequested) return null;
 
         IDirect3DSurface? surface;
@@ -251,6 +302,8 @@ public sealed class ScreenRecorder : IAsyncDisposable
     /// <summary>The next 10 ms of mixed audio, paced to real time; null at the end.</summary>
     private async Task<MediaStreamSample?> NextAudioSampleAsync()
     {
+        await WaitWhilePausedAsync();
+        if (_stop.IsCancellationRequested) return null;
         var timestamp = AudioBlock * _audioBlocks;
         var due = timestamp + AudioBlock;
         var wait = due - _clock.Elapsed;
@@ -259,6 +312,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
             try { await Task.Delay(wait, _stop.Token); }
             catch (TaskCanceledException) { return null; }
         }
+        await WaitWhilePausedAsync();
         if (_stop.IsCancellationRequested) return null;
 
         var mix = new float[AudioBlockFrames * WasapiSource.Channels];
@@ -283,6 +337,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
     {
         var length = _clock.Elapsed;
         _stop.Cancel();
+        _resume.TrySetResult();
         _clock.Stop();
         lock (_frameLock) _frameArrived.TrySetResult();
         _session.Dispose();

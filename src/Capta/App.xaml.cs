@@ -363,6 +363,7 @@ public partial class App : Application
             {
                 _recordBar = new RecordingBarWindow();
                 _recordBar.StopRequested += async () => await StopRecordingAsync();
+                _recordBar.PauseRequested += TogglePauseRecording;
                 _recordBar.SystemAudioChanged = on =>
                 {
                     Settings.RecordSystemAudio = on;
@@ -394,6 +395,15 @@ public partial class App : Application
         {
             _recordingBusy = false;
         }
+    }
+
+    private void TogglePauseRecording()
+    {
+        if (_recorder is not { } recorder || _recordingBusy) return;
+        if (recorder.IsPaused) recorder.Resume();
+        else recorder.Pause();
+        _recordBar?.SetPaused(recorder.IsPaused);
+        Log.Info(recorder.IsPaused ? "Recording paused" : "Recording resumed");
     }
 
     private async Task StopRecordingAsync()

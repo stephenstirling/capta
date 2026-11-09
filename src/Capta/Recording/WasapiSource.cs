@@ -63,8 +63,21 @@ internal sealed unsafe partial class WasapiSource : IDisposable
     private readonly Thread _thread;
     private volatile bool _running;
 
+    private bool _muted;
+
     /// <summary>When set, the device is still drained but contributes silence.</summary>
-    public bool Muted { get; set; }
+    public bool Muted
+    {
+        get { lock (_buffer) return _muted; }
+        set
+        {
+            lock (_buffer)
+            {
+                _muted = value;
+                _buffer.Clear(); // discard audio captured across a pause boundary
+            }
+        }
+    }
 
     private WasapiSource(nint client, nint capture, string name)
     {
@@ -144,7 +157,7 @@ internal sealed unsafe partial class WasapiSource : IDisposable
             for (var i = 0; i < n; i++)
             {
                 var v = _buffer.Dequeue();
-                if (!Muted) mix[i] += v;
+                if (!_muted) mix[i] += v;
             }
         }
     }
