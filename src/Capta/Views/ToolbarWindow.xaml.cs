@@ -158,6 +158,12 @@ public sealed partial class ToolbarWindow : Window
     {
         foreach (var b in ModeButtons)
             b.IsChecked = (string)b.Tag == mode.ToString();
+
+        var recording = mode == CaptureMode.Recording;
+        NewText.Text = recording ? "Start" : "New";
+        NewCaptureIcon.Visibility = recording ? Visibility.Collapsed : Visibility.Visible;
+        StartRecordingIcon.Visibility = recording ? Visibility.Visible : Visibility.Collapsed;
+        ToolTipService.SetToolTip(NewButton, recording ? "Start video recording" : "New capture");
     }
 
     private void OnModeClick(object sender, RoutedEventArgs e)
