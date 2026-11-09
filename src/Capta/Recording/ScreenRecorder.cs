@@ -42,7 +42,6 @@ public sealed class ScreenRecorder : IAsyncDisposable
     private IDirect3DSurface? _lastSent;        // repeated when the screen doesn't change
     private TaskCompletionSource _frameArrived = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private TaskCompletionSource _resume = CompletedSignal();
-    private volatile bool _paused;
     private TimeSpan _lastFrameTime = TimeSpan.FromSeconds(-1); // not MinValue: now - MinValue overflows
     private long _audioBlocks;
     private Task? _transcode;
@@ -291,7 +290,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
             // Nothing captured yet: wait for the first frame.
             return await NextVideoSampleAsync();
         }
-        return MediaStreamSample.CreateFromDirect3D11Surface(surface, _clock.Elapsed);
+        return MediaStreamSample.CreateFromDirect3D11Surface(surface, _timeline.Elapsed);
     }
 
     /// <summary>The next 10 ms of mixed audio, paced to real time; null at the end.</summary>
