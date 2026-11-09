@@ -54,6 +54,30 @@ public class RecordingTimelineTests
     }
 
     [Fact]
+    public void MultiplePauseCyclesEachFreezeOnlyTheirOwnInterval()
+    {
+        var timeline = new RecordingTimeline();
+        timeline.Start();
+        Thread.Sleep(30);
+        Assert.True(timeline.Pause());
+        var firstPause = timeline.Elapsed;
+        Thread.Sleep(40);
+        Assert.Equal(firstPause, timeline.Elapsed);
+
+        Assert.True(timeline.Resume());
+        Thread.Sleep(30);
+        Assert.True(timeline.Pause());
+        var secondPause = timeline.Elapsed;
+        Assert.True(secondPause > firstPause);
+        Thread.Sleep(40);
+        Assert.Equal(secondPause, timeline.Elapsed);
+
+        Assert.True(timeline.Resume());
+        Thread.Sleep(30);
+        Assert.True(timeline.Elapsed > secondPause);
+    }
+
+    [Fact]
     public void StopWhilePausedIsTerminalAndIdempotent()
     {
         var timeline = new RecordingTimeline();
