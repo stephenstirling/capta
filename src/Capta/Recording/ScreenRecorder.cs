@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Capta.Capture;
 using Capta.Services;
@@ -33,7 +32,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
     private readonly Lock _audioLock = new();
     private WasapiSource? _system;
     private WasapiSource? _mic;
-    private readonly Stopwatch _clock = new();
+    private readonly RecordingTimeline _timeline = new();
     private readonly Lock _frameLock = new();
     private readonly CancellationTokenSource _stop = new();
     private readonly string _path;
@@ -51,18 +50,15 @@ public sealed class ScreenRecorder : IAsyncDisposable
     public string Path => _path;
     public int Width => _crop.Width;
     public int Height => _crop.Height;
-    public TimeSpan Elapsed => _clock.Elapsed;
-    public bool IsPaused => _paused;
+    public TimeSpan Elapsed => _timeline.Elapsed;
+    public bool IsPaused => _timeline.IsPaused;
 
     /// <summary>Pauses the media timeline and mutes/drains audio until resumed.</summary>
     public void Pause()
     {
-        if (_paused || _stop.IsCancellationRequested) return;
-        _resume = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        _paused = true;
-        _clock.Stop();
         lock (_audioLock)
         {
+            if (_stop.IsCancellationRequested || !_timeline.Pause()) return;
             if (_system is not null) _system.Muted = true;
             if (_mic is not null) _mic.Muted = true;
         }
@@ -72,14 +68,12 @@ public sealed class ScreenRecorder : IAsyncDisposable
     /// <summary>Resumes capture without including the paused interval or its audio.</summary>
     public void Resume()
     {
-        if (!_paused || _stop.IsCancellationRequested) return;
         lock (_audioLock)
         {
+            if (_stop.IsCancellationRequested || !_timeline.Resume()) return;
             if (_system is not null) _system.Muted = false;
             if (_mic is not null) _mic.Muted = false;
         }
-        _clock.Start();
-        _paused = false;
         _resume.TrySetResult();
     }
 
@@ -92,10 +86,10 @@ public sealed class ScreenRecorder : IAsyncDisposable
 
     private async Task WaitWhilePausedAsync()
     {
-        while (_paused && !_stop.IsCancellationRequested)
+        while (_timeline.IsPaused && !_stop.IsCancellationRequested)
         {
             var resume = _resume.Task;
-            if (_paused) await resume.WaitAsync(_stop.Token);
+            if (_timeline.IsPaused) await resume.WaitAsync(_stop.Token);
         }
     }
     public bool SystemAudio => _system is not null;
@@ -121,6 +115,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
             {
                 source = WasapiSource.TryOpen(loopback);
                 source?.Start();
+                if (source is not null && _timeline.IsPaused) source.Muted = true;
             }
             else if (!on && source is not null)
             {
@@ -191,7 +186,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
             throw new InvalidOperationException($"Can't record video: {prepared.FailureReason}.");
 
         _session.StartCapture();
-        _clock.Start();
+        _timeline.Start();
         _transcode = RunTranscodeAsync(prepared, output);
     }
 
@@ -231,8 +226,8 @@ public sealed class ScreenRecorder : IAsyncDisposable
     private void OnFrameArrived(Direct3D11CaptureFramePool pool, object _)
     {
         using var frame = pool.TryGetNextFrame();
-        if (frame is null || _stop.IsCancellationRequested || _paused) return;
-        var now = _clock.Elapsed;
+        if (frame is null || _stop.IsCancellationRequested || _timeline.IsPaused) return;
+        var now = _timeline.Elapsed;
         if (now - _lastFrameTime < FrameInterval * 0.9) return; // throttle to the frame rate
         _lastFrameTime = now;
         try
@@ -338,7 +333,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
         var length = _clock.Elapsed;
         _stop.Cancel();
         _resume.TrySetResult();
-        _clock.Stop();
+        _timeline.Stop();
         lock (_frameLock) _frameArrived.TrySetResult();
         _session.Dispose();
         _pool.Dispose();
