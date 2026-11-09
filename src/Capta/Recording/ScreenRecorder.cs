@@ -300,7 +300,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
         if (_stop.IsCancellationRequested) return null;
         var timestamp = AudioBlock * _audioBlocks;
         var due = timestamp + AudioBlock;
-        var wait = due - _clock.Elapsed;
+        var wait = due - _timeline.Elapsed;
         if (wait > TimeSpan.Zero)
         {
             try { await Task.Delay(wait, _stop.Token); }
@@ -329,7 +329,7 @@ public sealed class ScreenRecorder : IAsyncDisposable
     /// <summary>Stops recording and finishes the file. Returns the length recorded.</summary>
     public async Task<TimeSpan> StopAsync()
     {
-        var length = _clock.Elapsed;
+        var length = _timeline.Elapsed;
         _stop.Cancel();
         _resume.TrySetResult();
         _timeline.Stop();
