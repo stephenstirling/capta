@@ -179,10 +179,15 @@ internal sealed unsafe partial class WasapiSource : IDisposable
                     var samples = (int)frames * Channels;
                     lock (_buffer)
                     {
-                        var silent = (flags & AUDCLNT_BUFFERFLAGS_SILENT) != 0;
-                        var src = (float*)data;
-                        for (var i = 0; i < samples; i++)
-                            _buffer.Enqueue(silent ? 0f : src[i]);
+                        // Keep draining WASAPI while paused, but don't accumulate audio that can
+                        // never be part of the recording.
+                        if (!_muted)
+                        {
+                            var silent = (flags & AUDCLNT_BUFFERFLAGS_SILENT) != 0;
+                            var src = (float*)data;
+                            for (var i = 0; i < samples; i++)
+                                _buffer.Enqueue(silent ? 0f : src[i]);
+                        }
                     }
                     ((delegate* unmanaged[Stdcall]<nint, uint, int>)Slot(_capture, Capture_ReleaseBuffer))(_capture, frames);
                 }
