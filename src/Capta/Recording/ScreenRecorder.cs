@@ -57,7 +57,14 @@ public sealed class ScreenRecorder : IAsyncDisposable
     {
         lock (_audioLock)
         {
-            if (_stop.IsCancellationRequested || !_timeline.Pause()) return;
+            if (_stop.IsCancellationRequested || _timeline.IsPaused) return;
+            var resumeSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            _resume = resumeSignal;
+            if (!_timeline.Pause())
+            {
+                resumeSignal.TrySetResult();
+                return;
+            }
             if (_system is not null) _system.Muted = true;
             if (_mic is not null) _mic.Muted = true;
         }
