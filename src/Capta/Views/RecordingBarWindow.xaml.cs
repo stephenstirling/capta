@@ -25,6 +25,8 @@ public sealed partial class RecordingBarWindow : Window
 
     public event Action? StopRequested;
 
+    public event Action? PauseRequested;
+
     /// <summary>The user switched a source; the handler returns whether it's actually on now.</summary>
     public Func<bool, Task<bool>>? SystemAudioChanged { get; set; }
 
@@ -60,6 +62,7 @@ public sealed partial class RecordingBarWindow : Window
     public void Show(RectInt32 recorded, MonitorInfo monitor, Func<TimeSpan> elapsed, bool systemAudio, bool microphone)
     {
         _elapsed = elapsed;
+        SetPaused(false);
         SystemAudioToggle.IsChecked = systemAudio;
         MicToggle.IsChecked = microphone;
         ToolTipService.SetToolTip(StopButton, $"Stop recording ({Shortcuts.For(HotkeyAction.Record).Compact})");
@@ -97,11 +100,24 @@ public sealed partial class RecordingBarWindow : Window
         AppWindow.Hide();
     }
 
+    public void SetPaused(bool paused)
+    {
+        PauseIcon.Visibility = paused ? Visibility.Collapsed : Visibility.Visible;
+        ResumeIcon.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+        PauseText.Text = paused ? "Resume" : "Pause";
+        StateText.Text = paused ? "PAUSED" : "RECORDING";
+        StateText.Foreground = paused
+            ? (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["CaptaAccentTextBrush"]
+            : (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["CaptaRecordBrush"];
+        ToolTipService.SetToolTip(PauseButton, paused ? "Resume recording" : "Pause recording");
+        Tick();
+    }
+
     private void Tick()
     {
         var t = _elapsed?.Invoke() ?? TimeSpan.Zero;
         TimeText.Text = t.TotalHours >= 1 ? t.ToString(@"h\:mm\:ss") : t.ToString(@"m\:ss");
-        Dot.Opacity = t.Milliseconds < 500 ? 1 : 0.35;
+        Dot.Opacity = StateText.Text == "PAUSED" ? 0.55 : t.Milliseconds < 500 ? 1 : 0.35;
     }
 
     private async void OnSystemAudio(object sender, RoutedEventArgs e)
@@ -115,6 +131,8 @@ public sealed partial class RecordingBarWindow : Window
         var want = MicToggle.IsChecked == true;
         if (MicrophoneChanged is not null) MicToggle.IsChecked = await MicrophoneChanged(want);
     }
+
+    private void OnPause(object sender, RoutedEventArgs e) => PauseRequested?.Invoke();
 
     private void OnStop(object sender, RoutedEventArgs e) => StopRequested?.Invoke();
 
