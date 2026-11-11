@@ -393,6 +393,9 @@ public sealed partial class OverlayWindow : Window
         e.Handled = true;
     }
 
+    /// <summary>A menu or flyout is open on this overlay.</summary>
+    internal bool HasOpenPopup => VisualTreeHelper.GetOpenPopupsForXamlRoot(Root.XamlRoot).Count > 0;
+
     internal bool CanFinishWithEnter => IsRegionLike && HasSelection;
 
     internal void FinishWithEnter() => CompleteSelection();

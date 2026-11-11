@@ -176,7 +176,7 @@ public sealed partial class ToolbarWindow : Window
 
     private void OnNew(object sender, RoutedEventArgs e)
     {
-        Hide();
+        // Capta hides the toolbar when the capture starts and brings it back afterwards.
         CaptureRequested?.Invoke(Settings.ToolbarMode, Settings.CaptureDelaySeconds);
     }
 

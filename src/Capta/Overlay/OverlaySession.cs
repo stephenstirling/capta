@@ -82,23 +82,28 @@ public sealed class OverlaySession
     }
 
     /// <summary>
-    /// Esc and Enter for when the overlay doesn't have keyboard focus (Windows can refuse to move it to a window
-    /// opened from a shortcut or another app's input), so the key never reaches the overlay's own handler. Esc
-    /// clears a selection, then cancels; Enter finishes a selection (which is how Record and Scrolling start).
-    /// False if the key isn't needed, or the overlay already has the focus.
+    /// Esc and Enter while an overlay is open, handled here rather than by the overlay's own key handler, which
+    /// doesn't see them when Windows hasn't given the overlay the keyboard focus (as can happen for a window opened
+    /// from a shortcut or another app's input). Esc clears a selection, then cancels; Enter finishes a selection
+    /// (which is how Record and Scrolling start). False if the key isn't needed, or a menu is open and should get it.
     /// </summary>
-    public static bool HandleKeyWithoutFocus(int vk)
+    public static bool HandleKey(int vk)
     {
         if (s_active is not { } session) return false;
-        var foreground = NativeMethods.GetForegroundWindow();
-        if (session._windows.Any(w => w.GetHwnd() == foreground)) return false; // its own key handler gets the key
+        if (session._windows.Any(w => w.HasOpenPopup)) return false; // Esc closes the menu first
 
         // Posted, not run here: this is called from the keyboard hook, which must return at once.
         var queue = DispatcherQueue.GetForCurrentThread();
         if (vk == NativeMethods.VK_ESCAPE)
+        {
+            Log.Info($"Esc handled for the overlay (it has the keyboard focus: {session._windows.Any(w => w.GetHwnd() == NativeMethods.GetForegroundWindow())})");
             return queue.TryEnqueue(session.EscapePressed);
+        }
         if (vk == NativeMethods.VK_RETURN && session._windows.FirstOrDefault(w => w.CanFinishWithEnter) is { } window)
+        {
+            Log.Info("Enter handled for the overlay");
             return queue.TryEnqueue(window.FinishWithEnter);
+        }
         return false;
     }
 
