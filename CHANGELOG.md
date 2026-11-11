@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- **Esc and Enter work in the capture overlay** whether or not Windows has given it the keyboard focus. Esc clears
+  a selection, then cancels the capture; Enter starts a Record or Scrolling capture once an area is chosen.
+- **The floating toolbar comes back after a capture started from its New button**, as it does for shortcuts.
+
 ## 1.1.1
 
 - **Esc cancels a capture again** when the capture overlay doesn't have the keyboard focus, which could happen
