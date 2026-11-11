@@ -368,8 +368,8 @@ public sealed partial class OverlayWindow : Window
                 if (!TryClearSelectionForEscape())
                     _session.Cancel();
                 break;
-            case VirtualKey.Enter when IsRegionLike && HasSelection:
-                CompleteSelection();
+            case VirtualKey.Enter when CanFinishWithEnter:
+                FinishWithEnter();
                 break;
             case VirtualKey.Space:
                 _spaceDown = true;
@@ -392,6 +392,13 @@ public sealed partial class OverlayWindow : Window
         }
         e.Handled = true;
     }
+
+    /// <summary>A menu or flyout is open on this overlay.</summary>
+    internal bool HasOpenPopup => VisualTreeHelper.GetOpenPopupsForXamlRoot(Root.XamlRoot).Count > 0;
+
+    internal bool CanFinishWithEnter => IsRegionLike && HasSelection;
+
+    internal void FinishWithEnter() => CompleteSelection();
 
     /// <summary>
     /// The first Esc clears a selection that's being drawn or adjusted, so you can start again without leaving
