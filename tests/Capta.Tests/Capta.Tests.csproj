@@ -38,6 +38,7 @@
     <Compile Include="..\..\src\Capta\Interop\NativeMethods.cs" Link="App\NativeMethods.cs" />
     <Compile Include="..\..\src\Capta\Services\CaptureText.cs" Link="App\CaptureText.cs" />
     <Compile Include="..\..\src\Capta\Services\Chord.cs" Link="App\Chord.cs" />
+    <Compile Include="..\..\src\Capta\Services\IntegraManagement.cs" Link="App\IntegraManagement.cs" />
     <Compile Include="..\..\src\Capta\Services\Log.cs" Link="App\Log.cs" />
     <Compile Include="..\..\src\Capta\Services\PersonalInfo.cs" Link="App\PersonalInfo.cs" />
     <Compile Include="..\..\src\Capta\Services\Redaction.cs" Link="App\Redaction.cs" />

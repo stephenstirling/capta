@@ -60,7 +60,23 @@ function Find-SignTool {
 }
 
 # ---- 1. Certificate ----
-$cert = Get-SigningCertificate
+if ($env:CAPTA_SIGNING_PFX) {
+    # The release workflow passes the repository's one signing certificate (docs/releasing.md): every release is
+    # signed with it, so a PC that has trusted it once never needs to again.
+    $pfx = Join-Path ([IO.Path]::GetTempPath()) ('capta-signing-' + [guid]::NewGuid() + '.pfx')
+    try {
+        [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CAPTA_SIGNING_PFX))
+        $password = ConvertTo-SecureString $env:CAPTA_SIGNING_PFX_PASSWORD -AsPlainText -Force
+        $cert = Import-PfxCertificate -FilePath $pfx -CertStoreLocation Cert:\CurrentUser\My -Password $password |
+            Select-Object -First 1
+    }
+    finally { Remove-Item $pfx -Force -ErrorAction SilentlyContinue }
+    if (-not $cert -or -not $cert.HasPrivateKey) { throw 'CAPTA_SIGNING_PFX has no private key.' }
+    if ($cert.Subject -ne $subject) { throw "The signing certificate is for '$($cert.Subject)', but the package's Publisher is '$subject'." }
+    if ($cert.NotAfter -lt (Get-Date).AddDays(30)) { throw "The signing certificate expires on $($cert.NotAfter.ToString('yyyy-MM-dd')). Make a new one (tools/selfsign/New-SigningCertificate.ps1)." }
+    Write-Host "Using the repository's signing certificate."
+}
+else { $cert = Get-SigningCertificate }
 if (-not $cert) {
     Write-Host "Creating a self-signed certificate for $subject (valid 5 years, stored for this user only)..."
     $cert = New-SelfSignedCertificate -Type Custom -Subject $subject -KeyUsage DigitalSignature `
