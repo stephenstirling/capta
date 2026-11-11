@@ -32,14 +32,29 @@ The `installer` job in the release workflow builds `Capta-Setup-<version>-x64.ex
 the draft release (a manual run of the workflow keeps it as the `capta-setup` artifact instead).
 
 - **What it is.** `tools/selfsign/Build-SelfSigned.ps1 -SkipInstall` builds the Release x64 bundle and signs it with a
-  certificate it creates on the runner. `installer/Capta.iss` (Inno Setup) wraps the bundle and the public `.cer` in
-  a setup program. Setup trusts the certificate in the PC's Trusted People store as an administrator, then installs
-  the bundle as the user who ran it (`installer/Install-Capta.ps1`). It doesn't install files of its own, so there's
-  no uninstaller of its own: Capta is removed from Installed apps like any package.
-- **Why the key is safe.** The certificate's private key exists only on that runner and is gone when the job ends,
-  so a trusted certificate can't be used to sign anything else, and every release has a new one. Packages from
-  different releases still update each other: Windows matches them by the publisher name in the manifest
-  (`CN=StephenStirling`), not by the certificate.
+  certificate (see below for which). `installer/Capta.iss` (Inno Setup) wraps the bundle and the public `.cer` in a
+  setup program. Setup checks whether the PC already trusts the certificate; if not, it adds it to Trusted People
+  (Windows asks for administrator approval, for that step only), then installs the bundle as the user who ran it
+  (`installer/Install-Capta.ps1`). It doesn't install files of its own, so there's no uninstaller of its own: Capta
+  is removed from Installed apps like any package.
+- **Which certificate.** With the repository secrets `CAPTA_SIGNING_PFX` and `CAPTA_SIGNING_PFX_PASSWORD` set, every
+  release is signed with that one certificate. A PC that trusted it once is never asked again, so setup runs without
+  an approval prompt, which is what lets Integra update Capta quietly. Without the secrets the job makes a
+  throwaway certificate for each release (the PC is asked every time).
+- **Setting up the one certificate.** On your own PC, in a normal PowerShell, run
+  `.\tools\selfsign\New-SigningCertificate.ps1`. It writes a PFX and prints exactly what to save as the two
+  repository secrets (Settings > Secrets and variables > Actions), then how to delete the files. The next tagged
+  release uses it. To replace it (it lasts 10 years, or if the key may have leaked), run the script again, save the
+  new secrets, and remove the old certificate from Trusted People on PCs that have it
+  ([selfsigned-install.md](selfsigned-install.md) has the commands).
+- **What the one certificate trusts.** Windows accepts any package signed by a certificate in Trusted People. With
+  one certificate for every release, the private key lives in a GitHub secret, so whoever can change this
+  repository's workflows or secrets could sign a package that PCs trusting it install without a warning. Keep the
+  repository's access small, turn on two-factor sign-in, and don't hand the PFX to anyone. Throwaway certificates
+  avoid this, at the cost of an approval prompt on each install.
+- **Why throwaway keys were safe.** The key existed only on that runner and was gone when the job ended, so a
+  trusted certificate couldn't sign anything else. Packages from different releases still update each other:
+  Windows matches them by the publisher name in the manifest (`CN=StephenStirling`), not by the certificate.
 - **What users see.** SmartScreen warns about an unrecognised publisher, because the setup program itself isn't
   signed by a certificate Windows trusts. The release notes and README say so. Some antivirus products are also wary
   of unsigned installers; if one flags it, report it to the vendor.

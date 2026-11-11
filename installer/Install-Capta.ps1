@@ -3,11 +3,12 @@
     The two steps behind Capta-Setup.exe. Run by the setup program, not by hand.
 
 .PARAMETER Step
+    Check   - exit 0 if this PC already trusts the release's certificate, 3 if it doesn't (needs nothing special).
     Trust   - add the release's certificate to this PC's Trusted People store (needs administrator).
     Install - replace any installed Capta with the bundle and start it (runs as the user who ran setup).
 #>
 param(
-    [Parameter(Mandatory)][ValidateSet('Trust', 'Install')][string]$Step,
+    [Parameter(Mandatory)][ValidateSet('Check', 'Trust', 'Install')][string]$Step,
     [Parameter(Mandatory)][string]$Folder,
     [string]$PackageName = 'StephenStirling.Capta'
 )
@@ -21,10 +22,17 @@ $env:PSModulePath = (@([Environment]::GetEnvironmentVariable('PSModulePath', 'Ma
         [Environment]::GetEnvironmentVariable('PSModulePath', 'User')) | Where-Object { $_ }) -join ';'
 
 try {
-    if ($Step -eq 'Trust') {
+    if ($Step -in 'Check', 'Trust') {
         # The certificate store directly (no Cert: drive, which isn't always available).
         $certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 (Join-Path $Folder 'Capta.cer')
         $store = New-Object System.Security.Cryptography.X509Certificates.X509Store('TrustedPeople', 'LocalMachine')
+        if ($Step -eq 'Check') {
+            # Reading the store needs no administrator. A release signed with the repository's one certificate is
+            # trusted already after the first time, so setup then never asks for administrator approval.
+            $store.Open('ReadOnly')
+            try { $trusted = $store.Certificates.Find('FindByThumbprint', $certificate.Thumbprint, $false).Count -gt 0 } finally { $store.Close() }
+            exit $(if ($trusted) { 0 } else { 3 })
+        }
         $store.Open('ReadWrite')
         try { $store.Add($certificate) } finally { $store.Close() }
     }

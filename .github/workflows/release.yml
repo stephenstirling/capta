@@ -135,6 +135,11 @@ jobs:
 
       - name: Build and self-sign the bundle (x64)
         shell: pwsh
+        # The repository's one signing certificate when both secrets exist (docs/releasing.md); otherwise a
+        # throwaway certificate for this release.
+        env:
+          CAPTA_SIGNING_PFX: ${{ secrets.CAPTA_SIGNING_PFX }}
+          CAPTA_SIGNING_PFX_PASSWORD: ${{ secrets.CAPTA_SIGNING_PFX_PASSWORD }}
         run: ./tools/selfsign/Build-SelfSigned.ps1 -SkipInstall -OutputDir "$env:RUNNER_TEMP\selfsigned"
 
       - name: Install Inno Setup

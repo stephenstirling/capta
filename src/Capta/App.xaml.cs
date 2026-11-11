@@ -158,6 +158,14 @@ public partial class App : Application
         var now = DateTimeOffset.UtcNow;
         if (AboutInfo.IsStoreBuild || !Settings.CheckForUpdates || !UpdateSchedule.IsDue(Settings.LastUpdateCheck, now))
             return;
+        if (IntegraManagement.IsManagedByIntegra())
+        {
+            // Integra installed Capta and updates it: no second update card from here. Check now (tray menu,
+            // Settings) still works.
+            Log.Info("Updates are handled by Integra; the daily update check is skipped");
+            Settings.LastUpdateCheck = now;
+            return;
+        }
         Settings.LastUpdateCheck = now; // an attempt counts, so a failure isn't retried until tomorrow
         try
         {

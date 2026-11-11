@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.3
+
+- **Integra can update Capta quietly.** Capta's own daily update check is skipped when Integra installed Capta, so
+  there is one update prompt, not two. "Check for updates" in the tray menu and Settings still works.
+- **Setup asks for administrator approval only when needed.** If this PC already trusts the release's
+  certificate, setup installs without an approval prompt. Releases signed with the repository's one certificate
+  need the approval the first time only.
+
 ## 1.1.2
 
 - **Esc and Enter work in the capture overlay** whether or not Windows has given it the keyboard focus. Esc clears
